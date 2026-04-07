@@ -31,7 +31,7 @@
             z-index: 1; /* اللعبة في الطبقة السفلية */
         }
 
-        #btn-beta, #btn-wss, #btn-fans {
+        #btn-beta, #btn-wss {
             position: fixed;
             top: 50%;
             right: 20px;
@@ -50,9 +50,27 @@
             background: #222;
         }
 
-        #btn-wss, #btn-fans {
+        #btn-wss {
             background: #007bff;
-            display: none; /* مخفي حتى ينتهي التحميل أو يحين دوره */
+            display: none; /* مخفي حتى ينتهي التحميل */
+        }
+
+        /* تنسيق زر Fans الجديد ليكون أسفل الزر الأول بشكل أنيق */
+        #btn-fans {
+            position: fixed;
+            top: calc(50% + 55px); /* تم وضعه أسفل الزر الأول بقليل */
+            right: 20px;
+            transform: translateY(-50%);
+            padding: 10px 16px;
+            color: #fff;
+            background: #ff4757; /* لون مميز واحترافي */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 999999;
+            font-size: 16px;
+            font-family: sans-serif;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); /* إضافة ظل خفيف للأناقة */
         }
 
         #loading-screen {
@@ -92,12 +110,13 @@
 
     <button id="btn-beta">دخولbeta 2</button>
     <button id="btn-wss">WSS</button>
-    <button id="btn-fans">fans</button>
+    <!-- زر Fans الجديد -->
+    <button id="btn-fans">Fans</button>
 
     <div id="loading-screen">
         <div class="spinner"></div>
-        <h2>يرجى الانتظار</h2>
-        <p>للمعلومية ريماس قامت بتطويرها لكم🌷</p>
+        <h2>يرجى الانتضار</h2>
+        <p>لللمعلوميه ريماس قامت بتطويرها لكم🌷</p>
     </div>
 
     <iframe id="game-frame" src="https://delt.io/" allowfullscreen="true"></iframe>
@@ -105,11 +124,11 @@
     <script>
         const btnBeta = document.getElementById("btn-beta");
         const btnWss = document.getElementById("btn-wss");
-        const btnFans = document.getElementById("btn-fans");
         const loadingScreen = document.getElementById("loading-screen");
+        const btnFans = document.getElementById("btn-fans"); // تعريف الزر الجديد
         
         let lastWSS = "";
-        let fansTab = null; // متغير لحفظ مسار الصفحة الثانية لمنع التكرار
+        let fansTabWindow = null; // متغير لحفظ حالة التبويب الثاني
 
         // التقاط أي WebSocket يتم فتحه
         const OriginalWebSocket = window.WebSocket;
@@ -156,10 +175,6 @@
                 try {
                     document.execCommand("copy");
                     alert("تم نسخ: " + lastWSS);
-                    
-                    // بعد إتمام المهمة بنجاح، إخفاء زر WSS وإظهار زر fans
-                    btnWss.style.display = "none";
-                    btnFans.style.display = "block";
                 } catch (err) {
                     console.error("فشل النسخ", err);
                 }
@@ -169,17 +184,18 @@
             }
         });
 
-        // مهمة زر fans (فتح صفحة واحدة فقط والتبديل إليها)
+        // برمجة زر Fans الجديد
         btnFans.addEventListener("click", () => {
-            const targetUrl = 'https://delt.io/'; 
-            
-            // إذا كانت الصفحة لم تفتح بعد أو تم إغلاقها من قبل المستخدم
-            if (!fansTab || fansTab.closed) {
-                // افتحها في نافذة جديدة (Tab جديد) واعطها اسماً برمجياً
-                fansTab = window.open(targetUrl, 'DeltioSecondPage');
+            // ضع هنا الرابط الذي تريد فتحه في التبويب الثاني
+            const urlToOpen = "https://delt.io/"; 
+
+            // التحقق مما إذا كان التبويب الثاني مفتوحاً مسبقاً ولم يتم إغلاقه
+            if (fansTabWindow && !fansTabWindow.closed) {
+                // إذا كان مفتوحاً، قم بالتبديل إليه فقط
+                fansTabWindow.focus();
             } else {
-                // إذا كانت مفتوحة مسبقاً، قم فقط بالتبديل إليها (Focus)
-                fansTab.focus();
+                // إذا لم يكن مفتوحاً، افتح تبويب جديد باسم ثابت لمنع فتح أكثر من نسخة
+                fansTabWindow = window.open(urlToOpen, "RemasFansTab");
             }
         });
     </script>
