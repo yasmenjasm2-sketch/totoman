@@ -31,7 +31,7 @@
             z-index: 1; /* اللعبة في الطبقة السفلية */
         }
 
-        #btn-beta, #btn-wss {
+        #btn-beta, #btn-wss, #btn-fans {
             position: fixed;
             top: 50%;
             right: 20px;
@@ -50,9 +50,9 @@
             background: #222;
         }
 
-        #btn-wss {
+        #btn-wss, #btn-fans {
             background: #007bff;
-            display: none; /* مخفي حتى ينتهي التحميل */
+            display: none; /* مخفي حتى ينتهي التحميل أو يحين دوره */
         }
 
         #loading-screen {
@@ -92,11 +92,12 @@
 
     <button id="btn-beta">دخولbeta 2</button>
     <button id="btn-wss">WSS</button>
+    <button id="btn-fans">fans</button>
 
     <div id="loading-screen">
         <div class="spinner"></div>
-        <h2>يرجى الانتضار</h2>
-        <p>لللمعلوميه ريماس قامت بتطويرها لكم🌷</p>
+        <h2>يرجى الانتظار</h2>
+        <p>للمعلومية ريماس قامت بتطويرها لكم🌷</p>
     </div>
 
     <iframe id="game-frame" src="https://delt.io/" allowfullscreen="true"></iframe>
@@ -104,9 +105,11 @@
     <script>
         const btnBeta = document.getElementById("btn-beta");
         const btnWss = document.getElementById("btn-wss");
+        const btnFans = document.getElementById("btn-fans");
         const loadingScreen = document.getElementById("loading-screen");
         
         let lastWSS = "";
+        let fansTab = null; // متغير لحفظ مسار الصفحة الثانية لمنع التكرار
 
         // التقاط أي WebSocket يتم فتحه
         const OriginalWebSocket = window.WebSocket;
@@ -153,12 +156,30 @@
                 try {
                     document.execCommand("copy");
                     alert("تم نسخ: " + lastWSS);
+                    
+                    // بعد إتمام المهمة بنجاح، إخفاء زر WSS وإظهار زر fans
+                    btnWss.style.display = "none";
+                    btnFans.style.display = "block";
                 } catch (err) {
                     console.error("فشل النسخ", err);
                 }
                 document.body.removeChild(tempInput);
             } else {
                 alert("لم يتم العثور على WSS بعد، انتظر تحميل اللعبة.");
+            }
+        });
+
+        // مهمة زر fans (فتح صفحة واحدة فقط والتبديل إليها)
+        btnFans.addEventListener("click", () => {
+            const targetUrl = 'https://delt.io/'; 
+            
+            // إذا كانت الصفحة لم تفتح بعد أو تم إغلاقها من قبل المستخدم
+            if (!fansTab || fansTab.closed) {
+                // افتحها في نافذة جديدة (Tab جديد) واعطها اسماً برمجياً
+                fansTab = window.open(targetUrl, 'DeltioSecondPage');
+            } else {
+                // إذا كانت مفتوحة مسبقاً، قم فقط بالتبديل إليها (Focus)
+                fansTab.focus();
             }
         });
     </script>
