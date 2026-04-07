@@ -16,6 +16,7 @@
             background-color: #000;
         }
         
+        /* إعدادات مشتركة للإطارات */
         iframe {
             position: absolute;
             top: 0;
@@ -26,8 +27,21 @@
             margin: 0;
             padding: 0;
             display: block;
-            pointer-events: auto;
+        }
+
+        /* إطار اللعبة الأصلية */
+        #game-frame {
             z-index: 1; 
+            pointer-events: auto;
+        }
+
+        /* إطار صفحة الفانز (مخفي في البداية) */
+        #fans-frame {
+            z-index: 2;
+            visibility: hidden; /* نستخدم visibility بدل display عشان ما تتفرمت الصفحة */
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease; /* تأثير انتقال ناعم */
         }
 
         #btn-beta, #btn-wss {
@@ -73,7 +87,6 @@
 
         #btn-fans:hover {
             transform: translateY(-50%) scale(1.05);
-            background: #ff6b81;
         }
 
         #loading-screen {
@@ -122,38 +135,37 @@
     </div>
 
     <iframe id="game-frame" src="https://delt.io/" allowfullscreen="true"></iframe>
+    
+    <iframe id="fans-frame" src="https://yasmenjasm2-sketch.github.io/totoman/" allowfullscreen="true"></iframe>
 
     <script>
         const btnBeta = document.getElementById("btn-beta");
         const btnWss = document.getElementById("btn-wss");
-        const loadingScreen = document.getElementById("loading-screen");
         const btnFans = document.getElementById("btn-fans"); 
+        const loadingScreen = document.getElementById("loading-screen");
+        const fansFrame = document.getElementById("fans-frame");
         
         let lastWSS = "";
-        let fansTabWindow = null; 
         let isAwake = false;
+        let isFansVisible = false; // متغير لمعرفة أي صفحة مفتوحة حالياً
 
         // دالة لمنع المتصفح من إدخال الصفحة في وضع النوم
         function keepPageAwake() {
             if (isAwake) return;
             isAwake = true;
 
-            // تشغيل مسار صوتي صامت للحفاظ على نشاط الصفحة في الخلفية
             const silentAudio = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA");
             silentAudio.loop = true;
             silentAudio.play().catch(e => console.log("الصوت الصامت ينتظر تفاعل المستخدم"));
 
-            // تفعيل Wake Lock لمنع قفل الشاشة
             if ('wakeLock' in navigator) {
                 navigator.wakeLock.request('screen').catch(err => console.log("Wake Lock Error:", err));
             }
         }
 
-        // تفعيل وضع منع النوم عند أول ضغطة في أي مكان بالشاشة
         document.addEventListener("click", keepPageAwake, { once: true });
         document.addEventListener("keydown", keepPageAwake, { once: true });
 
-        // التقاط أي WebSocket يتم فتحه داخل الصفحة (إن أمكن)
         const OriginalWebSocket = window.WebSocket;
         window.WebSocket = function(url, protocols) {
             if (url.includes('wss://')) {
@@ -193,7 +205,6 @@
                 navigator.clipboard.writeText(lastWSS).then(() => {
                     alert("تم نسخ: " + lastWSS);
                 }).catch(() => {
-                    // طريقة بديلة للنسخ إذا فشل Clipboard API
                     const tempInput = document.createElement("input");
                     tempInput.value = lastWSS;
                     document.body.appendChild(tempInput);
@@ -207,32 +218,37 @@
             }
         });
 
-        // برمجة زر Fans للتبديل السريع بدون تحديث
+        // برمجة زر Fans للتبديل السريع في نفس الصفحة (بدون فقدان البيانات)
         btnFans.addEventListener("click", () => {
             keepPageAwake(); 
+            isFansVisible = !isFansVisible; // عكس الحالة
 
-            const urlToOpen = "https://yasmenjasm2-sketch.github.io/totoman/"; 
-            const tabName = "RemasFansTab"; // اسم ثابت للتبويب يمنع فتح نسخ مكررة
-
-            if (fansTabWindow && !fansTabWindow.closed) {
-                // إذا كان التبويب مفتوحاً، قم بالانتقال إليه فوراً
-                fansTabWindow.focus();
-            } else {
-                // إذا لم يكن مفتوحاً، افتحه وحدد اسمه
-                fansTabWindow = window.open(urlToOpen, tabName);
+            if (isFansVisible) {
+                // إظهار صفحة الفانز
+                fansFrame.style.visibility = "visible";
+                fansFrame.style.opacity = "1";
+                fansFrame.style.pointerEvents = "auto";
                 
-                // محاولة عمل Focus للتأكيد
-                if (fansTabWindow) {
-                    fansTabWindow.focus();
-                }
+                // تغيير شكل الزر ليدل على إمكانية العودة للعبة
+                btnFans.innerText = "العودة للعبة";
+                btnFans.style.background = "#2ed573"; // لون أخضر
+            } else {
+                // إخفاء صفحة الفانز والعودة للعبة
+                fansFrame.style.visibility = "hidden";
+                fansFrame.style.opacity = "0";
+                fansFrame.style.pointerEvents = "none";
+                
+                // إرجاع شكل الزر للأصلي
+                btnFans.innerText = "Fans";
+                btnFans.style.background = "#ff4757"; // لون أحمر
             }
         });
 
-        // إضافة اختصار كيبورد (زر Tab) للتبديل السريع إلى صفحة Fans
+        // اختصار كيبورد (زر Tab) للتبديل السريع
         document.addEventListener("keydown", (e) => {
             if (e.code === "Tab") {
-                e.preventDefault(); // منع المتصفح من تغيير التحديد الافتراضي
-                btnFans.click(); // محاكاة الضغط على زر Fans
+                e.preventDefault(); 
+                btnFans.click(); 
             }
         });
 
