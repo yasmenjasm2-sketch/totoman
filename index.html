@@ -17,13 +17,16 @@
             background-color: #000;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             
-            /* منع النسخ وتحديد النصوص لأجهزة الآيفون */
+            /* أسطر هامة جداً لإصلاح مشاكل الآيفون (منع التحديد، النسخ، والعدسة المكبرة) */
             -webkit-user-select: none;
             user-select: none;
             -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: none; /* يمنع متصفح الآيفون من التفاعل مع سحب الشاشة */
             
-            /* منع السحب المطاطي (البونس) الذي يظهر شريط البحث */
+            /* منع السحب المطاطي (البونس) */
             overscroll-behavior-y: none;
+            overscroll-behavior-x: none;
             position: fixed;
         }
         
@@ -38,12 +41,14 @@
             margin: 0;
             padding: 0;
             display: block;
+            touch-action: none;
         }
 
         /* إطار اللعبة الأصلية */
         #game-frame {
             z-index: 1; 
             pointer-events: auto;
+            transition: opacity 0.3s ease;
         }
 
         /* إطار صفحة الفانز (النسخة الثانية) */
@@ -52,7 +57,7 @@
             visibility: hidden; 
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease; 
+            transition: opacity 0.4s ease, visibility 0.4s; 
         }
 
         /* شاشة البداية الاحترافية */
@@ -68,7 +73,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 99999999; /* أعلى طبقة */
+            z-index: 99999999;
         }
 
         .welcome-box {
@@ -151,51 +156,56 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* تنسيق موحد للأزرار العائمة داخل اللعبة */
-        .action-btn {
+        /* زر بيتا 2 */
+        #btn-beta { 
             position: fixed;
             right: 20px;
+            top: 50%; 
+            transform: translateY(-50%); 
+            background: #222; 
+            border: 1px solid #444;
             padding: 12px 18px;
             color: #fff;
-            border: none;
             border-radius: 8px;
             cursor: pointer;
             z-index: 999999; 
             font-size: 16px;
             font-weight: bold;
             box-shadow: 0 4px 6px rgba(0,0,0,0.4);
-            transition: 0.2s;
-            display: none; /* مخفية في البداية */
+            display: none;
         }
 
-        /* زر بيتا 2 */
-        #btn-beta { 
-            top: 50%; 
-            transform: translateY(-50%); 
-            background: #222; 
-            border: 1px solid #444;
-        }
-
-        /* زر التبديل T */
+        /* زر التبديل T - تصميم احترافي ومناسب للعب */
         #btn-switch {
-            top: 50%; 
-            transform: translateY(-50%);
-            background: #007bff; /* لون أزرق */
-            border-radius: 50%; /* جعله دائرياً ليكون احترافياً */
-            width: 50px;
-            height: 50px;
+            position: fixed;
+            left: 20px; /* تم وضعه على اليسار لتجنب إعاقة أزرار اللعبة */
+            top: 20px; 
+            background: rgba(0, 123, 255, 0.8);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 50%; 
+            width: 55px;
+            height: 55px;
             padding: 0;
             display: none; 
-            font-size: 22px;
+            font-size: 24px;
+            font-weight: bold;
             align-items: center;
             justify-content: center;
+            z-index: 999999;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            -webkit-tap-highlight-color: transparent;
         }
 
-        #btn-switch:hover {
-            transform: translateY(-50%) scale(1.1);
+        #btn-switch:active {
+            transform: scale(0.9);
         }
 
-        /* شاشة التحميل الوهمية */
+        /* شاشة التحميل */
         #loading-screen {
             position: fixed;
             top: 0;
@@ -237,9 +247,9 @@
             <div class="instructions">
                 <h3>تعليمات اللعب الاحترافي:</h3>
                 <ul>
-                    <li>هذا الموقع مدمج به خاصية "الملتي" (تعدد النسخ) ليعمل بكفاءة على <b>الأندرويد والآيفون</b>.</li>
-                    <li>اضغط على زر <b>"دخول beta 2"</b> لتهيئة الشاشة الكاملة وتجهيز السيرفرات.</li>
-                    <li>للتبديل السريع بين النسخة الأصلية ونسخة الفانز، استخدم الزر الأزرق <b>"T"</b> الذي سيظهر لك.</li>
+                    <li>تم إصلاح الشاشة بالكامل للعمل بكفاءة على <b>الأندرويد والآيفون</b> بدون تقطيع أو تحديد شاشة.</li>
+                    <li>اضغط على زر <b>"دخول beta 2"</b> لتهيئة الشاشة الكاملة.</li>
+                    <li>اضغط على حرف <b>"T"</b> الأزرق أعلى يسار الشاشة للتبديل بين النسخ بضغطة واحدة.</li>
                 </ul>
             </div>
             <button id="btn-start" class="btn-start">دخول للعبة الآن</button>
@@ -247,7 +257,8 @@
     </div>
 
     <button id="btn-beta" class="action-btn">دخول beta 2</button>
-    <button id="btn-switch" class="action-btn">T</button>
+    
+    <div id="btn-switch">T</div>
 
     <div id="loading-screen">
         <div class="spinner"></div>
@@ -255,8 +266,8 @@
         <p>للمعلومية ريماس قامت بتطويرها لكم 🌷</p>
     </div>
 
-    <iframe id="game-frame" src="https://delt.io/" allowfullscreen="true"></iframe>
-    <iframe id="fans-frame" src="https://yasmenjasm2-sketch.github.io/totoman/" allowfullscreen="true"></iframe>
+    <iframe id="game-frame" src="https://delt.io/" allowfullscreen="true" scrolling="no"></iframe>
+    <iframe id="fans-frame" src="https://yasmenjasm2-sketch.github.io/totoman/" allowfullscreen="true" scrolling="no"></iframe>
 
     <script>
         const welcomeScreen = document.getElementById("welcome-screen");
@@ -264,10 +275,16 @@
         const btnBeta = document.getElementById("btn-beta");
         const btnSwitch = document.getElementById("btn-switch"); 
         const loadingScreen = document.getElementById("loading-screen");
+        const gameFrame = document.getElementById("game-frame");
         const fansFrame = document.getElementById("fans-frame");
         
         let isAwake = false;
         let isSecondVersion = false; 
+
+        // حلول إضافية للآيفون: منع إيماءات التكبير والتصغير من متصفح سفاري
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
 
         // دالة لمنع المتصفح من إدخال الصفحة في وضع النوم
         function keepPageAwake() {
@@ -290,20 +307,19 @@
         btnStart.addEventListener("click", () => {
             keepPageAwake();
             welcomeScreen.style.display = "none";
-            btnBeta.style.display = "block"; // إظهار زر الدخول للبيتا
+            btnBeta.style.display = "block";
         });
 
         // برمجة زر Beta 2
         btnBeta.addEventListener("click", () => {
             keepPageAwake(); 
 
-            // طلب ملء الشاشة إن أمكن
             try {
                 const docElm = document.documentElement;
                 if (docElm.requestFullscreen) {
                     docElm.requestFullscreen().then(() => {
                         if (screen.orientation && screen.orientation.lock) {
-                            screen.orientation.lock("landscape").catch(e => console.log("توجيه الشاشة غير مدعوم:", e));
+                            screen.orientation.lock("landscape").catch(e => console.log("توجيه الشاشة غير مدعوم"));
                         }
                     }).catch(e => console.log(e));
                 }
@@ -312,40 +328,45 @@
             }
 
             loadingScreen.style.display = "flex";
-            btnBeta.style.display = "none"; // إخفاء زر بيتا للأبد
+            btnBeta.style.display = "none"; 
             
-            // بعد 3 ثواني من التحميل
             setTimeout(() => {
                 loadingScreen.style.display = "none";
-                btnSwitch.style.display = "flex"; // إظهار زر التبديل T
+                btnSwitch.style.display = "flex"; // إظهار الزر الوحيد الاحترافي
             }, 3000);
         });
 
-        // برمجة زر التبديل (T) للتبديل بين اللعبة وصفحة الفانز
+        // برمجة زر التبديل (T) الوحيد للتبديل بين الشاشتين بضغطة واحدة
         btnSwitch.addEventListener("click", () => {
             keepPageAwake(); 
             isSecondVersion = !isSecondVersion; 
 
             if (isSecondVersion) {
-                // الانتقال للنسخة الثانية
+                // الانتقال لنسخة الفانز
                 fansFrame.style.visibility = "visible";
                 fansFrame.style.opacity = "1";
                 fansFrame.style.pointerEvents = "auto";
                 
-                // تغيير لون الزر ليدل على أنك في النسخة الثانية
-                btnSwitch.style.background = "#ff4757"; // أحمر
+                gameFrame.style.pointerEvents = "none";
+
+                // تغيير شكل ولون الزر لتنبيه اللاعب
+                btnSwitch.style.background = "rgba(255, 71, 87, 0.8)"; // لون أحمر
+                btnSwitch.style.boxShadow = "0 4px 15px rgba(255, 71, 87, 0.5)";
             } else {
-                // العودة للنسخة الأولى
+                // العودة للنسخة الأصلية
                 fansFrame.style.visibility = "hidden";
                 fansFrame.style.opacity = "0";
                 fansFrame.style.pointerEvents = "none";
                 
+                gameFrame.style.pointerEvents = "auto";
+
                 // إرجاع اللون الأزرق للزر
-                btnSwitch.style.background = "#007bff"; // أزرق
+                btnSwitch.style.background = "rgba(0, 123, 255, 0.8)"; // لون أزرق
+                btnSwitch.style.boxShadow = "0 4px 15px rgba(0, 0, 0, 0.5)";
             }
         });
 
-        // اختصار كيبورد (زر Tab) للتبديل السريع لأصحاب الكيبوردات
+        // اختصار الكيبورد
         document.addEventListener("keydown", (e) => {
             if (e.code === "Tab" && btnSwitch.style.display !== "none") {
                 e.preventDefault(); 
