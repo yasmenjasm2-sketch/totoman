@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <!-- تسمية الصفحة الأولى بالعلامة الحمراء -->
     <title>🔴 Delt.io - Remas</title>
     <style>
         html, body {
@@ -17,7 +16,6 @@
             background-color: #000;
         }
         
-        /* إعداد الإطار ليكون مرناً ولا يمنع اللمس نهائياً */
         iframe {
             position: absolute;
             top: 0;
@@ -29,7 +27,7 @@
             padding: 0;
             display: block;
             pointer-events: auto;
-            z-index: 1; /* اللعبة في الطبقة السفلية */
+            z-index: 1; 
         }
 
         #btn-beta, #btn-wss {
@@ -42,21 +40,19 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            z-index: 999999; /* الأزرار في الطبقة العلوية */
+            z-index: 999999; 
             font-size: 16px;
             font-family: sans-serif;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
-        #btn-beta {
-            background: #222;
-        }
+        #btn-beta { background: #222; }
 
         #btn-wss {
             background: #007bff;
-            display: none; /* مخفي حتى ينتهي التحميل */
+            display: none; 
         }
 
-        /* تنسيق زر Fans */
         #btn-fans {
             position: fixed;
             top: calc(50% + 55px);
@@ -72,6 +68,12 @@
             font-size: 16px;
             font-family: sans-serif;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: 0.2s;
+        }
+
+        #btn-fans:hover {
+            transform: translateY(-50%) scale(1.05);
+            background: #ff6b81;
         }
 
         #loading-screen {
@@ -109,15 +111,14 @@
 </head>
 <body>
 
-    <button id="btn-beta">دخولbeta 2</button>
+    <button id="btn-beta">دخول beta 2</button>
     <button id="btn-wss">WSS</button>
-    <!-- زر Fans -->
     <button id="btn-fans">Fans</button>
 
     <div id="loading-screen">
         <div class="spinner"></div>
         <h2>يرجى الانتظار</h2>
-        <p>للمعلومية ريماس قامت بتطويرها لكم🌷</p>
+        <p>للمعلومية ريماس قامت بتطويرها لكم 🌷</p>
     </div>
 
     <iframe id="game-frame" src="https://delt.io/" allowfullscreen="true"></iframe>
@@ -132,7 +133,7 @@
         let fansTabWindow = null; 
         let isAwake = false;
 
-        // دالة لمنع المتصفح من إدخال الصفحة في وضع النوم (عن طريق صوت صامت في الخلفية)
+        // دالة لمنع المتصفح من إدخال الصفحة في وضع النوم
         function keepPageAwake() {
             if (isAwake) return;
             isAwake = true;
@@ -140,24 +141,19 @@
             // تشغيل مسار صوتي صامت للحفاظ على نشاط الصفحة في الخلفية
             const silentAudio = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA");
             silentAudio.loop = true;
-            silentAudio.play().catch(() => {
-                console.log("الصوت الصامت يحتاج إلى تفاعل المستخدم أولاً");
-            });
+            silentAudio.play().catch(e => console.log("الصوت الصامت ينتظر تفاعل المستخدم"));
 
-            // تفعيل Wake Lock لمنع قفل الشاشة إذا كان مدعوماً
+            // تفعيل Wake Lock لمنع قفل الشاشة
             if ('wakeLock' in navigator) {
-                try {
-                    navigator.wakeLock.request('screen');
-                } catch (err) {
-                    console.log("Wake Lock Error:", err);
-                }
+                navigator.wakeLock.request('screen').catch(err => console.log("Wake Lock Error:", err));
             }
         }
 
-        // التقاط أي تفاعل من المستخدم لتفعيل دالة منع النوم
+        // تفعيل وضع منع النوم عند أول ضغطة في أي مكان بالشاشة
         document.addEventListener("click", keepPageAwake, { once: true });
+        document.addEventListener("keydown", keepPageAwake, { once: true });
 
-        // التقاط أي WebSocket يتم فتحه
+        // التقاط أي WebSocket يتم فتحه داخل الصفحة (إن أمكن)
         const OriginalWebSocket = window.WebSocket;
         window.WebSocket = function(url, protocols) {
             if (url.includes('wss://')) {
@@ -167,14 +163,14 @@
         };
 
         btnBeta.addEventListener("click", () => {
-            keepPageAwake(); // تفعيل منع النوم
+            keepPageAwake(); 
 
             try {
                 const docElm = document.documentElement;
                 if (docElm.requestFullscreen) {
                     docElm.requestFullscreen().then(() => {
                         if (screen.orientation && screen.orientation.lock) {
-                            screen.orientation.lock("landscape").catch(e => console.log("توجيه الشاشة غير مدعوم أو مرفوض:", e));
+                            screen.orientation.lock("landscape").catch(e => console.log("توجيه الشاشة غير مدعوم:", e));
                         }
                     }).catch(e => console.log(e));
                 }
@@ -192,46 +188,54 @@
         });
 
         btnWss.addEventListener("click", () => {
-            keepPageAwake(); // تفعيل منع النوم
+            keepPageAwake();
             if (lastWSS) {
-                const tempInput = document.createElement("input");
-                tempInput.value = lastWSS;
-                document.body.appendChild(tempInput);
-                tempInput.select();
-                try {
-                    document.execCommand("copy");
+                navigator.clipboard.writeText(lastWSS).then(() => {
                     alert("تم نسخ: " + lastWSS);
-                } catch (err) {
-                    console.error("فشل النسخ", err);
-                }
-                document.body.removeChild(tempInput);
+                }).catch(() => {
+                    // طريقة بديلة للنسخ إذا فشل Clipboard API
+                    const tempInput = document.createElement("input");
+                    tempInput.value = lastWSS;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(tempInput);
+                    alert("تم نسخ: " + lastWSS);
+                });
             } else {
-                alert("لم يتم العثور على WSS بعد، انتظر تحميل اللعبة.");
+                alert("لم يتم العثور على WSS بعد، انتظر تحميل اللعبة قليلاً.");
             }
         });
 
-        // برمجة زر Fans المطور
+        // برمجة زر Fans للتبديل السريع بدون تحديث
         btnFans.addEventListener("click", () => {
-            keepPageAwake(); // تفعيل منع النوم لضمان عدم فصل التبويب الأول
+            keepPageAwake(); 
 
             const urlToOpen = "https://yasmenjasm2-sketch.github.io/totoman/"; 
+            const tabName = "RemasFansTab"; // اسم ثابت للتبويب يمنع فتح نسخ مكررة
 
             if (fansTabWindow && !fansTabWindow.closed) {
-                // العودة للتبويب إذا كان مفتوحاً دون تجديده
+                // إذا كان التبويب مفتوحاً، قم بالانتقال إليه فوراً
                 fansTabWindow.focus();
             } else {
-                // فتح التبويب لأول مرة
-                fansTabWindow = window.open(urlToOpen, "RemasFansTab");
+                // إذا لم يكن مفتوحاً، افتحه وحدد اسمه
+                fansTabWindow = window.open(urlToOpen, tabName);
                 
-                // محاولة تغيير اسم التبويب الثاني إلى 🟢 
-                // (قد يحجبه المتصفح بسبب أمان المواقع الخارجية، ولكنه مدمج هنا كحل ممكن)
-                try {
-                    fansTabWindow.onload = function() {
-                        fansTabWindow.document.title = "🟢 Fans Page";
-                    };
-                } catch (e) {}
+                // محاولة عمل Focus للتأكيد
+                if (fansTabWindow) {
+                    fansTabWindow.focus();
+                }
             }
         });
+
+        // إضافة اختصار كيبورد (زر Tab) للتبديل السريع إلى صفحة Fans
+        document.addEventListener("keydown", (e) => {
+            if (e.code === "Tab") {
+                e.preventDefault(); // منع المتصفح من تغيير التحديد الافتراضي
+                btnFans.click(); // محاكاة الضغط على زر Fans
+            }
+        });
+
     </script>
 </body>
 </html>
