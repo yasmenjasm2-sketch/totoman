@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>Delt.io - Remas</title>
+    <!-- تسمية الصفحة الأولى بالعلامة الحمراء -->
+    <title>🔴 Delt.io - Remas</title>
     <style>
         html, body {
             margin: 0;
@@ -55,22 +56,22 @@
             display: none; /* مخفي حتى ينتهي التحميل */
         }
 
-        /* تنسيق زر Fans الجديد ليكون أسفل الزر الأول بشكل أنيق */
+        /* تنسيق زر Fans */
         #btn-fans {
             position: fixed;
-            top: calc(50% + 55px); /* تم وضعه أسفل الزر الأول بقليل */
+            top: calc(50% + 55px);
             right: 20px;
             transform: translateY(-50%);
             padding: 10px 16px;
             color: #fff;
-            background: #ff4757; /* لون مميز واحترافي */
+            background: #ff4757; 
             border: none;
             border-radius: 8px;
             cursor: pointer;
             z-index: 999999;
             font-size: 16px;
             font-family: sans-serif;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3); /* إضافة ظل خفيف للأناقة */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
         #loading-screen {
@@ -110,13 +111,13 @@
 
     <button id="btn-beta">دخولbeta 2</button>
     <button id="btn-wss">WSS</button>
-    <!-- زر Fans الجديد -->
+    <!-- زر Fans -->
     <button id="btn-fans">Fans</button>
 
     <div id="loading-screen">
         <div class="spinner"></div>
-        <h2>يرجى الانتضار</h2>
-        <p>لللمعلوميه ريماس قامت بتطويرها لكم🌷</p>
+        <h2>يرجى الانتظار</h2>
+        <p>للمعلومية ريماس قامت بتطويرها لكم🌷</p>
     </div>
 
     <iframe id="game-frame" src="https://delt.io/" allowfullscreen="true"></iframe>
@@ -125,10 +126,36 @@
         const btnBeta = document.getElementById("btn-beta");
         const btnWss = document.getElementById("btn-wss");
         const loadingScreen = document.getElementById("loading-screen");
-        const btnFans = document.getElementById("btn-fans"); // تعريف الزر الجديد
+        const btnFans = document.getElementById("btn-fans"); 
         
         let lastWSS = "";
-        let fansTabWindow = null; // متغير لحفظ حالة التبويب الثاني
+        let fansTabWindow = null; 
+        let isAwake = false;
+
+        // دالة لمنع المتصفح من إدخال الصفحة في وضع النوم (عن طريق صوت صامت في الخلفية)
+        function keepPageAwake() {
+            if (isAwake) return;
+            isAwake = true;
+
+            // تشغيل مسار صوتي صامت للحفاظ على نشاط الصفحة في الخلفية
+            const silentAudio = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA");
+            silentAudio.loop = true;
+            silentAudio.play().catch(() => {
+                console.log("الصوت الصامت يحتاج إلى تفاعل المستخدم أولاً");
+            });
+
+            // تفعيل Wake Lock لمنع قفل الشاشة إذا كان مدعوماً
+            if ('wakeLock' in navigator) {
+                try {
+                    navigator.wakeLock.request('screen');
+                } catch (err) {
+                    console.log("Wake Lock Error:", err);
+                }
+            }
+        }
+
+        // التقاط أي تفاعل من المستخدم لتفعيل دالة منع النوم
+        document.addEventListener("click", keepPageAwake, { once: true });
 
         // التقاط أي WebSocket يتم فتحه
         const OriginalWebSocket = window.WebSocket;
@@ -140,7 +167,8 @@
         };
 
         btnBeta.addEventListener("click", () => {
-            // طلب ملء الشاشة وقلبها أفقياً (Landscape)
+            keepPageAwake(); // تفعيل منع النوم
+
             try {
                 const docElm = document.documentElement;
                 if (docElm.requestFullscreen) {
@@ -154,19 +182,17 @@
                 console.log("خطأ في ملء الشاشة:", e);
             }
 
-            // إظهار التحميل وإخفاء زر الدخول
             loadingScreen.style.display = "flex";
             btnBeta.style.display = "none";
             
-            // بعد 3 ثواني، إخفاء شاشة التحميل وإظهار زر النسخ
             setTimeout(() => {
                 loadingScreen.style.display = "none";
                 btnWss.style.display = "block";
             }, 3000);
         });
 
-        // أمر النسخ عند الضغط على زر WSS
         btnWss.addEventListener("click", () => {
+            keepPageAwake(); // تفعيل منع النوم
             if (lastWSS) {
                 const tempInput = document.createElement("input");
                 tempInput.value = lastWSS;
@@ -184,18 +210,26 @@
             }
         });
 
-        // برمجة زر Fans الجديد
+        // برمجة زر Fans المطور
         btnFans.addEventListener("click", () => {
-            // ضع هنا الرابط الذي تريد فتحه في التبويب الثاني
+            keepPageAwake(); // تفعيل منع النوم لضمان عدم فصل التبويب الأول
+
             const urlToOpen = "https://yasmenjasm2-sketch.github.io/totoman/"; 
 
-            // التحقق مما إذا كان التبويب الثاني مفتوحاً مسبقاً ولم يتم إغلاقه
             if (fansTabWindow && !fansTabWindow.closed) {
-                // إذا كان مفتوحاً، قم بالتبديل إليه فقط
+                // العودة للتبويب إذا كان مفتوحاً دون تجديده
                 fansTabWindow.focus();
             } else {
-                // إذا لم يكن مفتوحاً، افتح تبويب جديد باسم ثابت لمنع فتح أكثر من نسخة
+                // فتح التبويب لأول مرة
                 fansTabWindow = window.open(urlToOpen, "RemasFansTab");
+                
+                // محاولة تغيير اسم التبويب الثاني إلى 🟢 
+                // (قد يحجبه المتصفح بسبب أمان المواقع الخارجية، ولكنه مدمج هنا كحل ممكن)
+                try {
+                    fansTabWindow.onload = function() {
+                        fansTabWindow.document.title = "🟢 Fans Page";
+                    };
+                } catch (e) {}
             }
         });
     </script>
