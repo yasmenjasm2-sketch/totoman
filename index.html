@@ -10,11 +10,10 @@
         html, body {
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
             background-color: #000;
-            touch-action: none;
         }
         iframe {
             width: 100%;
@@ -23,12 +22,14 @@
             margin: 0;
             padding: 0;
             display: block;
+            pointer-events: auto;
         }
         #btn-beta {
             position: fixed;
-            top: 20px;
+            top: 50%;
             right: 20px;
-            padding: 10px 20px;
+            transform: translateY(-50%);
+            padding: 10px 16px;
             background: #222;
             color: #fff;
             border: none;
@@ -81,24 +82,12 @@
     <iframe src="https://delt.io/" allowfullscreen="true"></iframe>
 
     <script>
-        let lastWSS = "";
-        const OriginalWebSocket = window.WebSocket;
-        
-        window.WebSocket = function(url, protocols) {
-            lastWSS = url;
-            return new OriginalWebSocket(url, protocols);
-        };
-
         const btnBeta = document.getElementById("btn-beta");
         const loadingScreen = document.getElementById("loading-screen");
 
         btnBeta.addEventListener("click", () => {
             loadingScreen.style.display = "flex";
             btnBeta.style.display = "none";
-            
-            if (lastWSS !== "") {
-                navigator.clipboard.writeText(lastWSS).catch(err => {});
-            }
             
             setTimeout(() => {
                 loadingScreen.style.display = "none";
