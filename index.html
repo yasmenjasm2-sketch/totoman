@@ -2,8 +2,9 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <title>🔴 Delt.io - Remas</title>
     <style>
@@ -14,6 +15,15 @@
             height: 100vh;
             overflow: hidden;
             background-color: #000;
+            
+            /* منع النسخ وتحديد النصوص لأجهزة الآيفون */
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            
+            /* منع السحب المطاطي (البونس) الذي يظهر شريط البحث */
+            overscroll-behavior-y: none;
+            position: fixed;
         }
         
         /* إعدادات مشتركة للإطارات */
@@ -38,17 +48,16 @@
         /* إطار صفحة الفانز (مخفي في البداية) */
         #fans-frame {
             z-index: 2;
-            visibility: hidden; /* نستخدم visibility بدل display عشان ما تتفرمت الصفحة */
+            visibility: hidden; 
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease; /* تأثير انتقال ناعم */
+            transition: opacity 0.3s ease; 
         }
 
-        #btn-beta, #btn-wss {
+        /* تنسيق موحد للأزرار */
+        .action-btn {
             position: fixed;
-            top: 50%;
             right: 20px;
-            transform: translateY(-50%);
             padding: 10px 16px;
             color: #fff;
             border: none;
@@ -58,35 +67,34 @@
             font-size: 16px;
             font-family: sans-serif;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        #btn-beta { background: #222; }
-
-        #btn-wss {
-            background: #007bff;
-            display: none; 
-        }
-
-        #btn-fans {
-            position: fixed;
-            top: calc(50% + 55px);
-            right: 20px;
-            transform: translateY(-50%);
-            padding: 10px 16px;
-            color: #fff;
-            background: #ff4757; 
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            z-index: 999999;
-            font-size: 16px;
-            font-family: sans-serif;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             transition: 0.2s;
+        }
+
+        /* زر بيتا 2 (في المنتصف) */
+        #btn-beta { 
+            top: 50%; 
+            transform: translateY(-50%); 
+            background: #222; 
+        }
+
+        /* زر الفانز (مخفي، ويظهر مكان بيتا لاحقاً) */
+        #btn-fans {
+            top: 50%; 
+            transform: translateY(-50%);
+            background: #ff4757; 
+            display: none; 
         }
 
         #btn-fans:hover {
             transform: translateY(-50%) scale(1.05);
+        }
+
+        /* زر WSS (مرفوع قليلاً حتى لا يتداخل مع الأزرار الأخرى) */
+        #btn-wss {
+            top: calc(50% - 55px);
+            transform: translateY(-50%);
+            background: #007bff;
+            display: none; 
         }
 
         #loading-screen {
@@ -124,9 +132,9 @@
 </head>
 <body>
 
-    <button id="btn-beta">دخول beta 2</button>
-    <button id="btn-wss">WSS</button>
-    <button id="btn-fans">Fans</button>
+    <button id="btn-beta" class="action-btn">دخول beta 2</button>
+    <button id="btn-wss" class="action-btn">WSS</button>
+    <button id="btn-fans" class="action-btn">Fans</button>
 
     <div id="loading-screen">
         <div class="spinner"></div>
@@ -147,7 +155,7 @@
         
         let lastWSS = "";
         let isAwake = false;
-        let isFansVisible = false; // متغير لمعرفة أي صفحة مفتوحة حالياً
+        let isFansVisible = false; 
 
         // دالة لمنع المتصفح من إدخال الصفحة في وضع النوم
         function keepPageAwake() {
@@ -174,6 +182,7 @@
             return new OriginalWebSocket(url, protocols);
         };
 
+        // برمجة زر Beta 2
         btnBeta.addEventListener("click", () => {
             keepPageAwake(); 
 
@@ -191,14 +200,18 @@
             }
 
             loadingScreen.style.display = "flex";
+            // إخفاء زر بيتا فور الضغط عليه
             btnBeta.style.display = "none";
             
             setTimeout(() => {
                 loadingScreen.style.display = "none";
                 btnWss.style.display = "block";
+                // إظهار زر الفانز ليأخذ مكان زر بيتا
+                btnFans.style.display = "block";
             }, 3000);
         });
 
+        // برمجة زر WSS
         btnWss.addEventListener("click", () => {
             keepPageAwake();
             if (lastWSS) {
@@ -218,10 +231,10 @@
             }
         });
 
-        // برمجة زر Fans للتبديل السريع في نفس الصفحة (بدون فقدان البيانات)
+        // برمجة زر Fans للتبديل بين اللعبة وصفحة الفانز
         btnFans.addEventListener("click", () => {
             keepPageAwake(); 
-            isFansVisible = !isFansVisible; // عكس الحالة
+            isFansVisible = !isFansVisible; 
 
             if (isFansVisible) {
                 // إظهار صفحة الفانز
@@ -231,7 +244,7 @@
                 
                 // تغيير شكل الزر ليدل على إمكانية العودة للعبة
                 btnFans.innerText = "العودة للعبة";
-                btnFans.style.background = "#2ed573"; // لون أخضر
+                btnFans.style.background = "#2ed573"; 
             } else {
                 // إخفاء صفحة الفانز والعودة للعبة
                 fansFrame.style.visibility = "hidden";
@@ -240,7 +253,7 @@
                 
                 // إرجاع شكل الزر للأصلي
                 btnFans.innerText = "Fans";
-                btnFans.style.background = "#ff4757"; // لون أحمر
+                btnFans.style.background = "#ff4757"; 
             }
         });
 
