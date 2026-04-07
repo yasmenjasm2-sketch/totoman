@@ -29,7 +29,7 @@
             display: block;
         }
 
-        /* إطار اللعبة الأصلية */
+        /* إطار اللعبة الأصلية - يبقى يعمل في الخلفية دائماً */
         #game-frame {
             z-index: 1; 
             pointer-events: auto;
@@ -38,13 +38,14 @@
         /* إطار صفحة الفانز (مخفي في البداية) */
         #fans-frame {
             z-index: 2;
-            visibility: hidden; /* نستخدم visibility بدل display عشان ما تتفرمت الصفحة */
+            visibility: hidden; 
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease; /* تأثير انتقال ناعم */
+            transition: opacity 0.3s ease; 
         }
 
-        #btn-beta, #btn-wss {
+        /* تنسيق الأزرار لتكون في نفس المكان */
+        #btn-beta, #btn-fans, #btn-wss {
             position: fixed;
             top: 50%;
             right: 20px;
@@ -58,31 +59,21 @@
             font-size: 16px;
             font-family: sans-serif;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: 0.2s;
         }
 
-        #btn-beta { background: #222; }
+        #btn-beta { 
+            background: #222; 
+        }
 
         #btn-wss {
             background: #007bff;
-            display: none; 
+            display: none; /* مخفي افتراضياً بناء على طلبك */
         }
 
         #btn-fans {
-            position: fixed;
-            top: calc(50% + 55px);
-            right: 20px;
-            transform: translateY(-50%);
-            padding: 10px 16px;
-            color: #fff;
             background: #ff4757; 
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            z-index: 999999;
-            font-size: 16px;
-            font-family: sans-serif;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            transition: 0.2s;
+            display: none; /* يظهر فقط بعد اختفاء زر بيتا */
         }
 
         #btn-fans:hover {
@@ -144,10 +135,11 @@
         const btnFans = document.getElementById("btn-fans"); 
         const loadingScreen = document.getElementById("loading-screen");
         const fansFrame = document.getElementById("fans-frame");
+        const gameFrame = document.getElementById("game-frame");
         
         let lastWSS = "";
         let isAwake = false;
-        let isFansVisible = false; // متغير لمعرفة أي صفحة مفتوحة حالياً
+        let isFansVisible = false;
 
         // دالة لمنع المتصفح من إدخال الصفحة في وضع النوم
         function keepPageAwake() {
@@ -166,17 +158,21 @@
         document.addEventListener("click", keepPageAwake, { once: true });
         document.addEventListener("keydown", keepPageAwake, { once: true });
 
+        // التقاط رابط WSS في الخلفية (حتى لو الزر مخفي)
         const OriginalWebSocket = window.WebSocket;
         window.WebSocket = function(url, protocols) {
             if (url.includes('wss://')) {
                 lastWSS = url;
+                console.log("تم التقاط WSS:", lastWSS); // طباعته في الكونسول للفائدة
             }
             return new OriginalWebSocket(url, protocols);
         };
 
+        // برمجة زر Beta 2
         btnBeta.addEventListener("click", () => {
             keepPageAwake(); 
 
+            // طلب ملء الشاشة
             try {
                 const docElm = document.documentElement;
                 if (docElm.requestFullscreen) {
@@ -190,57 +186,42 @@
                 console.log("خطأ في ملء الشاشة:", e);
             }
 
+            // إظهار شاشة التحميل وإخفاء زر بيتا وزر wss
             loadingScreen.style.display = "flex";
             btnBeta.style.display = "none";
+            btnWss.style.display = "none"; // تأكيد إخفاء زر wss
             
+            // بعد 3 ثواني، إخفاء شاشة التحميل وإظهار زر الفانز مكانه
             setTimeout(() => {
                 loadingScreen.style.display = "none";
-                btnWss.style.display = "block";
+                btnFans.style.display = "block"; // ظهور زر الفانز
             }, 3000);
         });
 
-        btnWss.addEventListener("click", () => {
-            keepPageAwake();
-            if (lastWSS) {
-                navigator.clipboard.writeText(lastWSS).then(() => {
-                    alert("تم نسخ: " + lastWSS);
-                }).catch(() => {
-                    const tempInput = document.createElement("input");
-                    tempInput.value = lastWSS;
-                    document.body.appendChild(tempInput);
-                    tempInput.select();
-                    document.execCommand("copy");
-                    document.body.removeChild(tempInput);
-                    alert("تم نسخ: " + lastWSS);
-                });
-            } else {
-                alert("لم يتم العثور على WSS بعد، انتظر تحميل اللعبة قليلاً.");
-            }
-        });
-
-        // برمجة زر Fans للتبديل السريع في نفس الصفحة (بدون فقدان البيانات)
+        // برمجة زر Fans للتبديل بتغطية اللعبة (وليس إخفائها لتجنب اكتشاف الخروج)
         btnFans.addEventListener("click", () => {
             keepPageAwake(); 
-            isFansVisible = !isFansVisible; // عكس الحالة
+            isFansVisible = !isFansVisible; 
 
             if (isFansVisible) {
-                // إظهار صفحة الفانز
+                // إظهار طبقة الفانز فوق اللعبة
                 fansFrame.style.visibility = "visible";
                 fansFrame.style.opacity = "1";
                 fansFrame.style.pointerEvents = "auto";
                 
-                // تغيير شكل الزر ليدل على إمكانية العودة للعبة
                 btnFans.innerText = "العودة للعبة";
-                btnFans.style.background = "#2ed573"; // لون أخضر
+                btnFans.style.background = "#2ed573"; 
             } else {
-                // إخفاء صفحة الفانز والعودة للعبة
+                // إزالة طبقة الفانز والعودة للعبة
                 fansFrame.style.visibility = "hidden";
                 fansFrame.style.opacity = "0";
                 fansFrame.style.pointerEvents = "none";
                 
-                // إرجاع شكل الزر للأصلي
                 btnFans.innerText = "Fans";
-                btnFans.style.background = "#ff4757"; // لون أحمر
+                btnFans.style.background = "#ff4757"; 
+                
+                // إعادة التركيز (Focus) للعبة فوراً
+                gameFrame.contentWindow.focus();
             }
         });
 
