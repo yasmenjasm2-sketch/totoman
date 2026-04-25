@@ -3,89 +3,395 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fawakih AI - الاشتراك</title>
+    <title>FawakihAI - النظام الذكي</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1A237E, #3949AB);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #fff;
-        }
-        .login-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
-        }
-        h1 { margin-bottom: 10px; font-size: 28px; }
-        p { margin-bottom: 30px; font-size: 14px; color: #E8EAF6; }
-        input {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: none;
-            border-radius: 10px;
-            box-sizing: border-box;
-            font-size: 16px;
-            text-align: center;
-            outline: none;
-        }
-        button {
-            width: 100%;
-            padding: 15px;
-            background-color: #FF9800;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        button:hover { background-color: #F57C00; }
-        .footer { margin-top: 20px; font-size: 12px; color: #C5CAE9; }
+        :root { --primary: #4CAF50; --bg: #121212; --card-bg: #1e1e1e; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: white; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        
+        /* شاشة تسجيل الدخول */
+        #loginScreen { background: var(--card-bg); padding: 40px; border-radius: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); text-align: center; width: 90%; max-width: 400px; }
+        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #2c2c2c; color: white; font-size: 16px; outline: none; }
+        input:focus { border-color: var(--primary); }
+        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; }
+        button:hover { background: #45a049; }
+        button:disabled { background: #555; cursor: not-allowed; }
+        #loginMsg { margin-top: 15px; font-weight: bold; }
+
+        /* شاشة اللعبة */
+        #gameScreen { display: none; width: 100%; max-width: 500px; padding: 20px; text-align: center; }
+        .header-game { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        #aiStatus { color: var(--primary); font-weight: bold; background: #1a237e; padding: 5px 15px; border-radius: 20px; font-size: 14px; }
+        .timer-box { font-size: 40px; font-weight: bold; color: #ff9800; margin: 20px 0; }
+        
+        .fruits-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+        .fruit-item { background: #2c2c2c; border: 2px solid #444; border-radius: 10px; padding: 15px 5px; font-size: 20px; transition: 0.3s; cursor: default; }
+        .fruit-active { background-color: rgba(255, 152, 0, 0.5) !important; border-color: #ff9800; }
+        
+        /* بانر تيليجرام */
+        #telegramBanner { position: fixed; top: 20px; left: -100%; background: #0088cc; color: white; padding: 15px 30px; border-radius: 0 20px 20px 0; font-weight: bold; z-index: 1000; transition: left 0.5s ease-in-out; }
+
+        /* نافذة التنبيه */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: white; color: #333; padding: 20px; border-radius: 10px; max-width: 350px; text-align: right; }
+        .modal-header { background: #1A237E; color: white; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; margin: -20px -20px 20px -20px; border-radius: 10px 10px 0 0; }
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <h1>Fawakih AI 🤖</h1>
-        <p>الرجاء إدخال مفتاح الاشتراك للوصول إلى النظام الذكي</p>
-        
-        <input type="text" id="subKey" placeholder="أدخل كود الاشتراك هنا...">
-        <button onclick="login()">تسجيل الدخول</button>
+    <div id="telegramBanner"><span id="telegramBannerText"></span></div>
 
-        <div class="footer">
-            © جميع الحقوق محفوظة لـ Hamza Alhumada
+    <div id="loginScreen">
+        <h2 style="color: var(--primary);">بوابة FawakihAI</h2>
+        <input type="text" id="username" placeholder="اسم المستخدم">
+        <input type="text" id="subCode" placeholder="كود الاشتراك (مثال: FAW-XXXX)">
+        <button onclick="login()">تفعيل الدخول</button>
+        <div id="loginMsg"></div>
+    </div>
+
+    <div id="gameScreen">
+        <div class="header-game">
+            <span id="aiStatus">حالة الذاكرة: نشطة (العقل 1) 🟢</span>
+            <span style="font-size: 12px; color: #888; cursor: pointer;" onclick="alert('FawakihAI\n© جميع الحقوق محفوظة لـ Hamza Alhumada')">🛡️ حقوق المطور</span>
+        </div>
+
+        <div class="timer-box" id="timerText">00</div>
+
+        <div class="fruits-grid" id="fruitsGrid">
+            <div class="fruit-item" id="fruit_grape">🍇 عنب</div>
+            <div class="fruit-item" id="fruit_lemon">🍋 ليمون</div>
+            <div class="fruit-item" id="fruit_orange">🍊 برتقال</div>
+            <div class="fruit-item" id="fruit_apple">🍎 تفاح</div>
+            <div class="fruit-item" id="fruit_cherry">🍒 كرز</div>
+            <div class="fruit-item" id="fruit_watermelon">🍉 بطيخ</div>
+            <div class="fruit-item" id="fruit_strawberry">🍓 فراولة</div>
+            <div class="fruit-item" id="fruit_mango">🥭 مانجو</div>
+        </div>
+
+        <input type="text" id="inputCorrectFruit" placeholder="أدخل الفاكهة الصحيحة هنا...">
+        <button id="btnNewRound" onclick="startNewRoundClick()">بدء جولة جديدة</button>
+        <button onclick="logout()" style="background: #f44336; margin-top: 20px;">خروج</button>
+    </div>
+
+    <div class="modal" id="smartAIWarning">
+        <div class="modal-content">
+            <div class="modal-header">🤖 نظام الذكاء الاصطناعي</div>
+            <p style="line-height: 1.6;">عذراً، لم أتمكن من العثور على هذا المدخل في قاعدة بياناتي.<br><br>لضمان دقة التحليل والتوقع، يرجى إدخال إحدى الفواكه المعتمدة للنظام:<br><br>🍇 عنب | 🍋 ليمون<br>🍊 برتقال | 🍎 تفاح<br>🍒 كرز | 🍉 بطيخ<br>🍓 فراولة | 🥭 مانجو<br><br>يرجى المحاولة مرة أخرى باسم صحيح.</p>
+            <button onclick="document.getElementById('smartAIWarning').style.display='none'" style="background: #1A237E;">حسناً، فهمت</button>
         </div>
     </div>
 
     <script>
+        // --- 1. إعدادات Firebase والدخول ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyApqVwnKmq0gJ7k-UM-jLNxaYlBPkRx1Go",
+            authDomain: "chatlive-4387e.firebaseapp.com",
+            databaseURL: "https://chatlive-4387e-default-rtdb.firebaseio.com",
+            projectId: "chatlive-4387e",
+            storageBucket: "chatlive-4387e.firebasestorage.app",
+            messagingSenderId: "722728428486",
+            appId: "1:722728428486:android:847b11a7743dfb7d5ac8c7"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        
+        let currentUser = localStorage.getItem("fawakihUser");
+        let securityInterval;
+
+        if (currentUser) {
+            checkSubscription(); // التحقق المباشر إذا كان مسجل مسبقاً
+        }
+
         function login() {
-            const key = document.getElementById('subKey').value.trim();
-            if (key.length > 3) {
-                // محاكاة تفعيل الاشتراك وحفظه في الجلسة
-                localStorage.setItem("FawakihaSecure2026X", "active");
-                window.location.href = "game.html"; // التوجيه لصفحة اللعب
-            } else {
-                alert("الرجاء إدخال مفتاح اشتراك صحيح!");
+            const user = document.getElementById('username').value.trim();
+            const code = document.getElementById('subCode').value.trim();
+            const msg = document.getElementById('loginMsg');
+
+            if(!user || !code) { msg.innerText = "أدخل جميع الحقول"; msg.style.color = "red"; return; }
+            msg.innerText = "جاري التحقق..."; msg.style.color = "orange";
+
+            db.ref('System/Codes/' + code).once('value').then((snap) => {
+                if (snap.exists() && snap.val().isActive) {
+                    const days = snap.val().durationDays;
+                    const expiry = Date.now() + (days * 24 * 60 * 60 * 1000);
+                    
+                    db.ref('System/Codes/' + code).update({ isActive: false, usedBy: user });
+                    db.ref('System/Users/' + user).set({ codeUsed: code, expiryTime: expiry, status: "نشط 🟢" });
+                    
+                    localStorage.setItem("fawakihUser", user);
+                    currentUser = user;
+                    startGame();
+                } else {
+                    // التحقق إذا كان المستخدم مسجل مسبقاً ولديه اشتراك فعال
+                    db.ref('System/Users/' + user).once('value').then((uSnap) => {
+                        if (uSnap.exists() && uSnap.val().expiryTime > Date.now() && uSnap.val().codeUsed === code) {
+                            localStorage.setItem("fawakihUser", user);
+                            currentUser = user;
+                            startGame();
+                        } else {
+                            msg.innerText = "الكود غير صحيح أو منتهي!"; msg.style.color = "red";
+                        }
+                    });
+                }
+            });
+        }
+
+        function checkSubscription() {
+            db.ref('System/Users/' + currentUser).once('value').then((snap) => {
+                if (snap.exists() && snap.val().expiryTime > Date.now()) {
+                    startGame();
+                } else {
+                    logout();
+                    alert("انتهت صلاحية الاشتراك!");
+                }
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem("fawakihUser");
+            location.reload();
+        }
+
+        function startGame() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            loadAIHistory();
+            updateAIStatusUI();
+            
+            // مراقبة الأمان كل 30 ثانية
+            securityInterval = setInterval(() => {
+                db.ref('System/Users/' + currentUser).once('value').then(snap => {
+                    if (!snap.exists() || snap.val().expiryTime <= Date.now()) {
+                        clearInterval(securityInterval);
+                        logout();
+                    }
+                });
+            }, 30000);
+
+            startTelegramListener();
+        }
+
+        // --- 2. خوارزميات اللعبة (AI Logic مطابقة لـ Java) ---
+        const VALID_FRUITS = ["عنب", "ليمون", "برتقال", "تفاح", "كرز", "بطيخ", "فراولة", "فراوله", "مانجو"];
+        const FRUIT_IDS = ["grape", "lemon", "orange", "apple", "cherry", "watermelon", "strawberry", "mango"];
+        
+        let fruitOccurrencesAI1 = {}; let fruitHistoryAI1 = [];
+        let fruitOccurrencesAI2 = {}; let fruitHistoryAI2 = [];
+        let currentAI = 1;
+        let wrongGuessesCount = 0;
+        let lastRoundGuesses = [];
+        let isAIActive = true;
+        let timerInterval;
+
+        function translateFruit(input) {
+            const lower = input.trim();
+            switch (lower) {
+                case "عنب": return "grape"; case "ليمون": return "lemon"; case "برتقال": return "orange";
+                case "تفاح": return "apple"; case "كرز": return "cherry"; case "بطيخ": return "watermelon";
+                case "فراولة": case "فراوله": return "strawberry"; case "مانجو": return "mango";
+                default: return lower;
             }
         }
 
-        // التحقق مما إذا كان مسجلاً مسبقاً
-        if(localStorage.getItem("FawakihaSecure2026X") === "active") {
-            window.location.href = "game.html";
+        function loadAIHistory() {
+            const data = JSON.parse(localStorage.getItem("FawakhAIPrefs")) || {};
+            currentAI = data.currentAI || 1;
+            wrongGuessesCount = data.wrongGuessesCount || 0;
+            fruitOccurrencesAI1 = data.occ1 || {}; fruitHistoryAI1 = data.hist1 || [];
+            fruitOccurrencesAI2 = data.occ2 || {}; fruitHistoryAI2 = data.hist2 || [];
+        }
+
+        function saveAIHistory() {
+            localStorage.setItem("FawakhAIPrefs", JSON.stringify({
+                currentAI, wrongGuessesCount,
+                occ1: fruitOccurrencesAI1, hist1: fruitHistoryAI1,
+                occ2: fruitOccurrencesAI2, hist2: fruitHistoryAI2
+            }));
+        }
+
+        function updateAIStatusUI() {
+            const aiText = document.getElementById('aiStatus');
+            if (isAIActive) {
+                aiText.innerText = `حالة الذاكرة: نشطة (العقل ${currentAI}) 🟢`;
+                aiText.style.color = "#4CAF50";
+            } else {
+                aiText.innerText = "تم ايقاف AI من قبل المطور ⛔";
+                aiText.style.color = "#D32F2F";
+            }
+        }
+
+        document.getElementById('inputCorrectFruit').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') { startNewRoundClick(); }
+        });
+
+        function startNewRoundClick() {
+            const input = document.getElementById('inputCorrectFruit');
+            const fruit = input.value.trim();
+            
+            if (fruit !== "") {
+                if (VALID_FRUITS.includes(fruit)) {
+                    processUserFruit(fruit);
+                    input.value = "";
+                } else {
+                    document.getElementById('smartAIWarning').style.display = 'flex';
+                    return; // إيقاف بدء الجولة إذا كان الإدخال خاطئ
+                }
+            }
+            startNewRound();
+        }
+
+        function processUserFruit(fruitName) {
+            if (!isAIActive) return;
+            const translated = translateFruit(fruitName);
+            
+            if (lastRoundGuesses.length > 0) {
+                if (!lastRoundGuesses.includes(translated)) { wrongGuessesCount++; } 
+                else { wrongGuessesCount = 0; }
+            }
+
+            if (wrongGuessesCount > 3) {
+                currentAI = currentAI === 1 ? 2 : 1;
+                wrongGuessesCount = 0;
+                updateAIStatusUI();
+                alert(`تم تبديل الذاكرة الاصطناعية (العقل ${currentAI}) لتحسين الأداء!`);
+            }
+
+            let activeOcc = currentAI === 1 ? fruitOccurrencesAI1 : fruitOccurrencesAI2;
+            let activeHist = currentAI === 1 ? fruitHistoryAI1 : fruitHistoryAI2;
+
+            activeOcc[translated] = (activeOcc[translated] || 0) + 1;
+            activeHist.push(translated);
+
+            if (activeHist.length > 10) {
+                const forgotten = activeHist.shift();
+                if (activeOcc[forgotten] > 1) { activeOcc[forgotten]--; } 
+                else { delete activeOcc[forgotten]; }
+            }
+            saveAIHistory();
+        }
+
+        function startNewRound() {
+            // تصفير الألوان
+            document.querySelectorAll('.fruit-item').forEach(el => el.classList.remove('fruit-active'));
+            
+            let predictionWeights = {};
+            let isConfirmedGuess = false;
+
+            // أوزان عشوائية مبدئية 1-5
+            FRUIT_IDS.forEach(f => predictionWeights[f] = Math.floor(Math.random() * 5) + 1);
+
+            if (lastRoundGuesses.includes("cherry")) delete predictionWeights["cherry"];
+            if (lastRoundGuesses.includes("watermelon")) delete predictionWeights["watermelon"];
+
+            if (isAIActive) {
+                let activeOcc = currentAI === 1 ? fruitOccurrencesAI1 : fruitOccurrencesAI2;
+                let activeHist = currentAI === 1 ? fruitHistoryAI1 : fruitHistoryAI2;
+
+                for (let [fruit, count] of Object.entries(activeOcc)) {
+                    if (predictionWeights[fruit] !== undefined) {
+                        if (count === 2) { predictionWeights[fruit] = Math.floor(Math.random() * 11) + 5; isConfirmedGuess = true; }
+                        else if (count >= 4) { predictionWeights[fruit] = Math.floor(Math.random() * 16) + 5; isConfirmedGuess = true; }
+                    }
+                }
+
+                if (activeHist.length >= 9 && Math.random() < 0.40) {
+                    const targetIndex = Math.random() > 0.5 ? 1 : 2;
+                    const smartFruit = activeHist[targetIndex];
+                    if (predictionWeights[smartFruit] !== undefined) {
+                        predictionWeights[smartFruit] = Math.floor(Math.random() * 11) + 20; // 20-30
+                        isConfirmedGuess = true;
+                    }
+                }
+            }
+
+            let totalWeight = 0; let maxWeight = 0;
+            for (let w of Object.values(predictionWeights)) {
+                totalWeight += w;
+                if (w > maxWeight) maxWeight = w;
+            }
+
+            let confidence = totalWeight > 0 ? (maxWeight * 100 / totalWeight) : 0;
+            let boxesToShow = (isConfirmedGuess && confidence >= 65) ? 3 : 4;
+
+            let lotteryList = [];
+            for (let [fruit, weight] of Object.entries(predictionWeights)) {
+                for (let i = 0; i < weight; i++) lotteryList.push(fruit);
+            }
+
+            // Shuffle
+            lotteryList.sort(() => Math.random() - 0.5);
+            
+            let finalGuesses = [];
+            for (let f of lotteryList) {
+                if (!finalGuesses.includes(f)) finalGuesses.push(f);
+                if (finalGuesses.length === boxesToShow) break;
+            }
+
+            lastRoundGuesses = [...finalGuesses];
+            finalGuesses.forEach(f => {
+                let el = document.getElementById("fruit_" + f);
+                if(el) el.classList.add('fruit-active');
+            });
+
+            // مؤقت عشوائي 23 إلى 38
+            document.getElementById('btnNewRound').disabled = true;
+            clearInterval(timerInterval);
+            let timeLeft = Math.floor(Math.random() * 16) + 23;
+            const timerTxt = document.getElementById('timerText');
+            timerTxt.innerText = timeLeft;
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerTxt.innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerTxt.innerText = "00";
+                    document.getElementById('btnNewRound').disabled = false;
+                }
+            }, 1000);
+        }
+
+        // --- 3. استماع تيليجرام (Telegram Polling) ---
+        function startTelegramListener() {
+            // ملاحظة: تم وضع توكن وهمي للحماية. استبدله بالتوكن الفعلي الخاص بك.
+            const BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"; 
+            const CHAT_ID = "YOUR_CHAT_ID_HERE";
+            let offset = 0;
+
+            setInterval(() => {
+                if(BOT_TOKEN === "YOUR_BOT_TOKEN_HERE") return; // تجاهل إذا لم يتم وضع التوكن
+                
+                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${offset}&timeout=10`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.ok && data.result.length > 0) {
+                        data.result.forEach(update => {
+                            offset = update.update_id + 1;
+                            if (update.message && update.message.chat.id.toString() === CHAT_ID) {
+                                const text = update.message.text.trim();
+                                if (text.startsWith("23 ")) {
+                                    triggerBannerAnimation(text.substring(3));
+                                } else if (text === "ايقافAI") {
+                                    isAIActive = false; updateAIStatusUI();
+                                } else if (text === "تشغيلAI") {
+                                    isAIActive = true; updateAIStatusUI();
+                                }
+                            }
+                        });
+                    }
+                }).catch(err => console.log("Telegram Error"));
+            }, 5000);
+        }
+
+        function triggerBannerAnimation(name) {
+            const banner = document.getElementById('telegramBanner');
+            document.getElementById('telegramBannerText').innerText = name;
+            banner.style.left = "0"; // دخول البانر
+            setTimeout(() => {
+                banner.style.left = "-100%"; // خروج البانر
+            }, 4500);
         }
     </script>
-
 </body>
 </html>
