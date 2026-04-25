@@ -3,57 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الإدارة - FawakihAI</title>
+    <title>لوحة الإدارة الذكية - FawakihAI</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Tahoma, sans-serif; background-color: #0f0f0f; color: #e0e0e0; margin: 0; padding: 20px; }
-        .header { background-color: #1a1a1a; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-bottom: 3px solid #E91E63; text-align: center; }
-        h1 { margin: 0; color: #E91E63; }
-        .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
-        .card { background-color: #1a1a1a; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        h3 { border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 0; color: #4CAF50; }
-        input { width: 100%; padding: 10px; margin: 10px 0; background: #2c2c2c; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #E91E63; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; }
-        button:hover { background: #c2185b; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px; border-bottom: 1px solid #333; text-align: right; }
-        th { color: #E91E63; }
-        .status-active { color: #4CAF50; font-weight: bold; }
-        .status-inactive { color: #f44336; font-weight: bold; }
-        .code-box { background: #000; padding: 10px; text-align: center; font-size: 18px; color: #00FF00; letter-spacing: 2px; margin-top: 10px; border-radius: 5px; user-select: all;}
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        :root { --primary: #00d2ff; --secondary: #3a7bd5; --bg: #0b0f19; --card: rgba(20, 27, 45, 0.9); }
+        body { font-family: 'Tajawal', sans-serif; background: var(--bg); color: #e0e0e0; margin: 0; padding: 20px; background-image: radial-gradient(circle at top right, #13203f, #0b0f19); min-height: 100vh; }
+        .header { background: linear-gradient(135deg, var(--secondary), var(--primary)); padding: 25px; border-radius: 15px; margin-bottom: 25px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.4); color: white; border: 1px solid rgba(255,255,255,0.1); }
+        h1 { margin: 0; font-size: 28px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .header p { margin: 10px 0 0 0; opacity: 0.9; font-size: 16px; }
+        .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 25px; }
+        .card { background: var(--card); padding: 25px; border-radius: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
+        h3 { border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-top: 0; color: var(--primary); font-size: 20px; }
+        .input-group { margin-bottom: 15px; text-align: right; }
+        .input-group label { display: block; margin-bottom: 8px; color: #aaa; font-size: 14px; }
+        .flex-row { display: flex; gap: 10px; }
+        input, select { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; box-sizing: border-box; font-family: 'Tajawal', sans-serif; font-size: 15px; outline: none; transition: 0.3s; }
+        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 210, 255, 0.2); }
+        button { width: 100%; padding: 14px; background: linear-gradient(90deg, var(--secondary), var(--primary)); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; font-family: 'Tajawal', sans-serif; margin-top: 10px; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 210, 255, 0.4); }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        th, td { padding: 15px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: right; }
+        th { color: var(--primary); font-weight: bold; background: rgba(0,0,0,0.2); }
+        .status-active { color: #00e676; font-weight: bold; background: rgba(0, 230, 118, 0.1); padding: 5px 10px; border-radius: 20px; }
+        .status-inactive { color: #ff1744; font-weight: bold; background: rgba(255, 23, 68, 0.1); padding: 5px 10px; border-radius: 20px; }
+        .code-box { background: rgba(0,0,0,0.5); padding: 15px; text-align: center; font-size: 22px; color: #00e676; letter-spacing: 3px; margin-top: 20px; border-radius: 8px; user-select: all; border: 1px dashed #00e676; font-weight: bold; }
+        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>[Remas System] لوحة التحكم والأمان</h1>
-        <p>إدارة أكواد الاشتراك والمستخدمين النشطين</p>
+        <h1>[Remas System] لوحة التحكم الاحترافية</h1>
+        <p>إدارة التراخيص والأكواد المتقدمة لبرمجيات FawakihAI</p>
     </div>
 
     <div class="grid">
         <div class="card">
-            <h3>🔑 توليد كود اشتراك</h3>
-            <label>مدة الاشتراك (بالأيام):</label>
-            <input type="number" id="codeDays" value="30" min="1">
-            <button onclick="generateCode()">توليد الكود الآن</button>
+            <h3>🔑 إصدار ترخيص جديد</h3>
+            
+            <div class="input-group">
+                <label>كود الاشتراك (اتركه فارغاً للتوليد التلقائي):</label>
+                <input type="text" id="manualCode" placeholder="مثال: VIP-HAMZA">
+            </div>
+
+            <div class="input-group flex-row">
+                <div style="flex: 2;">
+                    <label>القيمة:</label>
+                    <input type="number" id="timeValue" value="30" min="1">
+                </div>
+                <div style="flex: 1;">
+                    <label>المدة:</label>
+                    <select id="timeUnit">
+                        <option value="days">أيام</option>
+                        <option value="hours">ساعات</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="generateCode()">إصدار الكود الآن</button>
             <div id="generatedCode" class="code-box" style="display:none;"></div>
         </div>
 
         <div class="card">
-            <h3>👥 المشتركون</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>المستخدم</th>
-                        <th>تاريخ الانتهاء</th>
-                        <th>الكود</th>
-                        <th>الحالة</th>
-                    </tr>
-                </thead>
-                <tbody id="usersTableBody"></tbody>
-            </table>
+            <h3>👥 سجل المشتركين النشطين</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>المستخدم</th>
+                            <th>تاريخ الانتهاء</th>
+                            <th>الكود المستخدم</th>
+                            <th>الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -71,18 +98,33 @@
         const db = firebase.database();
 
         function generateCode() {
-            const days = parseInt(document.getElementById('codeDays').value);
-            if (!days || days < 1) return alert("أدخل عدد أيام صحيح");
+            let manualInput = document.getElementById('manualCode').value.trim();
+            const timeVal = parseInt(document.getElementById('timeValue').value);
+            const timeUnit = document.getElementById('timeUnit').value;
 
-            const randomStr = Math.random().toString(36).substring(2, 10).toUpperCase();
-            const newCode = "FAW-" + randomStr;
+            if (!timeVal || timeVal < 1) return alert("الرجاء إدخال مدة صحيحة");
+
+            // حساب الملي ثانية (MS) بناءً على الساعات أو الأيام
+            let durationMs = timeUnit === 'hours' ? timeVal * 60 * 60 * 1000 : timeVal * 24 * 60 * 60 * 1000;
+
+            // توليد كود تلقائي إذا كان الحقل اليدوي فارغاً
+            let newCode = manualInput;
+            if (newCode === "") {
+                const randomStr = Math.random().toString(36).substring(2, 10).toUpperCase();
+                newCode = "FAW-" + randomStr;
+            }
 
             db.ref('System/Codes/' + newCode).set({
-                durationDays: days, isActive: true, createdAt: Date.now()
+                durationMs: durationMs, // نرسل الوقت بالملي ثانية للدقة
+                isActive: true, 
+                createdAt: Date.now(),
+                type: timeUnit
             }).then(() => {
                 const box = document.getElementById('generatedCode');
-                box.style.display = "block"; box.innerText = newCode;
-            });
+                box.style.display = "block"; 
+                box.innerText = newCode;
+                document.getElementById('manualCode').value = ''; // تفريغ الحقل
+            }).catch(err => alert("حدث خطأ في الاتصال: " + err.message));
         }
 
         db.ref('System/Users').on('value', (snapshot) => {
@@ -90,6 +132,7 @@
             tbody.innerHTML = '';
             
             if (snapshot.exists()) {
+                let rows = [];
                 snapshot.forEach((childSnapshot) => {
                     const user = childSnapshot.key;
                     const data = childSnapshot.val();
@@ -97,12 +140,11 @@
                     const isExpired = Date.now() > data.expiryTime;
                     const statusText = isExpired ? '<span class="status-inactive">منتهي 🔴</span>' : '<span class="status-active">نشط 🟢</span>';
                     
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${user}</td><td dir="ltr">${expiryDate.toLocaleString('en-GB')}</td><td>${data.codeUsed}</td><td>${statusText}</td>`;
-                    tbody.appendChild(tr);
+                    rows.push(`<tr><td>${user}</td><td dir="ltr">${expiryDate.toLocaleString('en-GB')}</td><td><span style="background: rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 4px;">${data.codeUsed}</span></td><td>${statusText}</td></tr>`);
                 });
+                tbody.innerHTML = rows.reverse().join(''); // عكس الترتيب ليظهر الأحدث
             } else {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">لا يوجد مستخدمين بعد</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 30px; color: #888;">لا يوجد مستخدمين مسجلين في النظام بعد</td></tr>';
             }
         });
     </script>
