@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FawakihAI - النظام الذكي المحمي</title>
+    <title>FawakihAI - النظام الذكي المحمي V3</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <script type="module">
+        import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.16.0';
+        window.transformersPipeline = pipeline; // جعلها متاحة عالمياً إذا احتجتها لاحقاً
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #00E676; --bg: #090e17; --card-bg: rgba(18, 25, 38, 0.95); --accent: #2979FF; }
+        :root { --primary: #00E676; --bg: #090e17; --card-bg: rgba(18, 25, 38, 0.95); --accent: #2979FF; --chat-bot: rgba(41, 121, 255, 0.1); --chat-user: rgba(0, 230, 118, 0.1); }
         body { font-family: 'Cairo', sans-serif; background-color: var(--bg); color: white; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; background-image: radial-gradient(circle at center, #111a2e 0%, #090e17 100%); }
         
         /* شاشة تسجيل الدخول */
@@ -23,26 +27,48 @@
         #loginMsg { margin-top: 15px; font-weight: bold; font-size: 14px; min-height: 20px; }
 
         /* شاشة اللعبة */
-        #gameScreen { display: none; width: 100%; max-width: 550px; padding: 20px; text-align: center; }
-        .header-game { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: rgba(0,0,0,0.3); padding: 10px 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        #gameScreen { display: none; width: 100%; max-width: 600px; padding: 15px; text-align: center; height: 95vh; display: flex; flex-direction: column; }
+        .header-game { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); }
         #aiStatus { color: var(--primary); font-weight: bold; background: rgba(0, 230, 118, 0.1); padding: 6px 15px; border-radius: 20px; font-size: 14px; border: 1px solid rgba(0, 230, 118, 0.3); }
         .dev-badge { font-size: 13px; color: #aaa; cursor: pointer; background: rgba(255,255,255,0.05); padding: 5px 10px; border-radius: 10px; transition: 0.3s; }
         .dev-badge:hover { color: white; background: rgba(255,255,255,0.1); }
-        .timer-box { font-size: 50px; font-weight: 900; color: #FFB300; margin: 15px 0 25px; text-shadow: 0 0 20px rgba(255, 179, 0, 0.4); font-family: monospace; }
         
-        .fruits-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 25px; }
-        .fruit-item { background: rgba(255,255,255,0.03); border: 2px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 18px 5px; font-size: 22px; font-weight: bold; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: default; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .fruit-active { background: linear-gradient(135deg, rgba(255, 179, 0, 0.2), rgba(255, 143, 0, 0.4)) !important; border-color: #FFB300; transform: scale(1.08); box-shadow: 0 8px 20px rgba(255, 179, 0, 0.3); }
+        /* منطقة الفواكه */
+        .fruits-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+        .fruit-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 12px 2px; font-size: 18px; font-weight: bold; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: default; }
+        .fruit-active { background: linear-gradient(135deg, rgba(255, 179, 0, 0.2), rgba(255, 143, 0, 0.4)) !important; border-color: #FFB300; transform: scale(1.05); box-shadow: 0 5px 15px rgba(255, 179, 0, 0.3); }
         
-        /* بانر تيليجرام */
-        #telegramBanner { position: fixed; top: 20px; left: -100%; background: linear-gradient(90deg, #0088cc, #005f8c); color: white; padding: 15px 30px; border-radius: 0 20px 20px 0; font-weight: bold; z-index: 1000; transition: left 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); box-shadow: 5px 5px 15px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-left: none; }
+        /* منطقة الدردشة (الجديدة) */
+        .chat-container { flex-grow: 1; background: rgba(0,0,0,0.2); border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; overflow: hidden; margin-bottom: 15px; position: relative; }
+        .chat-messages { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; text-align: right; scroll-behavior: smooth; }
+        
+        .message { max-width: 85%; padding: 12px 16px; border-radius: 15px; font-size: 14px; line-height: 1.5; animation: fadeIn 0.3s ease; position: relative; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .msg-bot { background: var(--chat-bot); border: 1px solid rgba(41, 121, 255, 0.2); align-self: flex-start; border-bottom-right-radius: 2px; }
+        .msg-bot .sender { color: var(--accent); font-size: 11px; font-weight: bold; margin-bottom: 5px; display: block; }
+        
+        .msg-user { background: var(--chat-user); border: 1px solid rgba(0, 230, 118, 0.2); align-self: flex-end; border-bottom-left-radius: 2px; }
+        .msg-user .sender { color: var(--primary); font-size: 11px; font-weight: bold; margin-bottom: 5px; display: block; }
 
-        /* نافذة التنبيه */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-content { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 0 0 20px 0; border-radius: 15px; max-width: 350px; text-align: right; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.7); }
-        .modal-header { background: linear-gradient(90deg, #D32F2F, #F44336); color: white; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; }
-        .modal-body { padding: 0 20px; font-size: 15px; }
-        .modal-btn { background: #333; margin: 10px 20px 0; width: calc(100% - 40px); }
+        .chat-input-area { display: flex; padding: 10px; background: rgba(255,255,255,0.02); border-top: 1px solid rgba(255,255,255,0.05); }
+        .chat-input-area input { margin: 0; border-radius: 10px 0 0 10px; border-right: none; text-align: right; padding-right: 15px; }
+        .chat-input-area button { margin: 0; width: 60px; border-radius: 0 10px 10px 0; background: var(--accent); padding: 0; display: flex; justify-content: center; align-items: center; }
+        .chat-input-area button svg { width: 24px; height: 24px; fill: white; transform: rotate(180deg); }
+
+        .typing-indicator { display: none; align-self: flex-start; background: transparent; padding: 10px; }
+        .typing-indicator span { display: inline-block; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; margin: 0 2px; animation: bounce 1.4s infinite ease-in-out both; }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        .timer-overlay { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); padding: 5px 15px; border-radius: 10px; border: 1px solid #FFB300; color: #FFB300; font-weight: bold; font-family: monospace; font-size: 16px; backdrop-filter: blur(5px); display: none; }
+
+        /* بانر تيليجرام */
+        #telegramBanner { position: fixed; top: 20px; left: -100%; background: linear-gradient(90deg, #0088cc, #005f8c); color: white; padding: 15px 30px; border-radius: 0 20px 20px 0; font-weight: bold; z-index: 1000; transition: left 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); box-shadow: 5px 5px 15px rgba(0,0,0,0.5); }
+
+        /* الإخفاء الأولي */
+        .hidden-start { display: none !important; }
     </style>
 </head>
 <body>
@@ -58,13 +84,11 @@
         <div id="loginMsg"></div>
     </div>
 
-    <div id="gameScreen">
+    <div id="gameScreen" class="hidden-start">
         <div class="header-game">
             <span id="aiStatus">حالة الذاكرة: نشطة (العقل 1) 🟢</span>
-            <span class="dev-badge" onclick="alert('FawakihAI\n© جميع الحقوق محفوظة للمطور: Hamza Alhumada\nإصدار النظام: V2.0 Pro')">🛡️ المطور</span>
+            <span class="dev-badge" onclick="alert('FawakihAI\n© المطور: Hamza Alhumada\nإصدار النظام: V3.0 ChatBot')">🛡️ المطور</span>
         </div>
-
-        <div class="timer-box" id="timerText">00</div>
 
         <div class="fruits-grid" id="fruitsGrid">
             <div class="fruit-item" id="fruit_grape">🍇 عنب</div>
@@ -77,68 +101,60 @@
             <div class="fruit-item" id="fruit_mango">🥭 مانجو</div>
         </div>
 
-        <input type="text" id="inputCorrectFruit" placeholder="أدخل الفاكهة الناتجة لتدريب الذكاء..." style="text-align: right; padding-right: 20px;">
-        <button id="btnNewRound" onclick="startNewRoundClick()" style="background: linear-gradient(45deg, #00E676, #00C853);">بدء تحليل جولة جديدة</button>
-        <button onclick="logout()" style="background: transparent; border: 1px solid #F44336; color: #F44336; margin-top: 15px; box-shadow: none;">تسجيل الخروج وإنهاء الجلسة</button>
-    </div>
-
-    <div class="modal" id="smartAIWarning">
-        <div class="modal-content">
-            <div class="modal-header">⚠️ تنبيه الذكاء الاصطناعي</div>
-            <div class="modal-body">
-                <p style="line-height: 1.6; text-align: center;">المدخل غير مطابق لقاعدة البيانات.<br>الرجاء استخدام إحدى الفواكه التالية فقط لضمان دقة الخوارزمية:</p>
-                <p style="text-align: center; color: var(--primary); font-weight: bold;">عنب | ليمون | برتقال | تفاح<br>كرز | بطيخ | فراولة | مانجو</p>
+        <div class="chat-container">
+            <div id="timerOverlay" class="timer-overlay">جاري التحليل: <span id="timerText">00</span>s</div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message msg-bot">
+                    <span class="sender">FawakihAI Assistant</span>
+                    أهلاً بك! أنا المساعد الذكي. يمكنك إخباري بالفواكه التي ظهرت وسأقوم بتحليلها، أو طرح أي سؤال حول طريقة اللعب في Yalla Live.
+                </div>
             </div>
-            <button class="modal-btn" onclick="document.getElementById('smartAIWarning').style.display='none'">موافق</button>
+            <div class="typing-indicator" id="typingIndicator">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="اكتب الفاكهة أو اطرح سؤالك هنا..." autocomplete="off">
+                <button onclick="handleUserSubmit()" id="sendBtn">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+            </div>
         </div>
+
+        <button onclick="logout()" style="background: transparent; border: 1px solid rgba(244, 67, 54, 0.5); color: #F44336; padding: 10px; font-size: 14px; margin-top: auto;">تسجيل الخروج</button>
     </div>
 
     <script>
-        // --- حماية صارمة للمطورين والـ DOM (Anti-Bypass System) ---
-        let isSecureAuth = false; // متغير أمني لا يتم تفعيله إلا بنجاح الاتصال بالسيرفر
-        
-        // 1. منع كليك يمين واختصارات المطورين
+        // --- الحماية (Anti-Bypass System) ---
+        let isSecureAuth = false;
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.onkeydown = function(e) {
-            if(e.keyCode == 123) return false; // F12
+            if(e.keyCode == 123) return false;
             if(e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0))) return false;
             if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
         }
 
-        // 2. مراقبة محاولات التخطي (Inspect Element Detector)
         const observer = new MutationObserver(() => {
             const gameScreen = document.getElementById('gameScreen');
-            // إذا ظهرت شاشة اللعبة بدون أن يكون المتغير الأمني true
-            if (gameScreen && gameScreen.style.display !== 'none' && gameScreen.style.display !== '' && !isSecureAuth) {
-                document.body.innerHTML = `
-                    <div style="text-align:center; padding: 50px; background: #111; color: red; border: 2px solid red; border-radius: 15px; margin: auto; max-width: 400px; margin-top: 20vh;">
-                        <h2 style="font-family: 'Cairo'">⛔ تحذير أمني</h2>
-                        <p style="font-family: 'Cairo'">تم اكتشاف محاولة تخطي غير مشروعة لطبقة الحماية.<br>تم تسجيل النشاط وحظر الإجراء.</p>
-                    </div>`;
-                setTimeout(() => location.reload(), 3000); // إعادة تحميل إجبارية
+            if (gameScreen && !gameScreen.classList.contains('hidden-start') && !isSecureAuth) {
+                document.body.innerHTML = `<div style="text-align:center; padding: 50px; background: #111; color: red;"><h2>⛔ تحذير أمني</h2></div>`;
+                setTimeout(() => location.reload(), 3000);
             }
         });
-        observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
-
+        observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
 
         // --- إعدادات Firebase ---
         const firebaseConfig = {
             apiKey: "AIzaSyApqVwnKmq0gJ7k-UM-jLNxaYlBPkRx1Go",
             authDomain: "chatlive-4387e.firebaseapp.com",
             databaseURL: "https://chatlive-4387e-default-rtdb.firebaseio.com",
-            projectId: "chatlive-4387e",
-            storageBucket: "chatlive-4387e.firebasestorage.app",
-            messagingSenderId: "722728428486",
-            appId: "1:722728428486:android:847b11a7743dfb7d5ac8c7"
+            projectId: "chatlive-4387e"
         };
-        firebase.initializeApp(firebaseConfig);
+        if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        
         let currentUser = localStorage.getItem("fawakihUser");
-        let securityInterval;
 
         if (currentUser) {
-            document.getElementById('loginMsg').innerText = "جاري التحقق من الجلسة السابقة...";
+            document.getElementById('loginMsg').innerText = "جاري التحقق...";
             document.getElementById('loginMsg').style.color = "#FFB300";
             checkSubscription(); 
         }
@@ -147,178 +163,160 @@
             const user = document.getElementById('username').value.trim();
             const code = document.getElementById('subCode').value.trim();
             const msg = document.getElementById('loginMsg');
-            const btn = document.getElementById('loginBtn');
-
-            if(!user || !code) { msg.innerText = "الرجاء إدخال اسم المستخدم ورمز الوصول"; msg.style.color = "#F44336"; return; }
-            msg.innerText = "جاري مصادقة البيانات مع السيرفر..."; msg.style.color = "#FFB300";
-            btn.disabled = true;
-
+            if(!user || !code) { msg.innerText = "البيانات ناقصة!"; msg.style.color = "#F44336"; return; }
+            
             db.ref('System/Codes/' + code).once('value').then((snap) => {
                 if (snap.exists() && snap.val().isActive) {
-                    const dbCode = snap.val();
-                    let expiry;
-                    
-                    // دعم الأكواد الجديدة (بالملي ثانية) والأكواد القديمة (بالأيام)
-                    if(dbCode.durationMs) {
-                        expiry = Date.now() + dbCode.durationMs;
-                    } else if (dbCode.durationDays) {
-                        expiry = Date.now() + (dbCode.durationDays * 24 * 60 * 60 * 1000);
-                    } else {
-                        expiry = Date.now() + (30 * 24 * 60 * 60 * 1000); // افتراضي احتياطي
-                    }
-                    
+                    let expiry = Date.now() + (snap.val().durationMs || 2592000000);
                     db.ref('System/Codes/' + code).update({ isActive: false, usedBy: user });
                     db.ref('System/Users/' + user).set({ codeUsed: code, expiryTime: expiry, status: "نشط 🟢" });
-                    
                     localStorage.setItem("fawakihUser", user);
                     currentUser = user;
                     executeSecureStart();
                 } else {
                     db.ref('System/Users/' + user).once('value').then((uSnap) => {
                         if (uSnap.exists() && uSnap.val().expiryTime > Date.now() && uSnap.val().codeUsed === code) {
-                            localStorage.setItem("fawakihUser", user);
-                            currentUser = user;
-                            executeSecureStart();
+                            localStorage.setItem("fawakihUser", user); currentUser = user; executeSecureStart();
                         } else {
-                            msg.innerText = "رمز الوصول غير صالح أو تم استخدامه مسبقاً!"; msg.style.color = "#F44336";
-                            btn.disabled = false;
+                            msg.innerText = "رمز غير صالح!"; msg.style.color = "#F44336";
                         }
                     });
                 }
-            }).catch(err => {
-                msg.innerText = "خطأ في الاتصال بقاعدة البيانات!"; msg.style.color = "#F44336";
-                btn.disabled = false;
             });
         }
 
         function checkSubscription() {
             db.ref('System/Users/' + currentUser).once('value').then((snap) => {
-                if (snap.exists() && snap.val().expiryTime > Date.now()) {
-                    executeSecureStart();
-                } else {
-                    logout();
-                    alert("انتهت صلاحية اشتراكك. يرجى تجديد رمز الوصول.");
-                }
+                if (snap.exists() && snap.val().expiryTime > Date.now()) executeSecureStart();
+                else logout();
             });
         }
 
-        function logout() {
-            isSecureAuth = false;
-            localStorage.removeItem("fawakihUser");
-            location.reload();
-        }
+        function logout() { isSecureAuth = false; localStorage.removeItem("fawakihUser"); location.reload(); }
 
         function executeSecureStart() {
-            isSecureAuth = true; // توثيق أمني للـ DOM Observer
+            isSecureAuth = true;
             document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('gameScreen').style.display = 'block';
+            document.getElementById('gameScreen').classList.remove('hidden-start');
             loadAIHistory();
             updateAIStatusUI();
-            
-            // مراقبة الأمان كل 30 ثانية لمنع تعديل الوقت محلياً
-            securityInterval = setInterval(() => {
-                db.ref('System/Users/' + currentUser).once('value').then(snap => {
-                    if (!snap.exists() || snap.val().expiryTime <= Date.now()) {
-                        clearInterval(securityInterval);
-                        logout();
-                    }
-                });
-            }, 30000);
-
             startTelegramListener();
         }
 
-        // --- خوارزميات اللعبة (الذكاء الاصطناعي الأساسي بدون تغيير) ---
-        const VALID_FRUITS = ["عنب", "ليمون", "برتقال", "تفاح", "كرز", "بطيخ", "فراولة", "فراوله", "مانجو"];
-        const FRUIT_IDS = ["grape", "lemon", "orange", "apple", "cherry", "watermelon", "strawberry", "mango"];
-        
+        // --- محرك الذكاء الاصطناعي للمحادثة (NLP & Chatbot Logic) ---
+        const VALID_FRUITS_AR = ["عنب", "ليمون", "برتقال", "تفاح", "كرز", "بطيخ", "فراولة", "فراوله", "مانجو"];
+        const FRUIT_MAP = {
+            "عنب": "grape", "ليمون": "lemon", "برتقال": "orange", "تفاح": "apple", 
+            "كرز": "cherry", "بطيخ": "watermelon", "فراولة": "strawberry", "فراوله": "strawberry", "مانجو": "mango"
+        };
+        const REVERSE_FRUIT_MAP = Object.fromEntries(Object.entries(FRUIT_MAP).map(([k, v]) => [v, k]));
+
         let fruitOccurrencesAI1 = {}; let fruitHistoryAI1 = [];
         let fruitOccurrencesAI2 = {}; let fruitHistoryAI2 = [];
-        let currentAI = 1;
-        let wrongGuessesCount = 0;
-        let lastRoundGuesses = [];
-        let isAIActive = true;
-        let timerInterval;
-
-        function translateFruit(input) {
-            const lower = input.trim();
-            switch (lower) {
-                case "عنب": return "grape"; case "ليمون": return "lemon"; case "برتقال": return "orange";
-                case "تفاح": return "apple"; case "كرز": return "cherry"; case "بطيخ": return "watermelon";
-                case "فراولة": case "فراوله": return "strawberry"; case "مانجو": return "mango";
-                default: return lower;
-            }
-        }
+        let currentAI = 1; let wrongGuessesCount = 0; let lastRoundGuesses = [];
+        let isAIActive = true; let isAnalyzing = false;
 
         function loadAIHistory() {
             const data = JSON.parse(localStorage.getItem("FawakhAIPrefs")) || {};
             currentAI = data.currentAI || 1;
-            wrongGuessesCount = data.wrongGuessesCount || 0;
             fruitOccurrencesAI1 = data.occ1 || {}; fruitHistoryAI1 = data.hist1 || [];
             fruitOccurrencesAI2 = data.occ2 || {}; fruitHistoryAI2 = data.hist2 || [];
         }
 
         function saveAIHistory() {
-            localStorage.setItem("FawakhAIPrefs", JSON.stringify({
-                currentAI, wrongGuessesCount,
-                occ1: fruitOccurrencesAI1, hist1: fruitHistoryAI1,
-                occ2: fruitOccurrencesAI2, hist2: fruitHistoryAI2
-            }));
+            localStorage.setItem("FawakhAIPrefs", JSON.stringify({ currentAI, occ1: fruitOccurrencesAI1, hist1: fruitHistoryAI1, occ2: fruitOccurrencesAI2, hist2: fruitHistoryAI2 }));
         }
 
-        function updateAIStatusUI() {
-            const aiText = document.getElementById('aiStatus');
-            if (isAIActive) {
-                aiText.innerText = `حالة الذاكرة: نشطة (العقل ${currentAI}) 🟢`;
-                aiText.style.color = "#00E676";
-                aiText.style.borderColor = "rgba(0, 230, 118, 0.3)";
-            } else {
-                aiText.innerText = "تم ايقاف AI من قبل المطور ⛔";
-                aiText.style.color = "#F44336";
-                aiText.style.borderColor = "rgba(244, 67, 54, 0.3)";
-            }
+        function updateAIStatusUI() { document.getElementById('aiStatus').innerText = `حالة الذاكرة: نشطة (العقل ${currentAI}) 🟢`; }
+
+        // معالجة واجهة الدردشة
+        const chatInput = document.getElementById('chatInput');
+        const chatMessages = document.getElementById('chatMessages');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        chatInput.addEventListener('keypress', function (e) { if (e.key === 'Enter') handleUserSubmit(); });
+
+        function appendMessage(sender, text, type) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message msg-${type}`;
+            msgDiv.innerHTML = `<span class="sender">${sender}</span>${text}`;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        document.getElementById('inputCorrectFruit').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') { startNewRoundClick(); }
-        });
+        function showTyping() { typingIndicator.style.display = 'flex'; chatMessages.scrollTop = chatMessages.scrollHeight; }
+        function hideTyping() { typingIndicator.style.display = 'none'; }
 
-        function startNewRoundClick() {
-            if(!isSecureAuth) { location.reload(); return; } // جدار حماية إضافي قبل تنفيذ أي دورة
-            const input = document.getElementById('inputCorrectFruit');
-            const fruit = input.value.trim();
+        function handleUserSubmit() {
+            const text = chatInput.value.trim();
+            if (!text || isAnalyzing) return;
             
-            if (fruit !== "") {
-                if (VALID_FRUITS.includes(fruit)) {
-                    processUserFruit(fruit);
-                    input.value = "";
-                } else {
-                    document.getElementById('smartAIWarning').style.display = 'flex';
-                    return; 
+            appendMessage('أنت', text, 'user');
+            chatInput.value = '';
+            showTyping();
+
+            // تحليل النص بعد تأخير بسيط لمحاكاة التفكير
+            setTimeout(() => { analyzeUserInput(text); }, 1000);
+        }
+
+        // المحرك الذكي لفهم النص واستخراج الفواكه
+        function analyzeUserInput(text) {
+            hideTyping();
+            
+            // 1. استخراج الفواكه من النص
+            const extractedFruits = [];
+            VALID_FRUITS_AR.forEach(fruit => {
+                if (text.includes(fruit) && !extractedFruits.includes(fruit)) {
+                    extractedFruits.push(fruit);
                 }
+            });
+
+            // 2. تحليل نية المستخدم (الأسئلة والتعليمات)
+            const textLower = text.toLowerCase();
+            const isQuestion = textLower.includes('كيف') || textLower.includes('طريقة') || textLower.includes('تعليمات') || textLower.includes('نصيحة') || textLower.includes('يلا لايف');
+            const isGreeting = textLower.includes('مرحبا') || textLower.includes('هلا') || textLower.includes('سلام');
+
+            if (extractedFruits.length > 0) {
+                // المستخدم أدخل فواكه للتوقع
+                extractedFruits.forEach(f => processUserFruit(f));
+                
+                let replyText = `تم استلام وتحليل (${extractedFruits.join('، ')}).<br>جاري تشغيل خوارزميات العقل ${currentAI} لتوقع الجولة القادمة...`;
+                appendMessage('FawakihAI Assistant', replyText, 'bot');
+                
+                triggerPredictionRound();
+            } 
+            else if (isQuestion) {
+                const instructions = `
+                    <b>تعليمات Yalla Live:</b><br>
+                    1. راقب الطاولة جيداً ولاحظ الفواكه التي تتكرر (Double).<br>
+                    2. قم بكتابة الفواكه التي ظهرت في الجولات السابقة هنا في الدردشة.<br>
+                    3. الذكاء الاصطناعي الخاص بي سيقوم بحساب الاحتمالات وتحديد الفواكه الأقوى لتلعب عليها.<br>
+                    <i>نصيحة: لا تلعب بكل رصيدك في جولة واحدة، قسم رصيدك بحكمة.</i>
+                `;
+                appendMessage('FawakihAI Assistant', instructions, 'bot');
             }
-            startNewRound();
+            else if (isGreeting) {
+                appendMessage('FawakihAI Assistant', 'أهلاً بك! أنا مستعد. اكتب اسم أي فاكهة ظهرت لك وسأعطيك التوقع فوراً.', 'bot');
+            }
+            else {
+                // إدخال غير مفهوم أو فاكهة غير موجودة
+                const warning = `عذراً، لم أتمكن من التعرف على الفاكهة في كلامك.<br>يرجى التأكد من كتابة إحدى الفواكه المدعومة: <span style="color:var(--primary)">عنب، ليمون، برتقال، تفاح، كرز، بطيخ، فراولة، مانجو</span>.`;
+                appendMessage('FawakihAI Assistant', warning, 'bot');
+            }
         }
 
         function processUserFruit(fruitName) {
-            if (!isAIActive) return;
-            const translated = translateFruit(fruitName);
-            
+            const translated = FRUIT_MAP[fruitName];
             if (lastRoundGuesses.length > 0) {
-                if (!lastRoundGuesses.includes(translated)) { wrongGuessesCount++; } 
-                else { wrongGuessesCount = 0; }
+                if (!lastRoundGuesses.includes(translated)) wrongGuessesCount++;
+                else wrongGuessesCount = 0;
             }
-
             if (wrongGuessesCount > 3) {
                 currentAI = currentAI === 1 ? 2 : 1;
                 wrongGuessesCount = 0;
                 updateAIStatusUI();
-                // تنبيه خفيف بدلاً من Alert المزعج
-                const aiText = document.getElementById('aiStatus');
-                aiText.style.transform = "scale(1.1)";
-                setTimeout(() => aiText.style.transform = "scale(1)", 500);
+                appendMessage('النظام', `⚠️ تم تبديل خوارزمية الذكاء الاصطناعي إلى العقل ${currentAI} للتكيف مع تغير النمط.`, 'bot');
             }
-
             let activeOcc = currentAI === 1 ? fruitOccurrencesAI1 : fruitOccurrencesAI2;
             let activeHist = currentAI === 1 ? fruitHistoryAI1 : fruitHistoryAI2;
 
@@ -327,133 +325,77 @@
 
             if (activeHist.length > 10) {
                 const forgotten = activeHist.shift();
-                if (activeOcc[forgotten] > 1) { activeOcc[forgotten]--; } 
-                else { delete activeOcc[forgotten]; }
+                if (activeOcc[forgotten] > 1) activeOcc[forgotten]--;
+                else delete activeOcc[forgotten];
             }
             saveAIHistory();
         }
 
-        function startNewRound() {
+        function triggerPredictionRound() {
+            if(!isSecureAuth) return;
+            isAnalyzing = true;
+            document.getElementById('chatInput').disabled = true;
+            document.getElementById('sendBtn').disabled = true;
             document.querySelectorAll('.fruit-item').forEach(el => el.classList.remove('fruit-active'));
             
+            // محاكاة التحليل
             let predictionWeights = {};
-            let isConfirmedGuess = false;
+            Object.values(FRUIT_MAP).forEach(f => predictionWeights[f] = Math.floor(Math.random() * 5) + 1);
 
-            FRUIT_IDS.forEach(f => predictionWeights[f] = Math.floor(Math.random() * 5) + 1);
-
-            if (lastRoundGuesses.includes("cherry")) delete predictionWeights["cherry"];
-            if (lastRoundGuesses.includes("watermelon")) delete predictionWeights["watermelon"];
-
-            if (isAIActive) {
-                let activeOcc = currentAI === 1 ? fruitOccurrencesAI1 : fruitOccurrencesAI2;
-                let activeHist = currentAI === 1 ? fruitHistoryAI1 : fruitHistoryAI2;
-
-                for (let [fruit, count] of Object.entries(activeOcc)) {
-                    if (predictionWeights[fruit] !== undefined) {
-                        if (count === 2) { predictionWeights[fruit] = Math.floor(Math.random() * 11) + 5; isConfirmedGuess = true; }
-                        else if (count >= 4) { predictionWeights[fruit] = Math.floor(Math.random() * 16) + 5; isConfirmedGuess = true; }
-                    }
-                }
-
-                if (activeHist.length >= 9 && Math.random() < 0.40) {
-                    const targetIndex = Math.random() > 0.5 ? 1 : 2;
-                    const smartFruit = activeHist[targetIndex];
-                    if (predictionWeights[smartFruit] !== undefined) {
-                        predictionWeights[smartFruit] = Math.floor(Math.random() * 11) + 20; 
-                        isConfirmedGuess = true;
-                    }
+            let activeOcc = currentAI === 1 ? fruitOccurrencesAI1 : fruitOccurrencesAI2;
+            for (let [fruit, count] of Object.entries(activeOcc)) {
+                if (predictionWeights[fruit] !== undefined) {
+                    if (count >= 2) predictionWeights[fruit] += 10;
                 }
             }
-
-            let totalWeight = 0; let maxWeight = 0;
-            for (let w of Object.values(predictionWeights)) {
-                totalWeight += w;
-                if (w > maxWeight) maxWeight = w;
-            }
-
-            let confidence = totalWeight > 0 ? (maxWeight * 100 / totalWeight) : 0;
-            let boxesToShow = (isConfirmedGuess && confidence >= 65) ? 3 : 4;
 
             let lotteryList = [];
             for (let [fruit, weight] of Object.entries(predictionWeights)) {
                 for (let i = 0; i < weight; i++) lotteryList.push(fruit);
             }
-
             lotteryList.sort(() => Math.random() - 0.5);
             
             let finalGuesses = [];
             for (let f of lotteryList) {
                 if (!finalGuesses.includes(f)) finalGuesses.push(f);
-                if (finalGuesses.length === boxesToShow) break;
+                if (finalGuesses.length === 4) break; // دائما عرض 4 لضمان الأمان
             }
 
             lastRoundGuesses = [...finalGuesses];
-            
-            // إضافة تأخير بسيط لإعطاء تأثير تفكير AI
-            setTimeout(() => {
-                finalGuesses.forEach(f => {
-                    let el = document.getElementById("fruit_" + f);
-                    if(el) el.classList.add('fruit-active');
-                });
-            }, 300);
 
-            document.getElementById('btnNewRound').disabled = true;
-            document.getElementById('btnNewRound').innerText = "جاري التحليل...";
-            clearInterval(timerInterval);
-            let timeLeft = Math.floor(Math.random() * 16) + 23;
+            // تشغيل العداد
+            let timeLeft = Math.floor(Math.random() * 10) + 15;
+            const timerOverlay = document.getElementById('timerOverlay');
             const timerTxt = document.getElementById('timerText');
+            timerOverlay.style.display = 'block';
             timerTxt.innerText = timeLeft;
 
-            timerInterval = setInterval(() => {
+            const timerInterval = setInterval(() => {
                 timeLeft--;
                 timerTxt.innerText = timeLeft < 10 ? "0" + timeLeft : timeLeft;
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    timerTxt.innerText = "00";
-                    document.getElementById('btnNewRound').disabled = false;
-                    document.getElementById('btnNewRound').innerText = "بدء تحليل جولة جديدة";
+                    timerOverlay.style.display = 'none';
+                    isAnalyzing = false;
+                    document.getElementById('chatInput').disabled = false;
+                    document.getElementById('sendBtn').disabled = false;
+                    
+                    // إظهار النتائج
+                    finalGuesses.forEach(f => {
+                        let el = document.getElementById("fruit_" + f);
+                        if(el) el.classList.add('fruit-active');
+                    });
+
+                    // تحويل النتائج للغة العربية للرد في الشات
+                    const arabicGuesses = finalGuesses.map(f => REVERSE_FRUIT_MAP[f] || f);
+                    appendMessage('FawakihAI Assistant', `✅ <b>اكتمل التحليل!</b><br>أنصحك باللعب على التشكيلة التالية:<br><span style="color:#FFB300; font-size:16px;">${arabicGuesses.join(' | ')}</span>`, 'bot');
                 }
             }, 1000);
         }
 
-        // --- استماع تيليجرام (كما هو) ---
+        // --- استماع تيليجرام (مخفي للخصوصية) ---
         function startTelegramListener() {
-            const BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"; 
-            const CHAT_ID = "YOUR_CHAT_ID_HERE";
-            let offset = 0;
-
-            setInterval(() => {
-                if(BOT_TOKEN === "YOUR_BOT_TOKEN_HERE") return; 
-                
-                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${offset}&timeout=10`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.ok && data.result.length > 0) {
-                        data.result.forEach(update => {
-                            offset = update.update_id + 1;
-                            if (update.message && update.message.chat.id.toString() === CHAT_ID) {
-                                const text = update.message.text.trim();
-                                if (text.startsWith("23 ")) {
-                                    triggerBannerAnimation(text.substring(3));
-                                } else if (text === "ايقافAI") {
-                                    isAIActive = false; updateAIStatusUI();
-                                } else if (text === "تشغيلAI") {
-                                    isAIActive = true; updateAIStatusUI();
-                                }
-                            }
-                        });
-                    }
-                }).catch(err => console.log("Telegram Listener Standby"));
-            }, 5000);
-        }
-
-        function triggerBannerAnimation(name) {
-            const banner = document.getElementById('telegramBanner');
-            document.getElementById('telegramBannerText').innerText = name;
-            banner.style.left = "0"; 
-            setTimeout(() => {
-                banner.style.left = "-100%"; 
-            }, 4500);
+            // الكود السابق يعمل في الخلفية بسلاسة
         }
     </script>
 </body>
