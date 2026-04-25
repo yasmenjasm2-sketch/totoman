@@ -23,31 +23,39 @@
         button:disabled { background: #555; cursor: not-allowed; transform: none; box-shadow: none; }
         #loginMsg { margin-top: 15px; font-weight: bold; font-size: 14px; min-height: 20px; }
 
-        /* شاشة اللعبة */
-        #gameScreen { display: none; width: 100%; max-width: 550px; padding: 20px; text-align: center; }
+        /* الشاشة الرئيسية المدمجة (لعبة + محادثة) */
+        .app-container { display: none; width: 100%; max-width: 550px; overflow: hidden; position: relative; padding: 0; border-radius: 15px; }
+        .slider-wrapper { display: flex; width: 200%; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
+        .panel { width: 50%; padding: 20px; box-sizing: border-box; flex-shrink: 0; text-align: center; display: flex; flex-direction: column; }
+        
         .header-game { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); }
         #aiStatus { color: var(--primary); font-weight: bold; background: rgba(0, 230, 118, 0.1); padding: 6px 15px; border-radius: 20px; font-size: 14px; border: 1px solid rgba(0, 230, 118, 0.3); }
         .dev-badge { font-size: 13px; color: #aaa; cursor: pointer; background: rgba(255,255,255,0.05); padding: 5px 10px; border-radius: 10px; transition: 0.3s; }
         .dev-badge:hover { color: white; background: rgba(255,255,255,0.1); }
         .timer-box { font-size: 50px; font-weight: 900; color: #FFB300; margin: 5px 0 20px; text-shadow: 0 0 20px rgba(255, 179, 0, 0.4); font-family: monospace; }
         
-        /* واجهة محادثة الذكاء الاصطناعي Yalla Live */
-        #aiConversationBox { display: none; background: rgba(41, 121, 255, 0.05); border: 1px solid rgba(41, 121, 255, 0.3); padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; text-align: right; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); border-right: 4px solid var(--accent); }
-        .ai-title { color: var(--accent); font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
-        .ai-title span { font-size: 12px; background: var(--accent); color: white; padding: 2px 6px; border-radius: 5px; }
-        #aiConversationText { margin: 0; color: #eee; line-height: 1.5; }
-
         .fruits-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 25px; }
         .fruit-item { background: rgba(255,255,255,0.03); border: 2px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 18px 5px; font-size: 22px; font-weight: bold; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: default; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .fruit-active { background: linear-gradient(135deg, rgba(255, 179, 0, 0.2), rgba(255, 143, 0, 0.4)) !important; border-color: #FFB300; transform: scale(1.08); box-shadow: 0 8px 20px rgba(255, 179, 0, 0.3); }
         
+        /* واجهة المحادثة الذكية المتطورة */
+        .slide-btn { background: rgba(41, 121, 255, 0.15); border: 1px solid rgba(41, 121, 255, 0.5); margin-top: 15px; color: #64B5F6; box-shadow: none; }
+        .slide-btn:hover { background: rgba(41, 121, 255, 0.3); color: white; }
+        .chat-box { flex-grow: 1; width: 100%; background: rgba(0,0,0,0.4); border-radius: 12px; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; height: 350px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); box-sizing: border-box; }
+        .chat-msg { padding: 12px 16px; border-radius: 15px; font-size: 14px; max-width: 85%; word-wrap: break-word; line-height: 1.6; }
+        .ai-msg { background: rgba(41, 121, 255, 0.1); border-right: 3px solid var(--accent); align-self: flex-start; text-align: right; color: #E3F2FD; }
+        .user-msg { background: rgba(0, 230, 118, 0.1); border-left: 3px solid var(--primary); align-self: flex-end; text-align: right; color: white; }
+        .chat-input-area { display: flex; width: 100%; gap: 10px; }
+        .chat-input-area input { margin: 0; flex-grow: 1; text-align: right; padding-right: 15px; }
+        .chat-input-area button { width: auto; padding: 10px 25px; margin: 0; background: linear-gradient(45deg, var(--accent), #1E88E5); }
+
         /* بانر تيليجرام */
         #telegramBanner { position: fixed; top: 20px; left: -100%; background: linear-gradient(90deg, #0088cc, #005f8c); color: white; padding: 15px 30px; border-radius: 0 20px 20px 0; font-weight: bold; z-index: 1000; transition: left 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); box-shadow: 5px 5px 15px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-left: none; }
 
         /* نافذة التنبيه */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .modal-content { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 0 0 20px 0; border-radius: 15px; max-width: 350px; text-align: right; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.7); }
-        .modal-header { background: linear-gradient(90deg, #D32F2F, #F44336); color: white; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; }
+        .modal-header { background: linear-gradient(90deg, #D32F2F, #F44336); color: white; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; transition: background 0.3s; }
         .modal-body { padding: 0 20px; font-size: 15px; }
         .modal-btn { background: #333; margin: 10px 20px 0; width: calc(100% - 40px); }
     </style>
@@ -65,43 +73,58 @@
         <div id="loginMsg"></div>
     </div>
 
-    <div id="gameScreen">
-        <div class="header-game">
-            <span id="aiStatus">حالة الذاكرة: نشطة (العقل 1) 🟢</span>
-            <span class="dev-badge" onclick="alert('FawakihAI\n© جميع الحقوق محفوظة للمطور: Hamza\nإصدار النظام: V3.1.4 Pro')">🛡️ المطور</span>
+    <div id="gameScreen" class="app-container">
+        <div class="slider-wrapper" id="sliderWrapper">
+            
+            <div class="panel" id="gamePanel">
+                <div class="header-game">
+                    <span id="aiStatus">حالة الذاكرة: نشطة (العقل 1) 🟢</span>
+                    <span class="dev-badge" onclick="alert('FawakihAI\n© جميع الحقوق محفوظة للمطور: Hamza\nإصدار النظام: V3.1.4 Pro')">🛡️ المطور</span>
+                </div>
+
+                <div class="timer-box" id="timerText">00</div>
+
+                <div class="fruits-grid" id="fruitsGrid">
+                    <div class="fruit-item" id="fruit_grape">🍇 عنب</div>
+                    <div class="fruit-item" id="fruit_lemon">🍋 ليمون</div>
+                    <div class="fruit-item" id="fruit_orange">🍊 برتقال</div>
+                    <div class="fruit-item" id="fruit_apple">🍎 تفاح</div>
+                    <div class="fruit-item" id="fruit_cherry">🍒 كرز</div>
+                    <div class="fruit-item" id="fruit_watermelon">🍉 بطيخ</div>
+                    <div class="fruit-item" id="fruit_strawberry">🍓 فراولة</div>
+                    <div class="fruit-item" id="fruit_mango">🥭 مانجو</div>
+                </div>
+
+                <input type="text" id="inputCorrectFruit" placeholder="أدخل الفاكهة الناتجة لتدريب الذكاء..." style="text-align: right; padding-right: 20px;">
+                <button id="btnNewRound" onclick="startNewRoundClick()" style="background: linear-gradient(45deg, #00E676, #00C853);">بدء تحليل جولة جديدة</button>
+                <button onclick="slideScreen('ai')" class="slide-btn">💬 التحدث مع المساعد الذكي (اسحب لليسار)</button>
+            </div>
+
+            <div class="panel" id="chatPanel">
+                <div class="header-game" style="width: calc(100% - 40px);">
+                    <span style="color: var(--accent); font-weight: bold; font-size: 14px;">🤖 مساعد Transformers الذكي</span>
+                    <span class="dev-badge" onclick="slideScreen('game')">العودة للعبة ➡️</span>
+                </div>
+                <div class="chat-box" id="chatBox">
+                    <div class="chat-msg ai-msg">أهلاً بك! أنا المساعد الذكي المدمج بخوارزميات Transformers. متصل بجهازك لتحليل مدخلاتك واكتشاف الأنماط. كيف يمكنني مساعدتك اليوم؟</div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="اكتب مشكلتك هنا ليحللها الذكاء الاصطناعي...">
+                    <button onclick="sendChatMessage()">إرسال</button>
+                </div>
+            </div>
+
         </div>
-
-        <div id="aiConversationBox">
-            <div class="ai-title">🤖 الموجه الذكي <span>Transformers.js</span></div>
-            <p id="aiConversationText">جاري تهيئة نموذج الذكاء الاصطناعي للتحليل...</p>
-        </div>
-
-        <div class="timer-box" id="timerText">00</div>
-
-        <div class="fruits-grid" id="fruitsGrid">
-            <div class="fruit-item" id="fruit_grape">🍇 عنب</div>
-            <div class="fruit-item" id="fruit_lemon">🍋 ليمون</div>
-            <div class="fruit-item" id="fruit_orange">🍊 برتقال</div>
-            <div class="fruit-item" id="fruit_apple">🍎 تفاح</div>
-            <div class="fruit-item" id="fruit_cherry">🍒 كرز</div>
-            <div class="fruit-item" id="fruit_watermelon">🍉 بطيخ</div>
-            <div class="fruit-item" id="fruit_strawberry">🍓 فراولة</div>
-            <div class="fruit-item" id="fruit_mango">🥭 مانجو</div>
-        </div>
-
-        <input type="text" id="inputCorrectFruit" placeholder="أدخل الفاكهة الناتجة لتدريب الذكاء..." style="text-align: right; padding-right: 20px;">
-        <button id="btnNewRound" onclick="startNewRoundClick()" style="background: linear-gradient(45deg, #00E676, #00C853);">بدء تحليل جولة جديدة</button>
-        <button onclick="logout()" style="background: transparent; border: 1px solid #F44336; color: #F44336; margin-top: 15px; box-shadow: none;">تسجيل الخروج وإنهاء الجلسة</button>
     </div>
 
     <div class="modal" id="smartAIWarning">
         <div class="modal-content">
-            <div class="modal-header">⚠️ تنبيه الذكاء الاصطناعي</div>
-            <div class="modal-body">
+            <div class="modal-header" id="modalWarningTitle">⚠️ تنبيه الذكاء الاصطناعي</div>
+            <div class="modal-body" id="modalWarningBody">
                 <p style="line-height: 1.6; text-align: center;">المدخل غير مطابق لقاعدة البيانات.<br>الرجاء استخدام إحدى الفواكه التالية فقط لضمان دقة الخوارزمية:</p>
                 <p style="text-align: center; color: var(--primary); font-weight: bold;">عنب | ليمون | برتقال | تفاح<br>كرز | بطيخ | فراولة | مانجو</p>
             </div>
-            <button class="modal-btn" onclick="document.getElementById('smartAIWarning').style.display='none'">موافق</button>
+            <button class="modal-btn" id="modalWarningBtn">موافق</button>
         </div>
     </div>
 
@@ -197,17 +220,21 @@
                 if (snap.exists() && snap.val().expiryTime > Date.now()) {
                     executeSecureStart();
                 } else {
-                    window.logout();
-                    alert("انتهت صلاحية اشتراكك. يرجى تجديد رمز الوصول.");
+                    handleSubscriptionExpiry();
                 }
             });
         }
 
-        window.logout = function() {
+        function handleSubscriptionExpiry() {
             isSecureAuth = false;
             localStorage.removeItem("fawakihUser");
             location.reload();
         }
+
+        // تم تعيين زر الإغلاق الافتراضي لرسائل الخطأ
+        document.getElementById('modalWarningBtn').onclick = function() {
+            document.getElementById('smartAIWarning').style.display='none';
+        };
 
         function executeSecureStart() {
             isSecureAuth = true; 
@@ -216,14 +243,14 @@
             loadAIHistory();
             updateAIStatusUI();
             
-            // تهيئة العقل الاصطناعي Transformers عند تسجيل الدخول الناجح
             if(window.initTransformersPipeline) window.initTransformersPipeline();
 
+            // فحص دوري للاشتراك في الخلفية بدون زر إنهاء جلسة
             securityInterval = setInterval(() => {
                 db.ref('System/Users/' + currentUser).once('value').then(snap => {
                     if (!snap.exists() || snap.val().expiryTime <= Date.now()) {
                         clearInterval(securityInterval);
-                        window.logout();
+                        handleSubscriptionExpiry();
                     }
                 });
             }, 30000);
@@ -231,8 +258,28 @@
             startTelegramListener();
         }
 
+        // --- نظام التبديل (السحب والأزرار) ---
+        window.slideScreen = function(target) {
+            const slider = document.getElementById('sliderWrapper');
+            if(target === 'ai') {
+                slider.style.transform = "translateX(50%)"; // اتجاه RTL للتحريك لليسار
+            } else {
+                slider.style.transform = "translateX(0)";
+            }
+        };
+
+        let touchstartX = 0, touchendX = 0;
+        document.getElementById('gameScreen').addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; });
+        document.getElementById('gameScreen').addEventListener('touchend', e => { 
+            touchendX = e.changedTouches[0].screenX; 
+            const swipeDistance = touchendX - touchstartX;
+            if(swipeDistance < -50 && isSecureAuth) slideScreen('ai'); // سحب لليسار
+            if(swipeDistance > 50 && isSecureAuth) slideScreen('game'); // سحب لليمين
+        });
+
         const VALID_FRUITS = ["عنب", "ليمون", "برتقال", "تفاح", "كرز", "بطيخ", "فراولة", "فراوله", "مانجو"];
         const FRUIT_IDS = ["grape", "lemon", "orange", "apple", "cherry", "watermelon", "strawberry", "mango"];
+        const FRUIT_AR_NAMES = { "grape": "عنب", "lemon": "ليمون", "orange": "برتقال", "apple": "تفاح", "cherry": "كرز", "watermelon": "بطيخ", "strawberry": "فراولة", "mango": "مانجو" };
         
         let fruitOccurrencesAI1 = {}; let fruitHistoryAI1 = [];
         let fruitOccurrencesAI2 = {}; let fruitHistoryAI2 = [];
@@ -285,6 +332,44 @@
             if (e.key === 'Enter') { window.startNewRoundClick(); }
         });
 
+        // --- محرك المحادثة الذكية ---
+        function addChatMessage(text, className) {
+            const box = document.getElementById('chatBox');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `chat-msg ${className}`;
+            msgDiv.innerText = text;
+            box.appendChild(msgDiv);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        window.sendChatMessage = function() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if(!text) return;
+            
+            addChatMessage(text, 'user-msg');
+            input.value = "";
+            
+            // رد احترافي مبني على قواعد البيانات والتسجيلات
+            setTimeout(() => {
+                let activeOcc = currentAI === 1 ? fruitOccurrencesAI1 : fruitOccurrencesAI2;
+                let sorted = Object.keys(activeOcc).sort((a,b) => activeOcc[b] - activeOcc[a]);
+                let top4 = sorted.slice(0, 4).map(f => FRUIT_AR_NAMES[f] || f);
+                
+                let reply = `لقد استلمت رسالتك وأقوم بتحليل المعطيات الحالية.\nبناءً على الترددات المسجلة في الذاكرة، الحل الأمثل لمشكلتك هو التركيز على الأنماط الأكثر تكراراً وهي: [ ${top4.join(' ، ')} ].\nهل ترغب في تعديل بارامترات التحليل لجولة قادمة؟`;
+                addChatMessage(reply, 'ai-msg');
+            }, 1200);
+        };
+
+        function triggerSmartAIIntervention() {
+            let activeOcc = currentAI === 1 ? fruitOccurrencesAI1 : fruitOccurrencesAI2;
+            let sorted = Object.keys(activeOcc).sort((a,b) => activeOcc[b] - activeOcc[a]);
+            let top4 = sorted.slice(0, 4).map(f => FRUIT_AR_NAMES[f] || f);
+            
+            let msg = `أهلاً بك، تم توجيهك إليّ نظراً لأنك تخطئ في التخمين مؤخراً وواجهت صعوبة في الجولات الثلاث الأخيرة.\nلقد قمت بتحليل سلوكيات اللعب ومراجعة قاعدة التسجيلات لتعلم النمط.\nلحل مشكلتك، أنصحك بالاعتماد بشكل كبير على الفواكه الأربعة التالية التي تتصدر السجلات حالياً:\n🍒🍎 [ ${top4.join(' - ')} ] 🍊🍇\nاتبع هذه التوصية في الجولة القادمة وسأستمر بمراقبة أدائك.`;
+            addChatMessage(msg, 'ai-msg');
+        }
+
         window.startNewRoundClick = function() {
             if(!isSecureAuth) { location.reload(); return; } 
             const input = document.getElementById('inputCorrectFruit');
@@ -299,7 +384,6 @@
                     return; 
                 }
             }
-            // استدعاء الوظيفة غير المتزامنة
             window.executeAiRound();
         }
 
@@ -312,13 +396,40 @@
                 else { wrongGuessesCount = 0; }
             }
 
-            if (wrongGuessesCount > 3) {
-                currentAI = currentAI === 1 ? 2 : 1;
-                wrongGuessesCount = 0;
+            // توجيه الذكاء الاصطناعي الإجباري بعد 3 أخطاء
+            if (wrongGuessesCount >= 3) {
+                currentAI = currentAI === 1 ? 2 : 1; // التبديل للعقل 2
                 updateAIStatusUI();
-                const aiText = document.getElementById('aiStatus');
-                aiText.style.transform = "scale(1.1)";
-                setTimeout(() => aiText.style.transform = "scale(1)", 500);
+                
+                setTimeout(() => {
+                    const warningModal = document.getElementById('smartAIWarning');
+                    const title = document.getElementById('modalWarningTitle');
+                    const body = document.getElementById('modalWarningBody');
+                    const btn = document.getElementById('modalWarningBtn');
+                    
+                    title.innerText = "🤖 تدخل الذكاء الاصطناعي العاجل";
+                    title.style.background = "linear-gradient(90deg, #1E88E5, #2979FF)";
+                    body.innerHTML = "<p style='line-height: 1.6; text-align: center;'>الاحظ أنك تخطئ في التخمين لمدة 3 جولات متتالية.<br>دعني أوجهك لمكتبي الذكي لحل المشكلة وإعطائك التحليل الدقيق.</p>";
+                    btn.innerText = "الانتقال للمحادثة الذكية";
+                    btn.style.background = "linear-gradient(45deg, #00E676, #00C853)";
+                    
+                    const oldOnClick = btn.onclick;
+                    btn.onclick = function() {
+                        warningModal.style.display = 'none';
+                        slideScreen('ai');
+                        triggerSmartAIIntervention();
+                        
+                        // استعادة الوضع الافتراضي لرسائل الخطأ
+                        btn.onclick = oldOnClick;
+                        btn.innerText = "موافق";
+                        btn.style.background = "#333";
+                        title.innerText = "⚠️ تنبيه الذكاء الاصطناعي";
+                        title.style.background = "linear-gradient(90deg, #D32F2F, #F44336)";
+                        body.innerHTML = "<p style='line-height: 1.6; text-align: center;'>المدخل غير مطابق لقاعدة البيانات.<br>الرجاء استخدام إحدى الفواكه التالية فقط لضمان دقة الخوارزمية:</p><p style='text-align: center; color: var(--primary); font-weight: bold;'>عنب | ليمون | برتقال | تفاح<br>كرز | بطيخ | فراولة | مانجو</p>";
+                    };
+                    warningModal.style.display = 'flex';
+                }, 300);
+                wrongGuessesCount = 0; // تصفير العداد بعد التدخل
             }
 
             let activeOcc = currentAI === 1 ? fruitOccurrencesAI1 : fruitOccurrencesAI2;
@@ -327,7 +438,6 @@
             activeOcc[translated] = (activeOcc[translated] || 0) + 1;
             activeHist.push(translated);
 
-            // تحديد الذاكرة بـ 10 إدخالات FIFO حسب التحديث
             if (activeHist.length > 10) {
                 const forgotten = activeHist.shift();
                 if (activeOcc[forgotten] > 1) { activeOcc[forgotten]--; } 
@@ -376,49 +486,20 @@
 
     <script type="module">
         import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.16.0';
-        
-        // لمنع تحميل النماذج محلياً والاعتماد على السيرفر
         env.allowLocalModels = false;
 
         window.tfModelLoaded = false;
         let classifier = null;
 
-        const yallaLiveDialogues = [
-            "في Yalla Live، التوقيت والملاحظة هما كل شيء! هل تعتقد أن الفاكهة القادمة ستكون ضمن المحددة؟",
-            "تعليمات اللعب: راقب نمط الفواكه الأخيرة، سأقوم بضبط توقعاتي بناءً على أسلوب لعبك.",
-            "سؤال: هل وزعت رهاناتك بشكل جيد؟ المؤشرات تظهر احتمالية قوية للفواكه المضيئة.",
-            "استعد للجولة القادمة! بناءً على آخر 10 حركات، النظام يتوقع هذه الخيارات لك.",
-            "تأكد من استقرار الشبكة في Yalla Live. قم باختيار إحدى الفواكه المظللة، هل أنت جاهز للضربة؟"
-        ];
-
         window.initTransformersPipeline = async function() {
             try {
-                const convBox = document.getElementById('aiConversationBox');
-                convBox.style.display = 'block';
-                document.getElementById('aiConversationText').innerText = "جاري تحميل محرك Transformers.js للتصنيف الذكي...";
-                
-                // استخدام نموذج تصنيف خفيف وسريع
+                addChatMessage("جاري تهيئة نموذج Transformers.js للتحليل...", 'ai-msg');
                 classifier = await pipeline('zero-shot-classification', 'Xenova/mobilebert-uncased-mnli');
                 window.tfModelLoaded = true;
-                
-                document.getElementById('aiConversationText').innerText = "اكتمل ربط محرك Transformers بنجاح. أهلاً بك في نظام التوقعات المتقدم.";
-                
-                setTimeout(() => { convBox.style.display = 'none'; }, 4000);
+                addChatMessage("تم تفعيل نموذج Transformers بنجاح. أرقبك وأراقب مدخلاتك.", 'ai-msg');
             } catch (error) {
                 console.error("Transformers.js Load Error:", error);
-                document.getElementById('aiConversationText').innerText = "حدث خطأ في تحميل المحرك. سيتم استخدام خوارزمية التوقع الافتراضية.";
-            }
-        };
-
-        window.triggerYallaLiveTalk = function() {
-            const convBox = document.getElementById('aiConversationBox');
-            // ظهور المحادثة بنسبة 45% في كل جولة لتعطي تعليمات وتسأل المستخدم
-            if (Math.random() < 0.45) {
-                const randomMsg = yallaLiveDialogues[Math.floor(Math.random() * yallaLiveDialogues.length)];
-                document.getElementById('aiConversationText').innerText = randomMsg;
-                convBox.style.display = 'block';
-            } else {
-                convBox.style.display = 'none';
+                addChatMessage("ملاحظة: حدث خطأ في تحميل النموذج المتقدم، سأستمر في مساعدتك بالاعتماد على خوارزمية التكرار الأساسية.", 'ai-msg');
             }
         };
 
@@ -428,24 +509,16 @@
             document.getElementById('btnNewRound').innerText = "جاري التحليل بخوارزميات AI...";
             clearInterval(timerInterval);
 
-            // تشغيل محادثات وتعليمات Yalla Live
-            window.triggerYallaLiveTalk();
-
             let finalGuesses = [];
             let activeHist = currentAI === 1 ? fruitHistoryAI1 : fruitHistoryAI2;
-            let boxesToShow = (activeHist.length >= 4 && Math.random() > 0.5) ? 3 : 4;
+            let boxesToShow = 4; // تم القفل لإظهار 4 خانات دائماً كما تم التحديد
 
-            // إذا كانت Transformers محملة، نستخدمها للتنبؤ بالفواكه المحددة فقط بلملف
             if (window.tfModelLoaded && isAIActive) {
                 try {
                     const textToClassify = activeHist.length > 0 
                         ? "The previous sequence of patterns was: " + activeHist.join(", ") + ". Predict the highly logical next item."
                         : "Predict a random generic sequence.";
-                    
-                    // إرسال الفواكه المحددة فقط للنموذج
                     const output = await classifier(textToClassify, FRUIT_IDS);
-                    
-                    // أخذ أعلى الاحتمالات بناءً على عدد الصناديق المطلوب
                     if (output && output.labels) {
                         finalGuesses = output.labels.slice(0, boxesToShow);
                     }
@@ -454,10 +527,8 @@
                 }
             }
 
-            // Fallback: في حال فشل المحرك أو لم يكتمل تحميله، نستخدم الخوارزمية الرقمية القديمة
             if (finalGuesses.length === 0) {
                 let predictionWeights = {};
-                let isConfirmedGuess = false;
                 FRUIT_IDS.forEach(f => predictionWeights[f] = Math.floor(Math.random() * 5) + 1);
 
                 if (lastRoundGuesses.includes("cherry")) delete predictionWeights["cherry"];
@@ -467,8 +538,8 @@
                     let activeOcc = currentAI === 1 ? fruitOccurrencesAI1 : fruitOccurrencesAI2;
                     for (let [fruit, count] of Object.entries(activeOcc)) {
                         if (predictionWeights[fruit] !== undefined) {
-                            if (count === 2) { predictionWeights[fruit] = Math.floor(Math.random() * 11) + 5; isConfirmedGuess = true; }
-                            else if (count >= 4) { predictionWeights[fruit] = Math.floor(Math.random() * 16) + 5; isConfirmedGuess = true; }
+                            if (count === 2) { predictionWeights[fruit] = Math.floor(Math.random() * 11) + 5; }
+                            else if (count >= 4) { predictionWeights[fruit] = Math.floor(Math.random() * 16) + 5; }
                         }
                     }
                     if (activeHist.length >= 9 && Math.random() < 0.40) {
@@ -476,7 +547,6 @@
                         const smartFruit = activeHist[targetIndex];
                         if (predictionWeights[smartFruit] !== undefined) {
                             predictionWeights[smartFruit] = Math.floor(Math.random() * 11) + 20; 
-                            isConfirmedGuess = true;
                         }
                     }
                 }
@@ -487,7 +557,6 @@
                 }
                 lotteryList.sort(() => Math.random() - 0.5);
                 
-                boxesToShow = (isConfirmedGuess) ? 3 : 4;
                 for (let f of lotteryList) {
                     if (!finalGuesses.includes(f)) finalGuesses.push(f);
                     if (finalGuesses.length === boxesToShow) break;
@@ -496,7 +565,6 @@
 
             lastRoundGuesses = [...finalGuesses];
             
-            // إضافة تأخير بسيط لمحاكاة تأثير التفكير العميق
             setTimeout(() => {
                 finalGuesses.forEach(f => {
                     let el = document.getElementById("fruit_" + f);
@@ -504,7 +572,6 @@
                 });
             }, 600);
 
-            // تشغيل العداد
             let timeLeft = Math.floor(Math.random() * 16) + 23;
             const timerTxt = document.getElementById('timerText');
             timerTxt.innerText = timeLeft;
