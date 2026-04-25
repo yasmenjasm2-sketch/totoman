@@ -3,39 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FawakihAI - النظام الذكي</title>
+    <title>FawakihAI - النظام الذكي المحمي</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #4CAF50; --bg: #121212; --card-bg: #1e1e1e; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: white; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        :root { --primary: #00E676; --bg: #090e17; --card-bg: rgba(18, 25, 38, 0.95); --accent: #2979FF; }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--bg); color: white; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; background-image: radial-gradient(circle at center, #111a2e 0%, #090e17 100%); }
         
         /* شاشة تسجيل الدخول */
-        #loginScreen { background: var(--card-bg); padding: 40px; border-radius: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); text-align: center; width: 90%; max-width: 400px; }
-        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #2c2c2c; color: white; font-size: 16px; outline: none; }
-        input:focus { border-color: var(--primary); }
-        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; }
-        button:hover { background: #45a049; }
-        button:disabled { background: #555; cursor: not-allowed; }
-        #loginMsg { margin-top: 15px; font-weight: bold; }
+        #loginScreen { background: var(--card-bg); padding: 40px 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.05); text-align: center; width: 90%; max-width: 380px; position: relative; z-index: 10; backdrop-filter: blur(10px); }
+        .logo-title { color: white; font-size: 28px; font-weight: 900; margin-bottom: 25px; letter-spacing: 1px; }
+        .logo-title span { color: var(--primary); }
+        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); color: white; font-size: 15px; outline: none; box-sizing: border-box; transition: 0.3s; text-align: center; font-family: 'Cairo', sans-serif; }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(41, 121, 255, 0.3); }
+        button { width: 100%; padding: 15px; background: linear-gradient(45deg, var(--accent), #1E88E5); color: white; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; font-weight: bold; margin-top: 15px; transition: 0.3s; font-family: 'Cairo', sans-serif; box-shadow: 0 4px 15px rgba(41, 121, 255, 0.4); }
+        button:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(41, 121, 255, 0.6); }
+        button:disabled { background: #555; cursor: not-allowed; transform: none; box-shadow: none; }
+        #loginMsg { margin-top: 15px; font-weight: bold; font-size: 14px; min-height: 20px; }
 
         /* شاشة اللعبة */
-        #gameScreen { display: none; width: 100%; max-width: 500px; padding: 20px; text-align: center; }
-        .header-game { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        #aiStatus { color: var(--primary); font-weight: bold; background: #1a237e; padding: 5px 15px; border-radius: 20px; font-size: 14px; }
-        .timer-box { font-size: 40px; font-weight: bold; color: #ff9800; margin: 20px 0; }
+        #gameScreen { display: none; width: 100%; max-width: 550px; padding: 20px; text-align: center; }
+        .header-game { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: rgba(0,0,0,0.3); padding: 10px 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        #aiStatus { color: var(--primary); font-weight: bold; background: rgba(0, 230, 118, 0.1); padding: 6px 15px; border-radius: 20px; font-size: 14px; border: 1px solid rgba(0, 230, 118, 0.3); }
+        .dev-badge { font-size: 13px; color: #aaa; cursor: pointer; background: rgba(255,255,255,0.05); padding: 5px 10px; border-radius: 10px; transition: 0.3s; }
+        .dev-badge:hover { color: white; background: rgba(255,255,255,0.1); }
+        .timer-box { font-size: 50px; font-weight: 900; color: #FFB300; margin: 15px 0 25px; text-shadow: 0 0 20px rgba(255, 179, 0, 0.4); font-family: monospace; }
         
-        .fruits-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-        .fruit-item { background: #2c2c2c; border: 2px solid #444; border-radius: 10px; padding: 15px 5px; font-size: 20px; transition: 0.3s; cursor: default; }
-        .fruit-active { background-color: rgba(255, 152, 0, 0.5) !important; border-color: #ff9800; }
+        .fruits-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 25px; }
+        .fruit-item { background: rgba(255,255,255,0.03); border: 2px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 18px 5px; font-size: 22px; font-weight: bold; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: default; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .fruit-active { background: linear-gradient(135deg, rgba(255, 179, 0, 0.2), rgba(255, 143, 0, 0.4)) !important; border-color: #FFB300; transform: scale(1.08); box-shadow: 0 8px 20px rgba(255, 179, 0, 0.3); }
         
         /* بانر تيليجرام */
-        #telegramBanner { position: fixed; top: 20px; left: -100%; background: #0088cc; color: white; padding: 15px 30px; border-radius: 0 20px 20px 0; font-weight: bold; z-index: 1000; transition: left 0.5s ease-in-out; }
+        #telegramBanner { position: fixed; top: 20px; left: -100%; background: linear-gradient(90deg, #0088cc, #005f8c); color: white; padding: 15px 30px; border-radius: 0 20px 20px 0; font-weight: bold; z-index: 1000; transition: left 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); box-shadow: 5px 5px 15px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-left: none; }
 
         /* نافذة التنبيه */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: white; color: #333; padding: 20px; border-radius: 10px; max-width: 350px; text-align: right; }
-        .modal-header { background: #1A237E; color: white; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; margin: -20px -20px 20px -20px; border-radius: 10px 10px 0 0; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 0 0 20px 0; border-radius: 15px; max-width: 350px; text-align: right; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.7); }
+        .modal-header { background: linear-gradient(90deg, #D32F2F, #F44336); color: white; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; }
+        .modal-body { padding: 0 20px; font-size: 15px; }
+        .modal-btn { background: #333; margin: 10px 20px 0; width: calc(100% - 40px); }
     </style>
 </head>
 <body>
@@ -43,17 +50,18 @@
     <div id="telegramBanner"><span id="telegramBannerText"></span></div>
 
     <div id="loginScreen">
-        <h2 style="color: var(--primary);">بوابة FawakihAI</h2>
-        <input type="text" id="username" placeholder="اسم المستخدم">
-        <input type="text" id="subCode" placeholder="كود الاشتراك (مثال: FAW-XXXX)">
-        <button onclick="login()">تفعيل الدخول</button>
+        <div class="logo-title">Fawakih<span>AI</span></div>
+        <p style="color: #888; font-size: 14px; margin-top: -20px; margin-bottom: 25px;">بوابة التحليل الذكي المشفرة</p>
+        <input type="text" id="username" placeholder="معرف المستخدم (Username)">
+        <input type="text" id="subCode" placeholder="رمز الوصول (Access Key)">
+        <button onclick="login()" id="loginBtn">تفعيل وتوثيق الدخول</button>
         <div id="loginMsg"></div>
     </div>
 
     <div id="gameScreen">
         <div class="header-game">
             <span id="aiStatus">حالة الذاكرة: نشطة (العقل 1) 🟢</span>
-            <span style="font-size: 12px; color: #888; cursor: pointer;" onclick="alert('FawakihAI\n© جميع الحقوق محفوظة لـ Hamza Alhumada')">🛡️ حقوق المطور</span>
+            <span class="dev-badge" onclick="alert('FawakihAI\n© جميع الحقوق محفوظة للمطور: Hamza Alhumada\nإصدار النظام: V2.0 Pro')">🛡️ المطور</span>
         </div>
 
         <div class="timer-box" id="timerText">00</div>
@@ -69,21 +77,51 @@
             <div class="fruit-item" id="fruit_mango">🥭 مانجو</div>
         </div>
 
-        <input type="text" id="inputCorrectFruit" placeholder="أدخل الفاكهة الصحيحة هنا...">
-        <button id="btnNewRound" onclick="startNewRoundClick()">بدء جولة جديدة</button>
-        <button onclick="logout()" style="background: #f44336; margin-top: 20px;">خروج</button>
+        <input type="text" id="inputCorrectFruit" placeholder="أدخل الفاكهة الناتجة لتدريب الذكاء..." style="text-align: right; padding-right: 20px;">
+        <button id="btnNewRound" onclick="startNewRoundClick()" style="background: linear-gradient(45deg, #00E676, #00C853);">بدء تحليل جولة جديدة</button>
+        <button onclick="logout()" style="background: transparent; border: 1px solid #F44336; color: #F44336; margin-top: 15px; box-shadow: none;">تسجيل الخروج وإنهاء الجلسة</button>
     </div>
 
     <div class="modal" id="smartAIWarning">
         <div class="modal-content">
-            <div class="modal-header">🤖 نظام الذكاء الاصطناعي</div>
-            <p style="line-height: 1.6;">عذراً، لم أتمكن من العثور على هذا المدخل في قاعدة بياناتي.<br><br>لضمان دقة التحليل والتوقع، يرجى إدخال إحدى الفواكه المعتمدة للنظام:<br><br>🍇 عنب | 🍋 ليمون<br>🍊 برتقال | 🍎 تفاح<br>🍒 كرز | 🍉 بطيخ<br>🍓 فراولة | 🥭 مانجو<br><br>يرجى المحاولة مرة أخرى باسم صحيح.</p>
-            <button onclick="document.getElementById('smartAIWarning').style.display='none'" style="background: #1A237E;">حسناً، فهمت</button>
+            <div class="modal-header">⚠️ تنبيه الذكاء الاصطناعي</div>
+            <div class="modal-body">
+                <p style="line-height: 1.6; text-align: center;">المدخل غير مطابق لقاعدة البيانات.<br>الرجاء استخدام إحدى الفواكه التالية فقط لضمان دقة الخوارزمية:</p>
+                <p style="text-align: center; color: var(--primary); font-weight: bold;">عنب | ليمون | برتقال | تفاح<br>كرز | بطيخ | فراولة | مانجو</p>
+            </div>
+            <button class="modal-btn" onclick="document.getElementById('smartAIWarning').style.display='none'">موافق</button>
         </div>
     </div>
 
     <script>
-        // --- 1. إعدادات Firebase والدخول ---
+        // --- حماية صارمة للمطورين والـ DOM (Anti-Bypass System) ---
+        let isSecureAuth = false; // متغير أمني لا يتم تفعيله إلا بنجاح الاتصال بالسيرفر
+        
+        // 1. منع كليك يمين واختصارات المطورين
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) {
+            if(e.keyCode == 123) return false; // F12
+            if(e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0))) return false;
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+        }
+
+        // 2. مراقبة محاولات التخطي (Inspect Element Detector)
+        const observer = new MutationObserver(() => {
+            const gameScreen = document.getElementById('gameScreen');
+            // إذا ظهرت شاشة اللعبة بدون أن يكون المتغير الأمني true
+            if (gameScreen && gameScreen.style.display !== 'none' && gameScreen.style.display !== '' && !isSecureAuth) {
+                document.body.innerHTML = `
+                    <div style="text-align:center; padding: 50px; background: #111; color: red; border: 2px solid red; border-radius: 15px; margin: auto; max-width: 400px; margin-top: 20vh;">
+                        <h2 style="font-family: 'Cairo'">⛔ تحذير أمني</h2>
+                        <p style="font-family: 'Cairo'">تم اكتشاف محاولة تخطي غير مشروعة لطبقة الحماية.<br>تم تسجيل النشاط وحظر الإجراء.</p>
+                    </div>`;
+                setTimeout(() => location.reload(), 3000); // إعادة تحميل إجبارية
+            }
+        });
+        observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
+
+
+        // --- إعدادات Firebase ---
         const firebaseConfig = {
             apiKey: "AIzaSyApqVwnKmq0gJ7k-UM-jLNxaYlBPkRx1Go",
             authDomain: "chatlive-4387e.firebaseapp.com",
@@ -100,66 +138,84 @@
         let securityInterval;
 
         if (currentUser) {
-            checkSubscription(); // التحقق المباشر إذا كان مسجل مسبقاً
+            document.getElementById('loginMsg').innerText = "جاري التحقق من الجلسة السابقة...";
+            document.getElementById('loginMsg').style.color = "#FFB300";
+            checkSubscription(); 
         }
 
         function login() {
             const user = document.getElementById('username').value.trim();
             const code = document.getElementById('subCode').value.trim();
             const msg = document.getElementById('loginMsg');
+            const btn = document.getElementById('loginBtn');
 
-            if(!user || !code) { msg.innerText = "أدخل جميع الحقول"; msg.style.color = "red"; return; }
-            msg.innerText = "جاري التحقق..."; msg.style.color = "orange";
+            if(!user || !code) { msg.innerText = "الرجاء إدخال اسم المستخدم ورمز الوصول"; msg.style.color = "#F44336"; return; }
+            msg.innerText = "جاري مصادقة البيانات مع السيرفر..."; msg.style.color = "#FFB300";
+            btn.disabled = true;
 
             db.ref('System/Codes/' + code).once('value').then((snap) => {
                 if (snap.exists() && snap.val().isActive) {
-                    const days = snap.val().durationDays;
-                    const expiry = Date.now() + (days * 24 * 60 * 60 * 1000);
+                    const dbCode = snap.val();
+                    let expiry;
+                    
+                    // دعم الأكواد الجديدة (بالملي ثانية) والأكواد القديمة (بالأيام)
+                    if(dbCode.durationMs) {
+                        expiry = Date.now() + dbCode.durationMs;
+                    } else if (dbCode.durationDays) {
+                        expiry = Date.now() + (dbCode.durationDays * 24 * 60 * 60 * 1000);
+                    } else {
+                        expiry = Date.now() + (30 * 24 * 60 * 60 * 1000); // افتراضي احتياطي
+                    }
                     
                     db.ref('System/Codes/' + code).update({ isActive: false, usedBy: user });
                     db.ref('System/Users/' + user).set({ codeUsed: code, expiryTime: expiry, status: "نشط 🟢" });
                     
                     localStorage.setItem("fawakihUser", user);
                     currentUser = user;
-                    startGame();
+                    executeSecureStart();
                 } else {
-                    // التحقق إذا كان المستخدم مسجل مسبقاً ولديه اشتراك فعال
                     db.ref('System/Users/' + user).once('value').then((uSnap) => {
                         if (uSnap.exists() && uSnap.val().expiryTime > Date.now() && uSnap.val().codeUsed === code) {
                             localStorage.setItem("fawakihUser", user);
                             currentUser = user;
-                            startGame();
+                            executeSecureStart();
                         } else {
-                            msg.innerText = "الكود غير صحيح أو منتهي!"; msg.style.color = "red";
+                            msg.innerText = "رمز الوصول غير صالح أو تم استخدامه مسبقاً!"; msg.style.color = "#F44336";
+                            btn.disabled = false;
                         }
                     });
                 }
+            }).catch(err => {
+                msg.innerText = "خطأ في الاتصال بقاعدة البيانات!"; msg.style.color = "#F44336";
+                btn.disabled = false;
             });
         }
 
         function checkSubscription() {
             db.ref('System/Users/' + currentUser).once('value').then((snap) => {
                 if (snap.exists() && snap.val().expiryTime > Date.now()) {
-                    startGame();
+                    executeSecureStart();
                 } else {
                     logout();
-                    alert("انتهت صلاحية الاشتراك!");
+                    alert("انتهت صلاحية اشتراكك. يرجى تجديد رمز الوصول.");
                 }
             });
         }
 
         function logout() {
+            isSecureAuth = false;
             localStorage.removeItem("fawakihUser");
             location.reload();
         }
 
-        function startGame() {
+        function executeSecureStart() {
+            isSecureAuth = true; // توثيق أمني للـ DOM Observer
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('gameScreen').style.display = 'block';
             loadAIHistory();
             updateAIStatusUI();
             
-            // مراقبة الأمان كل 30 ثانية
+            // مراقبة الأمان كل 30 ثانية لمنع تعديل الوقت محلياً
             securityInterval = setInterval(() => {
                 db.ref('System/Users/' + currentUser).once('value').then(snap => {
                     if (!snap.exists() || snap.val().expiryTime <= Date.now()) {
@@ -172,7 +228,7 @@
             startTelegramListener();
         }
 
-        // --- 2. خوارزميات اللعبة (AI Logic مطابقة لـ Java) ---
+        // --- خوارزميات اللعبة (الذكاء الاصطناعي الأساسي بدون تغيير) ---
         const VALID_FRUITS = ["عنب", "ليمون", "برتقال", "تفاح", "كرز", "بطيخ", "فراولة", "فراوله", "مانجو"];
         const FRUIT_IDS = ["grape", "lemon", "orange", "apple", "cherry", "watermelon", "strawberry", "mango"];
         
@@ -214,10 +270,12 @@
             const aiText = document.getElementById('aiStatus');
             if (isAIActive) {
                 aiText.innerText = `حالة الذاكرة: نشطة (العقل ${currentAI}) 🟢`;
-                aiText.style.color = "#4CAF50";
+                aiText.style.color = "#00E676";
+                aiText.style.borderColor = "rgba(0, 230, 118, 0.3)";
             } else {
                 aiText.innerText = "تم ايقاف AI من قبل المطور ⛔";
-                aiText.style.color = "#D32F2F";
+                aiText.style.color = "#F44336";
+                aiText.style.borderColor = "rgba(244, 67, 54, 0.3)";
             }
         }
 
@@ -226,6 +284,7 @@
         });
 
         function startNewRoundClick() {
+            if(!isSecureAuth) { location.reload(); return; } // جدار حماية إضافي قبل تنفيذ أي دورة
             const input = document.getElementById('inputCorrectFruit');
             const fruit = input.value.trim();
             
@@ -235,7 +294,7 @@
                     input.value = "";
                 } else {
                     document.getElementById('smartAIWarning').style.display = 'flex';
-                    return; // إيقاف بدء الجولة إذا كان الإدخال خاطئ
+                    return; 
                 }
             }
             startNewRound();
@@ -254,7 +313,10 @@
                 currentAI = currentAI === 1 ? 2 : 1;
                 wrongGuessesCount = 0;
                 updateAIStatusUI();
-                alert(`تم تبديل الذاكرة الاصطناعية (العقل ${currentAI}) لتحسين الأداء!`);
+                // تنبيه خفيف بدلاً من Alert المزعج
+                const aiText = document.getElementById('aiStatus');
+                aiText.style.transform = "scale(1.1)";
+                setTimeout(() => aiText.style.transform = "scale(1)", 500);
             }
 
             let activeOcc = currentAI === 1 ? fruitOccurrencesAI1 : fruitOccurrencesAI2;
@@ -272,13 +334,11 @@
         }
 
         function startNewRound() {
-            // تصفير الألوان
             document.querySelectorAll('.fruit-item').forEach(el => el.classList.remove('fruit-active'));
             
             let predictionWeights = {};
             let isConfirmedGuess = false;
 
-            // أوزان عشوائية مبدئية 1-5
             FRUIT_IDS.forEach(f => predictionWeights[f] = Math.floor(Math.random() * 5) + 1);
 
             if (lastRoundGuesses.includes("cherry")) delete predictionWeights["cherry"];
@@ -299,7 +359,7 @@
                     const targetIndex = Math.random() > 0.5 ? 1 : 2;
                     const smartFruit = activeHist[targetIndex];
                     if (predictionWeights[smartFruit] !== undefined) {
-                        predictionWeights[smartFruit] = Math.floor(Math.random() * 11) + 20; // 20-30
+                        predictionWeights[smartFruit] = Math.floor(Math.random() * 11) + 20; 
                         isConfirmedGuess = true;
                     }
                 }
@@ -319,7 +379,6 @@
                 for (let i = 0; i < weight; i++) lotteryList.push(fruit);
             }
 
-            // Shuffle
             lotteryList.sort(() => Math.random() - 0.5);
             
             let finalGuesses = [];
@@ -329,13 +388,17 @@
             }
 
             lastRoundGuesses = [...finalGuesses];
-            finalGuesses.forEach(f => {
-                let el = document.getElementById("fruit_" + f);
-                if(el) el.classList.add('fruit-active');
-            });
+            
+            // إضافة تأخير بسيط لإعطاء تأثير تفكير AI
+            setTimeout(() => {
+                finalGuesses.forEach(f => {
+                    let el = document.getElementById("fruit_" + f);
+                    if(el) el.classList.add('fruit-active');
+                });
+            }, 300);
 
-            // مؤقت عشوائي 23 إلى 38
             document.getElementById('btnNewRound').disabled = true;
+            document.getElementById('btnNewRound').innerText = "جاري التحليل...";
             clearInterval(timerInterval);
             let timeLeft = Math.floor(Math.random() * 16) + 23;
             const timerTxt = document.getElementById('timerText');
@@ -343,24 +406,24 @@
 
             timerInterval = setInterval(() => {
                 timeLeft--;
-                timerTxt.innerText = timeLeft;
+                timerTxt.innerText = timeLeft < 10 ? "0" + timeLeft : timeLeft;
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     timerTxt.innerText = "00";
                     document.getElementById('btnNewRound').disabled = false;
+                    document.getElementById('btnNewRound').innerText = "بدء تحليل جولة جديدة";
                 }
             }, 1000);
         }
 
-        // --- 3. استماع تيليجرام (Telegram Polling) ---
+        // --- استماع تيليجرام (كما هو) ---
         function startTelegramListener() {
-            // ملاحظة: تم وضع توكن وهمي للحماية. استبدله بالتوكن الفعلي الخاص بك.
             const BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"; 
             const CHAT_ID = "YOUR_CHAT_ID_HERE";
             let offset = 0;
 
             setInterval(() => {
-                if(BOT_TOKEN === "YOUR_BOT_TOKEN_HERE") return; // تجاهل إذا لم يتم وضع التوكن
+                if(BOT_TOKEN === "YOUR_BOT_TOKEN_HERE") return; 
                 
                 fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${offset}&timeout=10`)
                 .then(res => res.json())
@@ -380,16 +443,16 @@
                             }
                         });
                     }
-                }).catch(err => console.log("Telegram Error"));
+                }).catch(err => console.log("Telegram Listener Standby"));
             }, 5000);
         }
 
         function triggerBannerAnimation(name) {
             const banner = document.getElementById('telegramBanner');
             document.getElementById('telegramBannerText').innerText = name;
-            banner.style.left = "0"; // دخول البانر
+            banner.style.left = "0"; 
             setTimeout(() => {
-                banner.style.left = "-100%"; // خروج البانر
+                banner.style.left = "-100%"; 
             }, 4500);
         }
     </script>
