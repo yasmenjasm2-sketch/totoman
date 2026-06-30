@@ -29,7 +29,6 @@
         .logo {
             font-size: 48px;
             margin-bottom: 10px;
-            cursor: pointer;
             user-select: none;
         }
         h2 {
@@ -53,17 +52,19 @@
             color: #aaa;
             margin-bottom: 6px;
         }
-        input, select {
+        input {
             width: 100%;
             background: #050510;
             border: 1px solid #1a1a2a;
             color: #fff;
-            padding: 12px;
+            padding: 14px;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 16px;
+            font-family: monospace;
             outline: none;
             transition: border-color 0.3s;
             text-align: center;
+            letter-spacing: 2px;
         }
         input:focus {
             border-color: #ffd700;
@@ -74,7 +75,7 @@
             color: #000;
             border: none;
             border-radius: 8px;
-            padding: 12px;
+            padding: 14px;
             font-size: 15px;
             font-weight: bold;
             cursor: pointer;
@@ -92,92 +93,37 @@
             margin-top: 15px;
             font-size: 12px;
             min-height: 18px;
+            font-weight: bold;
         }
         .status-msg.success { color: #4caf50; }
         .status-msg.error { color: #f44336; }
         .status-msg.loading { color: #00bcd4; }
-
-        /* لوحة التحكم السرية للمسؤول */
-        .admin-panel {
-            display: none;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px dashed #ffd70033;
-            text-align: right;
-        }
-        .admin-title {
-            font-size: 14px;
-            color: #ffd700;
-            margin-bottom: 12px;
-            text-align: center;
-        }
-        .admin-btn {
-            background: #1a1a2a;
-            border: 1px solid #4caf50;
-            color: #4caf50;
-            margin-top: 8px;
-        }
-        .admin-btn:hover {
-            background: #4caf50;
-            color: #fff;
-        }
-        .generated-code-box {
-            margin-top: 12px;
-            background: #050510;
-            padding: 10px;
-            border-radius: 6px;
-            text-align: center;
-            font-family: monospace;
-            font-size: 16px;
-            color: #4caf50;
-            border: 1px solid #4caf5033;
-            user-select: all;
-            display: none;
-        }
     </style>
 </head>
 <body>
 
 <div class="login-card">
-    <div class="logo" id="logoHeader" onclick="handleLogoClick()">🍒</div>
-    <h2 id="titleText">🍒 YALLA FRUIT HACK</h2>
+    <div class="logo">🍒</div>
+    <h2>🍒 YALLA FRUIT HACK</h2>
     <div class="subtitle">بوابة الدخول الآمنة والتحقق من الاشتراك</div>
 
     <div class="form-group">
         <label>أدخل كود الاشتراك الخاص بك:</label>
-        <input type="text" id="activationCode" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off" style="text-transform: uppercase;">
+        <input type="text" id="activationCode" placeholder="YF-XXXX-XXXX" autocomplete="off" style="text-transform: uppercase;">
     </div>
 
     <button class="btn" onclick="validateAndLogin()">🔑 تسجيل الدخول والتشغيل</button>
 
     <div class="status-msg" id="statusMessage"></div>
-
-    <!-- لوحة تحكم المسؤول السرية لتوليد الأكواد -->
-    <div class="admin-panel" id="adminPanel">
-        <div class="admin-title">🛠️ لوحة تحكم المسؤول السرية</div>
-        
-        <div class="form-group">
-            <label>اختر مدة صلاحية الاشتراك الكود:</label>
-            <select id="subDuration">
-                <option value="1">يوم واحد (24 ساعة)</option>
-                <option value="7">أسبوع واحد</option>
-                <option value="30" selected>شهر واحد (30 يوم)</option>
-                <option value="365">سنة كاملة</option>
-            </select>
-        </div>
-        
-        <button class="btn admin-btn" onclick="generateNewCode()">✨ توليد كود اشتراك جديد</button>
-        <div class="generated-code-box" id="codeDisplay"></div>
-    </div>
 </div>
 
-<!-- تحميل حزمة Firebase الأساسية ومتطلباتها -->
+<!-- تحميل حزمة Firebase الأساسية -->
 <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"></script>
 
 <script>
-// تهيئة متغيرات تهيئة Firebase المستمدة من ملف الإعدادات الخاص بك
+// إعدادات Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyAo4IaLd5SfVYHAAp_noJD7ZXBbhdVx9-0",
     authDomain: "fawakihyallalive.firebaseapp.com",
@@ -187,23 +133,20 @@ const firebaseConfig = {
     appId: "1:917478913649:android:fee5d42aca81c8a2e3cdd0"
 };
 
-// تهيئة خدمات Firebase
 const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 const appId = "fawakihyallalive";
 
-let logoClickCount = 0;
-let logoTimer = null;
-
-// التحقق الفوري مما إذا كان المستخدم يملك جلسة نشطة بالفعل وصالحة
+// التحقق من وجود جلسة صالحة مسبقاً
 window.onload = async () => {
     const savedCode = localStorage.getItem('yalla_fruit_active_code');
     const expiryTime = localStorage.getItem('yalla_fruit_expiry');
     
     if (savedCode && expiryTime) {
         if (Date.now() < parseInt(expiryTime)) {
-            // توجيه فوري للمنصة لو الاشتراك لم ينتهي بعد
+            // ملاحظة: لو أردت أن يتحقق من الحظر في كل مرة يفتح التطبيق، يمكن وضع الفحص في index.html
+            // لكن لسرعة الدخول سنوجهه مباشرة، والحماية الأقوى تتم عند إدخال الكود.
             window.location.href = "index.html";
         } else {
             localStorage.removeItem('yalla_fruit_active_code');
@@ -219,7 +162,12 @@ function showStatus(text, type) {
     msg.className = "status-msg " + type;
 }
 
-// دالة تسجيل الدخول والتحقق من صلاحية الكود بقاعدة البيانات
+function getDeviceFingerprint() {
+    // إنشاء بصمة فريدة للجهاز لمنع استخدام الكود في أكثر من هاتف
+    return navigator.userAgent.replace(/\D+/g, '') + screen.width + screen.height;
+}
+
+// تسجيل الدخول
 async function validateAndLogin() {
     const code = document.getElementById('activationCode').value.trim().toUpperCase();
     if (!code) {
@@ -230,115 +178,66 @@ async function validateAndLogin() {
     showStatus("⏳ جاري التحقق من الاشتراك وصلاحيته...", "loading");
 
     try {
-        // قاعدة رقم 3: تسجيل الدخول بشكل آمن وصامت أولاً
         await auth.signInAnonymously();
 
-        // قاعدة رقم 1: جلب مستند الكود من المسار الصارم والمحمي المخصص للبيانات العامة للمشروع
         const codeDocRef = firebase.firestore().doc(db, 'artifacts', appId, 'public', 'data', 'subscriptions', code);
         const docSnap = await codeDocRef.get();
 
         if (!docSnap.exists) {
-            showStatus("❌ كود الاشتراك غير صحيح أو غير متوفر بقاعدة البيانات!", "error");
+            showStatus("❌ كود الاشتراك غير صحيح أو غير متوفر!", "error");
             return;
         }
 
         const data = docSnap.data();
         const now = Date.now();
 
-        if (data.isUsed && data.usedByDeviceId && data.usedByDeviceId !== getDeviceFingerprint()) {
-            showStatus("❌ هذا الكود مستخدم بالفعل على جهاز آخر!", "error");
+        // 1. التحقق من الحظر
+        if (data.isBanned) {
+            showStatus("🚫 تم حظر هذا الكود من قبل الإدارة!", "error");
             return;
         }
 
+        // 2. التحقق من الجهاز (إذا تم استخدام الكود من قبل ولم تقم الإدارة بفك ارتباطه)
+        const currentDevice = getDeviceFingerprint();
+        if (data.isUsed && data.usedByDeviceId && data.usedByDeviceId !== currentDevice) {
+            showStatus("📱 هذا الكود مستخدم بالفعل على هاتف آخر! تواصل مع الإدارة لفك الارتباط.", "error");
+            return;
+        }
+
+        // 3. التحقق من انتهاء الصلاحية
         if (data.expiryTimestamp && now > data.expiryTimestamp) {
-            showStatus("❌ انتهت صلاحية هذا الكود بالفعل!", "error");
+            showStatus("⏳ انتهت صلاحية هذا الكود!", "error");
             return;
         }
 
-        // إذا كان الكود جديداً ولم يستخدم بعد، يتم ربطه وتنشيطه فوراً
-        if (!data.isUsed) {
+        // 4. تفعيل الكود إذا كان جديداً (أو تم فك ارتباطه)
+        let expiryTimestamp = data.expiryTimestamp;
+        
+        if (!data.isUsed || !data.usedByDeviceId) {
             const durationDays = data.durationDays || 30;
-            const expiryTimestamp = now + (durationDays * 24 * 60 * 60 * 1000);
+            // إذا كان جديداً تماماً نحسب تاريخ الانتهاء، وإذا كان مفكوك الارتباط فقط نحتفظ بتاريخه القديم
+            expiryTimestamp = data.expiryTimestamp || (now + (durationDays * 24 * 60 * 60 * 1000));
             
             await codeDocRef.update({
                 isUsed: true,
-                activatedAt: now,
+                activatedAt: data.activatedAt || now,
                 expiryTimestamp: expiryTimestamp,
-                usedByDeviceId: getDeviceFingerprint()
+                usedByDeviceId: currentDevice // ربط الكود بهذا الهاتف
             });
-
-            // تخزين الجلسة محلياً لعدم مطالبته بالدخول في كل مرة
-            localStorage.setItem('yalla_fruit_active_code', code);
-            localStorage.setItem('yalla_fruit_expiry', String(expiryTimestamp));
-        } else {
-            // كود صالح ومفعل مسبقاً على نفس الجهاز
-            localStorage.setItem('yalla_fruit_active_code', code);
-            localStorage.setItem('yalla_fruit_expiry', String(data.expiryTimestamp));
         }
 
-        showStatus("✅ تم التحقق بنجاح! جاري الانتقال لمنصة فواكه يلا...", "success");
+        // حفظ الدخول في الهاتف
+        localStorage.setItem('yalla_fruit_active_code', code);
+        localStorage.setItem('yalla_fruit_expiry', String(expiryTimestamp));
+
+        showStatus("✅ تم التحقق بنجاح! جاري الدخول...", "success");
         setTimeout(() => {
             window.location.href = "index.html";
         }, 1200);
 
     } catch (error) {
         console.error("Authentication Error:", error);
-        showStatus("❌ حدث خطأ أثناء الاتصال بالخادم. حاول مجدداً.", "error");
-    }
-}
-
-// دالة الكشف التلقائي عن بصمة الجهاز لمنع مشاركة الأكواد بين الأجهزة
-function getDeviceFingerprint() {
-    return navigator.userAgent.replace(/\D+/g, '') + screen.width + screen.height;
-}
-
-// آلية الدخول السري للوحة التحكم بالضغط 5 مرات متتالية على الأيقونة
-function handleLogoClick() {
-    logoClickCount++;
-    clearTimeout(logoTimer);
-    logoTimer = setTimeout(() => { logoClickCount = 0; }, 2000);
-
-    if (logoClickCount >= 5) {
-        const adminPanel = document.getElementById('adminPanel');
-        adminPanel.style.display = adminPanel.style.display === 'block' ? 'none' : 'block';
-        logoClickCount = 0;
-        showStatus("🛠️ تم فتح لوحة تحكم المسؤول السرية", "success");
-    }
-}
-
-// توليد كود وحفظه مباشرة في الـ Firestore لمشروعك
-async function generateNewCode() {
-    showStatus("⏳ جاري إنشاء الكود وحفظه بقاعدة البيانات...", "loading");
-    
-    try {
-        await auth.signInAnonymously();
-        
-        const duration = parseInt(document.getElementById('subDuration').value);
-        const randomParts = [];
-        for (let i = 0; i < 4; i++) {
-            randomParts.push(Math.random().toString(36).substring(2, 6).toUpperCase());
-        }
-        const newCode = "YF-" + randomParts.join('-');
-
-        // حفظ الكود الجديد بالمسار الصارم المعتمد
-        const codeDocRef = firebase.firestore().doc(db, 'artifacts', appId, 'public', 'data', 'subscriptions', newCode);
-        await codeDocRef.set({
-            code: newCode,
-            durationDays: duration,
-            isUsed: false,
-            createdAt: Date.now(),
-            expiryTimestamp: null,
-            usedByDeviceId: null
-        });
-
-        const display = document.getElementById('codeDisplay');
-        display.style.display = "block";
-        display.textContent = newCode;
-        
-        showStatus("✅ تم إنشاء كود الاشتراك الجديد بنجاح وحفظه!", "success");
-    } catch (e) {
-        console.error(e);
-        showStatus("❌ فشل في إنشاء الكود. تحقق من الصلاحيات والاتصال.", "error");
+        showStatus("❌ حدث خطأ في الاتصال بالسيرفر. تأكد من الإنترنت.", "error");
     }
 }
 </script>
