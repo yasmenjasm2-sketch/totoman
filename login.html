@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🔐 بوابة تسجيل الدخول - YALLA FRUIT</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: #0a0a12;
+            color: #d0d0d0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+        .login-card {
+            background: #0d0d1a;
+            border: 1px solid #ffd70033;
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        .logo {
+            font-size: 48px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+        h2 {
+            font-size: 20px;
+            color: #ffd700;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px #ffd70033;
+        }
+        .subtitle {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 24px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+            text-align: right;
+        }
+        label {
+            display: block;
+            font-size: 11px;
+            color: #aaa;
+            margin-bottom: 6px;
+        }
+        input, select {
+            width: 100%;
+            background: #050510;
+            border: 1px solid #1a1a2a;
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+            text-align: center;
+        }
+        input:focus {
+            border-color: #ffd700;
+        }
+        .btn {
+            width: 100%;
+            background: linear-gradient(135deg, #ffd700, #ffa500);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .status-msg {
+            margin-top: 15px;
+            font-size: 12px;
+            min-height: 18px;
+        }
+        .status-msg.success { color: #4caf50; }
+        .status-msg.error { color: #f44336; }
+        .status-msg.loading { color: #00bcd4; }
+
+        /* لوحة التحكم السرية للمسؤول */
+        .admin-panel {
+            display: none;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #ffd70033;
+            text-align: right;
+        }
+        .admin-title {
+            font-size: 14px;
+            color: #ffd700;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .admin-btn {
+            background: #1a1a2a;
+            border: 1px solid #4caf50;
+            color: #4caf50;
+            margin-top: 8px;
+        }
+        .admin-btn:hover {
+            background: #4caf50;
+            color: #fff;
+        }
+        .generated-code-box {
+            margin-top: 12px;
+            background: #050510;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-family: monospace;
+            font-size: 16px;
+            color: #4caf50;
+            border: 1px solid #4caf5033;
+            user-select: all;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <div class="logo" id="logoHeader" onclick="handleLogoClick()">🍒</div>
+    <h2 id="titleText">🍒 YALLA FRUIT HACK</h2>
+    <div class="subtitle">بوابة الدخول الآمنة والتحقق من الاشتراك</div>
+
+    <div class="form-group">
+        <label>أدخل كود الاشتراك الخاص بك:</label>
+        <input type="text" id="activationCode" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off" style="text-transform: uppercase;">
+    </div>
+
+    <button class="btn" onclick="validateAndLogin()">🔑 تسجيل الدخول والتشغيل</button>
+
+    <div class="status-msg" id="statusMessage"></div>
+
+    <!-- لوحة تحكم المسؤول السرية لتوليد الأكواد -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-title">🛠️ لوحة تحكم المسؤول السرية</div>
+        
+        <div class="form-group">
+            <label>اختر مدة صلاحية الاشتراك الكود:</label>
+            <select id="subDuration">
+                <option value="1">يوم واحد (24 ساعة)</option>
+                <option value="7">أسبوع واحد</option>
+                <option value="30" selected>شهر واحد (30 يوم)</option>
+                <option value="365">سنة كاملة</option>
+            </select>
+        </div>
+        
+        <button class="btn admin-btn" onclick="generateNewCode()">✨ توليد كود اشتراك جديد</button>
+        <div class="generated-code-box" id="codeDisplay"></div>
+    </div>
+</div>
+
+<!-- تحميل حزمة Firebase الأساسية ومتطلباتها -->
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"></script>
+
+<script>
+// تهيئة متغيرات تهيئة Firebase المستمدة من ملف الإعدادات الخاص بك
+const firebaseConfig = {
+    apiKey: "AIzaSyAo4IaLd5SfVYHAAp_noJD7ZXBbhdVx9-0",
+    authDomain: "fawakihyallalive.firebaseapp.com",
+    projectId: "fawakihyallalive",
+    storageBucket: "fawakihyallalive.firebasestorage.app",
+    messagingSenderId: "917478913649",
+    appId: "1:917478913649:android:fee5d42aca81c8a2e3cdd0"
+};
+
+// تهيئة خدمات Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const appId = "fawakihyallalive";
+
+let logoClickCount = 0;
+let logoTimer = null;
+
+// التحقق الفوري مما إذا كان المستخدم يملك جلسة نشطة بالفعل وصالحة
+window.onload = async () => {
+    const savedCode = localStorage.getItem('yalla_fruit_active_code');
+    const expiryTime = localStorage.getItem('yalla_fruit_expiry');
+    
+    if (savedCode && expiryTime) {
+        if (Date.now() < parseInt(expiryTime)) {
+            // توجيه فوري للمنصة لو الاشتراك لم ينتهي بعد
+            window.location.href = "index.html";
+        } else {
+            localStorage.removeItem('yalla_fruit_active_code');
+            localStorage.removeItem('yalla_fruit_expiry');
+            showStatus("انتهت صلاحية اشتراكك السابق. يرجى تجديده وكتابة كود جديد.", "error");
+        }
+    }
+};
+
+function showStatus(text, type) {
+    const msg = document.getElementById('statusMessage');
+    msg.textContent = text;
+    msg.className = "status-msg " + type;
+}
+
+// دالة تسجيل الدخول والتحقق من صلاحية الكود بقاعدة البيانات
+async function validateAndLogin() {
+    const code = document.getElementById('activationCode').value.trim().toUpperCase();
+    if (!code) {
+        showStatus("⚠️ يرجى إدخال كود الاشتراك أولاً!", "error");
+        return;
+    }
+
+    showStatus("⏳ جاري التحقق من الاشتراك وصلاحيته...", "loading");
+
+    try {
+        // قاعدة رقم 3: تسجيل الدخول بشكل آمن وصامت أولاً
+        await auth.signInAnonymously();
+
+        // قاعدة رقم 1: جلب مستند الكود من المسار الصارم والمحمي المخصص للبيانات العامة للمشروع
+        const codeDocRef = firebase.firestore().doc(db, 'artifacts', appId, 'public', 'data', 'subscriptions', code);
+        const docSnap = await codeDocRef.get();
+
+        if (!docSnap.exists) {
+            showStatus("❌ كود الاشتراك غير صحيح أو غير متوفر بقاعدة البيانات!", "error");
+            return;
+        }
+
+        const data = docSnap.data();
+        const now = Date.now();
+
+        if (data.isUsed && data.usedByDeviceId && data.usedByDeviceId !== getDeviceFingerprint()) {
+            showStatus("❌ هذا الكود مستخدم بالفعل على جهاز آخر!", "error");
+            return;
+        }
+
+        if (data.expiryTimestamp && now > data.expiryTimestamp) {
+            showStatus("❌ انتهت صلاحية هذا الكود بالفعل!", "error");
+            return;
+        }
+
+        // إذا كان الكود جديداً ولم يستخدم بعد، يتم ربطه وتنشيطه فوراً
+        if (!data.isUsed) {
+            const durationDays = data.durationDays || 30;
+            const expiryTimestamp = now + (durationDays * 24 * 60 * 60 * 1000);
+            
+            await codeDocRef.update({
+                isUsed: true,
+                activatedAt: now,
+                expiryTimestamp: expiryTimestamp,
+                usedByDeviceId: getDeviceFingerprint()
+            });
+
+            // تخزين الجلسة محلياً لعدم مطالبته بالدخول في كل مرة
+            localStorage.setItem('yalla_fruit_active_code', code);
+            localStorage.setItem('yalla_fruit_expiry', String(expiryTimestamp));
+        } else {
+            // كود صالح ومفعل مسبقاً على نفس الجهاز
+            localStorage.setItem('yalla_fruit_active_code', code);
+            localStorage.setItem('yalla_fruit_expiry', String(data.expiryTimestamp));
+        }
+
+        showStatus("✅ تم التحقق بنجاح! جاري الانتقال لمنصة فواكه يلا...", "success");
+        setTimeout(() => {
+            window.location.href = "index.html";
+        }, 1200);
+
+    } catch (error) {
+        console.error("Authentication Error:", error);
+        showStatus("❌ حدث خطأ أثناء الاتصال بالخادم. حاول مجدداً.", "error");
+    }
+}
+
+// دالة الكشف التلقائي عن بصمة الجهاز لمنع مشاركة الأكواد بين الأجهزة
+function getDeviceFingerprint() {
+    return navigator.userAgent.replace(/\D+/g, '') + screen.width + screen.height;
+}
+
+// آلية الدخول السري للوحة التحكم بالضغط 5 مرات متتالية على الأيقونة
+function handleLogoClick() {
+    logoClickCount++;
+    clearTimeout(logoTimer);
+    logoTimer = setTimeout(() => { logoClickCount = 0; }, 2000);
+
+    if (logoClickCount >= 5) {
+        const adminPanel = document.getElementById('adminPanel');
+        adminPanel.style.display = adminPanel.style.display === 'block' ? 'none' : 'block';
+        logoClickCount = 0;
+        showStatus("🛠️ تم فتح لوحة تحكم المسؤول السرية", "success");
+    }
+}
+
+// توليد كود وحفظه مباشرة في الـ Firestore لمشروعك
+async function generateNewCode() {
+    showStatus("⏳ جاري إنشاء الكود وحفظه بقاعدة البيانات...", "loading");
+    
+    try {
+        await auth.signInAnonymously();
+        
+        const duration = parseInt(document.getElementById('subDuration').value);
+        const randomParts = [];
+        for (let i = 0; i < 4; i++) {
+            randomParts.push(Math.random().toString(36).substring(2, 6).toUpperCase());
+        }
+        const newCode = "YF-" + randomParts.join('-');
+
+        // حفظ الكود الجديد بالمسار الصارم المعتمد
+        const codeDocRef = firebase.firestore().doc(db, 'artifacts', appId, 'public', 'data', 'subscriptions', newCode);
+        await codeDocRef.set({
+            code: newCode,
+            durationDays: duration,
+            isUsed: false,
+            createdAt: Date.now(),
+            expiryTimestamp: null,
+            usedByDeviceId: null
+        });
+
+        const display = document.getElementById('codeDisplay');
+        display.style.display = "block";
+        display.textContent = newCode;
+        
+        showStatus("✅ تم إنشاء كود الاشتراك الجديد بنجاح وحفظه!", "success");
+    } catch (e) {
+        console.error(e);
+        showStatus("❌ فشل في إنشاء الكود. تحقق من الصلاحيات والاتصال.", "error");
+    }
+}
+</script>
+</body>
+</html>
