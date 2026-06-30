@@ -1,0 +1,341 @@
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>⚙️ لوحة تحكم الإدارة - YALLA FRUIT</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: #05050a;
+            color: #d0d0d0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        /* واجهة الدخول للوحة التحكم */
+        #authScreen {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 80vh;
+        }
+        .auth-box {
+            background: #0d0d1a; border: 1px solid #ffd70033; border-radius: 12px;
+            padding: 30px; text-align: center; width: 100%; max-width: 350px;
+        }
+        .auth-box input {
+            width: 100%; background: #050510; border: 1px solid #1a1a2a; color: #fff;
+            padding: 12px; border-radius: 8px; margin: 15px 0; text-align: center;
+        }
+        
+        /* لوحة التحكم الرئيسية */
+        #dashboardScreen { display: none; max-width: 1000px; margin: 0 auto; }
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(135deg, #1a1a2a, #0d0d1a);
+            padding: 15px 20px; border-radius: 12px; border: 1px solid #ffd70055; margin-bottom: 20px;
+        }
+        .header h1 { font-size: 20px; color: #ffd700; }
+        
+        .panel-section {
+            background: #0d0d1a; border: 1px solid #1a1a2a; border-radius: 12px;
+            padding: 20px; margin-bottom: 20px;
+        }
+        .panel-title { font-size: 16px; color: #4caf50; margin-bottom: 15px; border-bottom: 1px solid #1a1a2a; padding-bottom: 10px; }
+        
+        .form-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        select, .btn {
+            padding: 10px 15px; border-radius: 8px; font-size: 14px; border: none; outline: none;
+        }
+        select { background: #050510; color: #fff; border: 1px solid #1a1a2a; flex: 1; min-width: 150px; }
+        
+        .btn { cursor: pointer; font-weight: bold; transition: 0.3s; color: #fff; }
+        .btn-primary { background: #2196f3; }
+        .btn-primary:hover { background: #1976d2; }
+        .btn-success { background: #4caf50; }
+        .btn-warning { background: #ff9800; }
+        .btn-danger { background: #f44336; }
+        
+        /* جدول الأكواد */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; text-align: center; }
+        th, td { padding: 12px; border-bottom: 1px solid #1a1a2a; }
+        th { background: #111122; color: #ffd700; white-space: nowrap; }
+        tr:hover { background: #111122; }
+        
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .b-new { background: #2196f333; color: #64b5f6; }
+        .b-active { background: #4caf5033; color: #81c784; }
+        .b-expired { background: #f4433633; color: #e57373; }
+        .b-banned { background: #ff980033; color: #ffb74d; }
+        
+        .code-text { font-family: monospace; font-size: 14px; color: #fff; background: #050510; padding: 4px 8px; border-radius: 4px; user-select: all; }
+        
+        .action-btns { display: flex; gap: 5px; justify-content: center; }
+        .action-btns button { padding: 5px 10px; font-size: 11px; border-radius: 4px; }
+        
+        #toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: #333; color: #fff; padding: 10px 20px; border-radius: 8px;
+            display: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- شاشة تسجيل الدخول للإدارة -->
+    <div id="authScreen">
+        <div class="auth-box">
+            <h2 style="color: #ffd700; margin-bottom: 10px;">🍒 YALLA FRUIT ADMIN</h2>
+            <p style="font-size: 12px; color: #888;">أدخل كلمة مرور الإدارة للمتابعة</p>
+            <input type="password" id="adminPassword" placeholder="كلمة المرور">
+            <button class="btn btn-primary" style="width: 100%;" onclick="checkAdmin()">تسجيل الدخول</button>
+        </div>
+    </div>
+
+    <!-- لوحة التحكم -->
+    <div id="dashboardScreen">
+        <div class="header">
+            <h1>🍒 لوحة تحكم الاشتراكات</h1>
+            <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="location.reload()">تسجيل خروج</button>
+        </div>
+
+        <!-- قسم توليد الأكواد -->
+        <div class="panel-section">
+            <div class="panel-title">✨ إنشاء كود اشتراك جديد</div>
+            <div class="form-row">
+                <select id="newDuration">
+                    <option value="1">يوم واحد (24 ساعة)</option>
+                    <option value="7">أسبوع (7 أيام)</option>
+                    <option value="15">نصف شهر (15 يوم)</option>
+                    <option value="30" selected>شهر (30 يوم)</option>
+                    <option value="90">3 أشهر (90 يوم)</option>
+                    <option value="180">6 أشهر (180 يوم)</option>
+                    <option value="365">سنة كاملة (365 يوم)</option>
+                </select>
+                <button class="btn btn-success" onclick="generateCode()">➕ توليد وحفظ الكود</button>
+                <button class="btn btn-primary" onclick="fetchCodes()">🔄 تحديث الجدول</button>
+            </div>
+        </div>
+
+        <!-- قسم عرض الأكواد -->
+        <div class="panel-section">
+            <div class="panel-title">📋 قائمة الاشتراكات والأكواد</div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الكود</th>
+                            <th>المدة</th>
+                            <th>الحالة</th>
+                            <th>تاريخ الإنشاء</th>
+                            <th>تاريخ الانتهاء</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="codesTableBody">
+                        <tr><td colspan="6" style="color: #888;">جاري جلب البيانات...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">تمت العملية بنجاح!</div>
+
+<!-- تحميل حزمة Firebase -->
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"></script>
+
+<script>
+// إعدادات Firebase الخاصة بك
+const firebaseConfig = {
+    apiKey: "AIzaSyAo4IaLd5SfVYHAAp_noJD7ZXBbhdVx9-0",
+    authDomain: "fawakihyallalive.firebaseapp.com",
+    projectId: "fawakihyallalive",
+    storageBucket: "fawakihyallalive.firebasestorage.app",
+    messagingSenderId: "917478913649",
+    appId: "1:917478913649:android:fee5d42aca81c8a2e3cdd0"
+};
+
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const appId = "fawakihyallalive";
+const collectionPath = `artifacts/${appId}/public/data/subscriptions`;
+
+// ==========================================
+// 1. نظام الدخول للوحة (كلمة المرور الافتراضية: admin2024)
+// ==========================================
+function checkAdmin() {
+    const pass = document.getElementById('adminPassword').value;
+    if (pass === "admin2024") { // يمكنك تغيير كلمة المرور من هنا
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('dashboardScreen').style.display = 'block';
+        initAdmin();
+    } else {
+        alert("كلمة المرور غير صحيحة!");
+    }
+}
+
+async function initAdmin() {
+    showToast("جاري الاتصال بقاعدة البيانات...");
+    try {
+        await auth.signInAnonymously();
+        fetchCodes();
+    } catch (error) {
+        console.error(error);
+        alert("حدث خطأ في الاتصال بقاعدة البيانات.");
+    }
+}
+
+// ==========================================
+// 2. توليد كود جديد
+// ==========================================
+async function generateCode() {
+    const duration = parseInt(document.getElementById('newDuration').value);
+    
+    // توليد كود بصيغة YF-XXXX-XXXX
+    const randomPart1 = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const randomPart2 = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const newCode = `YF-${randomPart1}-${randomPart2}`;
+
+    const codeData = {
+        code: newCode,
+        durationDays: duration,
+        isUsed: false,
+        isBanned: false,
+        createdAt: Date.now(),
+        activatedAt: null,
+        expiryTimestamp: null,
+        usedByDeviceId: null
+    };
+
+    try {
+        await db.doc(`${collectionPath}/${newCode}`).set(codeData);
+        showToast("✅ تم إنشاء الكود بنجاح!");
+        fetchCodes();
+    } catch (e) {
+        console.error(e);
+        alert("فشل في حفظ الكود!");
+    }
+}
+
+// ==========================================
+// 3. جلب وعرض الأكواد
+// ==========================================
+async function fetchCodes() {
+    const tbody = document.getElementById('codesTableBody');
+    tbody.innerHTML = '<tr><td colspan="6" style="color: #888;">جاري التحديث...</td></tr>';
+    
+    try {
+        const snapshot = await db.collection(collectionPath).get();
+        let html = '';
+        
+        if (snapshot.empty) {
+            tbody.innerHTML = '<tr><td colspan="6" style="color: #888;">لا توجد أكواد حالياً.</td></tr>';
+            return;
+        }
+
+        const codes = [];
+        snapshot.forEach(doc => codes.push(doc.data()));
+        
+        // ترتيب الأكواد (الأحدث أولاً)
+        codes.sort((a, b) => b.createdAt - a.createdAt);
+
+        codes.forEach(data => {
+            const now = Date.now();
+            let statusHtml = '';
+            let isExpired = data.expiryTimestamp && now > data.expiryTimestamp;
+
+            // تحديد الحالة
+            if (data.isBanned) {
+                statusHtml = '<span class="badge b-banned">محظور 🚫</span>';
+            } else if (isExpired) {
+                statusHtml = '<span class="badge b-expired">منتهي ❌</span>';
+            } else if (data.isUsed) {
+                statusHtml = '<span class="badge b-active">نشط ✅</span>';
+            } else {
+                statusHtml = '<span class="badge b-new">جديد ✨</span>';
+            }
+
+            const createdDate = new Date(data.createdAt).toLocaleDateString('en-GB');
+            const expiryDate = data.expiryTimestamp ? new Date(data.expiryTimestamp).toLocaleDateString('en-GB') : '-';
+            
+            // أزرار الإجراءات
+            const banBtn = data.isBanned 
+                ? `<button class="btn btn-success" onclick="toggleBan('${data.code}', false)">فك الحظر</button>`
+                : `<button class="btn btn-warning" onclick="toggleBan('${data.code}', true)">حظر</button>`;
+                
+            const resetBtn = data.isUsed 
+                ? `<button class="btn btn-primary" onclick="resetDevice('${data.code}')">فك الجهاز</button>` 
+                : '';
+
+            html += `
+                <tr>
+                    <td><span class="code-text">${data.code}</span></td>
+                    <td>${data.durationDays} يوم</td>
+                    <td>${statusHtml}</td>
+                    <td>${createdDate}</td>
+                    <td>${expiryDate}</td>
+                    <td class="action-btns">
+                        ${banBtn}
+                        ${resetBtn}
+                        <button class="btn btn-danger" onclick="deleteCode('${data.code}')">حذف</button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        tbody.innerHTML = html;
+    } catch (e) {
+        console.error(e);
+        tbody.innerHTML = '<tr><td colspan="6" style="color: #f44336;">فشل في جلب البيانات!</td></tr>';
+    }
+}
+
+// ==========================================
+// 4. إجراءات الإدارة (حظر، فك جهاز، حذف)
+// ==========================================
+async function toggleBan(code, banStatus) {
+    if(!confirm(banStatus ? "هل أنت متأكد من حظر هذا الكود؟" : "هل تريد فك الحظر عن هذا الكود؟")) return;
+    try {
+        await db.doc(`${collectionPath}/${code}`).update({ isBanned: banStatus });
+        showToast(banStatus ? "تم حظر الكود!" : "تم فك الحظر!");
+        fetchCodes();
+    } catch(e) { alert("حدث خطأ!"); }
+}
+
+async function resetDevice(code) {
+    if(!confirm("هل تريد فك ارتباط الجهاز بهذا الكود ليتمكن المستخدم من الدخول بجهاز آخر؟")) return;
+    try {
+        // إزالة بصمة الجهاز ليتمكن من التسجيل من جديد
+        await db.doc(`${collectionPath}/${code}`).update({ usedByDeviceId: null });
+        showToast("تم فك ارتباط الجهاز بنجاح!");
+        fetchCodes();
+    } catch(e) { alert("حدث خطأ!"); }
+}
+
+async function deleteCode(code) {
+    if(!confirm("⚠️ تحذير: هل أنت متأكد من حذف هذا الكود نهائياً؟ لا يمكن التراجع!")) return;
+    try {
+        await db.doc(`${collectionPath}/${code}`).delete();
+        showToast("تم حذف الكود نهائياً!");
+        fetchCodes();
+    } catch(e) { alert("حدث خطأ!"); }
+}
+
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.display = 'block';
+    toast.style.background = msg.includes("✅") || msg.includes("نجاح") ? '#4caf50' : '#333';
+    setTimeout(() => { toast.style.display = 'none'; }, 3000);
+}
+</script>
+</body>
+</html>
+
+```
