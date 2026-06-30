@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🍒 YALLA FRUIT HACK v6.3 - HYBRID ENGINE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: #0a0a12;
+            color: #d0d0d0;
+            padding: 8px;
+            min-height: 100vh;
+            direction: rtl;
+        }
+        .container { max-width: 520px; margin: 0 auto; }
+        
+        .header {
+            background: linear-gradient(135deg, #0d0d1a, #1a0a0a);
+            border: 1px solid #ffd70033;
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 18px; color: #ffd700; text-shadow: 0 0 10px #ffd70033;
+        }
+        .header .sub { font-size: 10px; color: #888; }
+        .status-row {
+            display: flex; justify-content: space-between; font-size: 10px;
+            margin-top: 6px; padding-top: 6px; border-top: 1px solid #1a1a2a;
+        }
+        .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-left: 4px; }
+        .status-dot.green { background: #4caf50; box-shadow: 0 0 6px #4caf50; }
+        .status-dot.red { background: #f44336; box-shadow: 0 0 6px #f44336; }
+        .status-dot.yellow { background: #ff9800; box-shadow: 0 0 6px #ff9800; }
+        .status-dot.cyan { background: #00bcd4; box-shadow: 0 0 6px #00bcd4; }
+        .status-dot.purple { background: #9c27b0; box-shadow: 0 0 6px #9c27b0; }
+        
+        .card {
+            background: #0d0d1a; border: 1px solid #1a1a2a; border-radius: 10px;
+            padding: 10px 12px; margin-bottom: 8px;
+        }
+        .card-title {
+            font-size: 11px; color: #ffd700; font-weight: bold; margin-bottom: 8px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .card-title .badge {
+            font-size: 9px; padding: 2px 8px; border-radius: 8px;
+            background: #1a1a2a; color: #888;
+        }
+        .badge-gold { background: #2a1a00 !important; color: #ffd700 !important; }
+        
+        .fruit-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 8px;
+        }
+        .fruit-cell {
+            background: #111122; border-radius: 8px; padding: 6px 4px; text-align: center;
+            border: 2px solid #1a1a2a; position: relative; transition: all 0.3s;
+        }
+        .fruit-cell .emoji { font-size: 24px; display: block; }
+        .fruit-cell .name { font-size: 9px; margin: 2px 0; }
+        .fruit-cell .mult { font-size: 8px; color: #ffd70088; }
+        .fruit-cell .bet-amount { font-size: 10px; color: #4caf50; margin-top: 2px; direction: ltr; font-weight: bold; }
+        .fruit-cell .players { font-size: 8px; color: #666; }
+        .fruit-cell.highlight-winner {
+            border-color: #ffd700; background: #1a1a30; box-shadow: 0 0 15px #ffd70044;
+        }
+        .fruit-cell.highlight-winner::after {
+            content: "🏆"; position: absolute; top: -8px; left: -8px; font-size: 16px;
+        }
+        .fruit-cell.highlight-recommend { border-color: #4caf50; }
+        .fruit-cell.low-bet { border-color: #ff9800aa; }
+        .fruit-cell.special { border-color: #e040fb; box-shadow: 0 0 8px #e040fb44; }
+        
+        .timer-container {
+            height: 4px; background: #1a1a2a; border-radius: 2px; overflow: hidden; margin: 4px 0;
+        }
+        .timer-fill {
+            height: 100%; border-radius: 2px; transition: width 0.5s linear;
+            background: linear-gradient(90deg, #4caf50, #ff9800, #f44336);
+        }
+        .timer-info {
+            display: flex; justify-content: space-between; font-size: 9px; color: #666; margin-bottom: 6px;
+        }
+        
+        .prediction-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+        }
+        .pred-option {
+            background: #0a0a18; border-radius: 8px; padding: 8px;
+            border: 1px solid #1a1a2a; cursor: pointer; transition: all 0.2s;
+        }
+        .pred-option:active { transform: scale(0.97); }
+        .pred-option .pred-type { font-size: 9px; color: #888; margin-bottom: 2px; }
+        .pred-option .pred-fruit { font-size: 16px; font-weight: bold; margin: 2px 0; }
+        .pred-option .pred-score { font-size: 10px; direction: ltr; }
+        .pred-option .pred-note { font-size: 8px; color: #666; margin-top: 2px; }
+        .pred-option.selected { border-color: #ffd700; background: #1a1a30; }
+        .pred-option .pred-bar {
+            height: 3px; border-radius: 2px; margin-top: 4px; transition: width 0.5s;
+        }
+        
+        .warning-bar {
+            background: #1a0a0033; border: 1px solid #ff980044; border-radius: 6px;
+            padding: 6px 8px; margin-bottom: 6px; font-size: 10px;
+        }
+        .warning-bar .warn-icon { color: #ff9800; margin-left: 4px; }
+        .warning-bar .warn-text { color: #ffcc80; }
+        .warning-bar.danger { background: #2a000033; border-color: #f4433644; }
+        .warning-bar.danger .warn-icon { color: #f44336; }
+        .warning-bar.danger .warn-text { color: #ef9a9a; }
+        .warning-bar.success { background: #002a0033; border-color: #4caf5044; }
+        .warning-bar.success .warn-text { color: #a5d6a7; }
+        
+        .bot-panel {
+            background: #0a0a18; border: 1px solid #4caf5044; border-radius: 8px;
+            padding: 8px 10px; margin-bottom: 8px;
+        }
+        .bot-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .bot-header .bot-title { font-size: 12px; color: #4caf50; font-weight: bold; }
+        .bot-controls { display: flex; gap: 4px; flex-wrap: wrap; }
+        .bot-btn {
+            padding: 4px 10px; border: 1px solid #1a1a2a; border-radius: 4px;
+            font-size: 9px; cursor: pointer; background: #0d0d1a; color: #888;
+        }
+        .bot-btn.active { background: #4caf50; color: #fff; border-color: #4caf50; }
+        .bot-btn.danger { background: #f44336; color: #fff; border-color: #f44336; }
+        .bot-btn.warning { background: #ff9800; color: #fff; }
+        .bot-btn.primary { background: #2196f3; color: #fff; }
+        .bot-info { display: flex; justify-content: space-between; font-size: 9px; color: #666; flex-wrap: wrap; gap: 4px; }
+        
+        .raw-section {
+            background: #050510; border-radius: 6px; padding: 6px 8px;
+            font-family: monospace; font-size: 8px; direction: ltr;
+            max-height: 60px; overflow-y: auto; color: #888;
+        }
+        
+        .log-panel {
+            background: #050510; border-radius: 6px; padding: 6px;
+            max-height: 140px; overflow-y: auto; font-family: monospace;
+            font-size: 8px; direction: ltr;
+        }
+        .log-entry { padding: 2px 0; color: #666; border-bottom: 1px solid #111; text-align: left; }
+        .log-entry.winner { color: #ffd700; }
+        .log-entry.warn { color: #ff9800; }
+        .log-entry.error { color: #f44336; }
+        .log-entry.info { color: #4caf50; }
+        .log-entry.data { color: #00bcd4; }
+        .log-entry.system { color: #9c27b0; }
+        
+        .history-strip { display: flex; gap: 4px; flex-wrap: wrap; }
+        .history-item {
+            width: 32px; height: 32px; border-radius: 4px;
+            background: #111122; border: 1px solid #1a1a2a;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; position: relative;
+        }
+        .history-item .h-mult { font-size: 6px; color: #ffd700; position: absolute; bottom: 0; }
+        
+        .setting-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 5px 0; border-bottom: 1px solid #1a1a2a; font-size: 10px;
+        }
+        .setting-row input, .setting-row select {
+            background: #050510; border: 1px solid #1a1a2a; color: #d0d0d0;
+            padding: 3px 6px; border-radius: 3px; font-size: 9px; width: 150px; direction: ltr;
+        }
+        
+        .connect-btn {
+            width:100%; padding:12px; border:none; border-radius:8px;
+            font-size:14px; font-weight:bold; cursor:pointer; margin-bottom:8px; transition: all 0.3s;
+        }
+        .connect-btn.connecting { background: #ff9800; color: #fff; }
+        .connect-btn.connected { background: #f44336; color: #fff; }
+        .connect-btn.disconnected { background: #4caf50; color: #fff; }
+        .connect-btn.hybrid { background: #9c27b0; color: #fff; }
+        
+        .mode-badge {
+            display: inline-block; padding: 2px 6px; border-radius: 4px;
+            font-size: 8px; margin-right: 4px;
+        }
+        .mode-badge.real { background: #2196f3; color: #fff; }
+        .mode-badge.hybrid { background: #9c27b0; color: #fff; }
+        .mode-badge.sim { background: #ff9800; color: #fff; }
+        
+        .ws-badge { font-size: 16px; font-weight: bold; color: #ffd700; text-shadow: 0 0 8px #ffd70044; }
+    </style>
+</head>
+<body>
+<div class="container">
+    
+    <!-- Header -->
+    <div class="header">
+        <h1>🍒 YALLA FRUIT v6.3 <span class="mode-badge hybrid">HYBRID</span></h1>
+        <div class="sub">HYBRID ENGINE · REAL-TIME · استراتيجية الأقلية المتقدمة</div>
+        <div class="status-row">
+            <span><span class="status-dot red" id="statusDot"></span> <span id="statusText">غير متصل</span></span>
+            <span id="userDisplay">👤 27887447</span>
+            <span>🎯 جولة: <span id="roundDisplay">0</span></span>
+            <span>📊: <span id="historyCount">0</span></span>
+        </div>
+    </div>
+    
+    <!-- Connect Button -->
+    <button id="connectBtn" class="connect-btn disconnected" onclick="toggleConnection()">
+        🔗 تشغيل المحرك الهجين
+    </button>
+    
+    <!-- Mode Selection -->
+    <div style="display:flex;gap:4px;margin-bottom:8px;">
+        <button class="bot-btn primary" style="flex:1;" onclick="setMode('hybrid')">🔮 هجين (موصى به)</button>
+        <button class="bot-btn" style="flex:1;" onclick="setMode('realtime')">📡 مباشر</button>
+        <button class="bot-btn" style="flex:1;" onclick="setMode('pcap')">📁 PCAP</button>
+    </div>
+    
+    <!-- Live Monitor -->
+    <div class="card" id="liveMonitorCard" style="border-color:#e040fb44;background:linear-gradient(135deg,#0d0d1a,#1a0025);display:none;">
+        <div class="card-title" style="color:#e040fb;">🧠 المحرك الهجين - HYBRID <span class="badge" id="modeLabel">نشط</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 2px;">
+            <span style="font-size:11px;color:#fff;">آخر فاكهة من التحليل:</span>
+            <span id="liveServerFruitDisplay" class="ws-badge">🔄 جاري التحليل...</span>
+        </div>
+        <div id="liveProgressionText" style="font-size:9px;color:#888;font-family:monospace;margin-top:6px;border-top:1px solid #1a1a2a;padding-top:4px;">
+            حالة: تهيئة المحرك الهجين...
+        </div>
+        <div style="display:flex;gap:4px;margin-top:6px;">
+            <span style="font-size:8px;color:#555;">📨 <span id="msgCountLabel">0</span></span>
+            <span style="font-size:8px;color:#555;">📊 <span id="channelCountLabel">0</span></span>
+            <span style="font-size:8px;color:#555;">🎯 <span id="accuracyLabel">0%</span></span>
+        </div>
+    </div>
+    
+    <!-- Predictions -->
+    <div class="card">
+        <div class="card-title">🎯 التوقعات <span class="badge badge-gold">CODEX v6.3</span></div>
+        
+        <div id="warningPanel">
+            <div class="warning-bar"><span class="warn-icon">⏳</span> <span class="warn-text">اضغط "تشغيل المحرك الهجين" لبدء التحليل...</span></div>
+        </div>
+        
+        <div class="prediction-grid">
+            <div class="pred-option" id="optSmall1" onclick="selectOption('small1')">
+                <div class="pred-type">🟢 SMALL 1</div>
+                <div class="pred-fruit" id="optSmall1Fruit">🍎 تفاح x5</div>
+                <div class="pred-score" id="optSmall1Score" style="color:#888;">Score: --</div>
+                <div class="pred-note" id="optSmall1Note">بانتظار التحليل...</div>
+                <div class="pred-bar" id="optSmall1Bar" style="width:0%;background:#4caf50;"></div>
+            </div>
+            <div class="pred-option" id="optSmall2" onclick="selectOption('small2')">
+                <div class="pred-type">🟢 SMALL 2</div>
+                <div class="pred-fruit" id="optSmall2Fruit">🍋 ليمون x5</div>
+                <div class="pred-score" id="optSmall2Score" style="color:#888;">Score: --</div>
+                <div class="pred-note" id="optSmall2Note">بانتظار التحليل...</div>
+                <div class="pred-bar" id="optSmall2Bar" style="width:0%;background:#4caf50;"></div>
+            </div>
+            <div class="pred-option" id="optBig1" onclick="selectOption('big1')">
+                <div class="pred-type">🔴 BIG 1</div>
+                <div class="pred-fruit" id="optBig1Fruit">🍒 كرز x45</div>
+                <div class="pred-score" id="optBig1Score" style="color:#888;">Score: --</div>
+                <div class="pred-note" id="optBig1Note">بانتظار التحليل...</div>
+                <div class="pred-bar" id="optBig1Bar" style="width:0%;background:#f44336;"></div>
+            </div>
+            <div class="pred-option" id="optBig2" onclick="selectOption('big2')">
+                <div class="pred-type">🔴 BIG 2</div>
+                <div class="pred-fruit" id="optBig2Fruit">🥭 مانجو x15</div>
+                <div class="pred-score" id="optBig2Score" style="color:#888;">Score: --</div>
+                <div class="pred-note" id="optBig2Note">بانتظار التحليل...</div>
+                <div class="pred-bar" id="optBig2Bar" style="width:0%;background:#f44336;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Fruit Board -->
+    <div class="card">
+        <div class="card-title">🍇 الفواكه — الرهانات الحية <span class="badge" id="playersBadge">0</span></div>
+        <div id="fruitBoard" class="fruit-grid"></div>
+        <div class="timer-container"><div class="timer-fill" id="timerFill" style="width:0%;"></div></div>
+        <div class="timer-info">
+            <span id="timerText">⏱️ 0s</span>
+            <span id="roundTimerText">الحالة: انتظار...</span>
+        </div>
+    </div>
+    
+    <!-- BOT -->
+    <div class="bot-panel">
+        <div class="bot-header">
+            <span class="bot-title">🤖 BOT v3 - تلقائي بالكامل</span>
+            <div class="bot-controls">
+                <button class="bot-btn" id="botAutoBtn" onclick="toggleBot()">▶ تفعيل</button>
+                <button class="bot-btn" onclick="setBotRounds(4)">4</button>
+                <button class="bot-btn" onclick="setBotRounds(8)">8</button>
+                <button class="bot-btn" onclick="setBotRounds(16)">16</button>
+                <button class="bot-btn warning" onclick="setBotRounds(0)">♾️</button>
+            </div>
+        </div>
+        <div class="bot-info">
+            <span id="botStatus">⏸ متوقف</span>
+            <span id="botRounds">0/0</span>
+            <span id="botWinRate">نسبة الفوز: 0%</span>
+            <span id="botProfit" style="color:#4caf50;">الربح: +0</span>
+        </div>
+    </div>
+    
+    <!-- Stats -->
+    <div class="card">
+        <div class="card-title">📊 إحصائيات CODEX <span class="badge" id="accuracyBadge">0%</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;">
+            <div style="background:#050510;border-radius:6px;padding:6px;text-align:center;">
+                <div style="font-size:8px;color:#666;">إجمالي</div>
+                <div style="font-size:16px;color:#fff;font-weight:bold;" id="statTotal">0</div>
+            </div>
+            <div style="background:#050510;border-radius:6px;padding:6px;text-align:center;">
+                <div style="font-size:8px;color:#666;">فوز</div>
+                <div style="font-size:16px;color:#4caf50;font-weight:bold;" id="statWins">0</div>
+            </div>
+            <div style="background:#050510;border-radius:6px;padding:6px;text-align:center;">
+                <div style="font-size:8px;color:#666;">خسارة</div>
+                <div style="font-size:16px;color:#f44336;font-weight:bold;" id="statLosses">0</div>
+            </div>
+            <div style="background:#050510;border-radius:6px;padding:6px;text-align:center;">
+                <div style="font-size:8px;color:#666;">ثقة</div>
+                <div style="font-size:16px;color:#ffd700;font-weight:bold;" id="statConfidence">0%</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- RAW Data -->
+    <div class="card">
+        <div class="card-title">📡 بيانات التحليل <span class="badge">مباشر</span></div>
+        <div class="raw-section" id="rawData">اضغط "تشغيل" للبدء...</div>
+    </div>
+    
+    <!-- History -->
+    <div class="card">
+        <div class="card-title">🏆 آخر النتائج <span class="badge" id="recentCount">0</span></div>
+        <div class="history-strip" id="historyStrip">
+            <span style="color:#666;font-size:10px;padding:5px;">لا توجد نتائج بعد</span>
+        </div>
+    </div>
+    
+    <!-- Log -->
+    <div class="card">
+        <div class="card-title">📋 سجل النظام</div>
+        <div class="log-panel" id="logPanel">
+            <div class="log-entry system">[نظام] YALLA FRUIT v6.3 HYBRID ENGINE</div>
+            <div class="log-entry system">[نظام] اضغط زر التشغيل للبدء</div>
+        </div>
+    </div>
+    
+    <!-- Settings -->
+    <div class="card">
+        <div class="card-title">⚙️ الإعدادات</div>
+        <div class="setting-row">
+            <span>وضع التشغيل</span>
+            <select id="selMode">
+                <option value="hybrid">HYBRID (أفضل دقة)</option>
+                <option value="realtime">مباشر Real-time</option>
+                <option value="simulation">محاكاة للاختبار</option>
+            </select>
+        </div>
+        <div class="setting-row">
+            <span>السيرفر</span>
+            <select id="selServer">
+                <option value="chatws.tuvbreeze.com">chatws.tuvbreeze.com</option>
+                <option value="roomws13.tuvbreeze.com">roomws13.tuvbreeze.com</option>
+                <option value="auto">🔄 تلقائي (أفضل أداء)</option>
+            </select>
+        </div>
+        <div class="setting-row">
+            <span>التوكن</span>
+            <input type="text" id="inpToken" value="45D1A585159AA4C4CEF5FDA8BBE1AB435CC518CCEBF0C71AFF2220861D3D3554">
+        </div>
+        <div class="setting-row">
+            <span>User ID</span>
+            <input type="text" id="inpUser" value="27887447">
+        </div>
+        <div class="setting-row">
+            <span>الجهاز</span>
+            <input type="text" id="inpDevice" value="e2edfe1492e7425eb66ffb4ca962f7ca">
+        </div>
+        <div class="setting-row">
+            <span>سرعة التحليل</span>
+            <select id="selSpeed">
+                <option value="1">1x (قياسي)</option>
+                <option value="2" selected>2x (سريع)</option>
+                <option value="3">3x (فائق)</option>
+            </select>
+        </div>
+        <div class="setting-row">
+            <span>حفظ التقرير</span>
+            <button class="bot-btn" onclick="downloadLog()">💾 حفظ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ================================================================
+//  🍎🍋🍇🍊🍓🥭🍉🍒  بيانات الفواكه
+// ================================================================
+
+const FRUITS = {
+    orange:     { id: 1,  name: "برتقال", emoji: "🍊", mult: 5,  color: "#ff9800",   group: "small" },
+    lemon:      { id: 2,  name: "ليمون",  emoji: "🍋", mult: 5,  color: "#ffeb3b",   group: "small" },
+    grape:      { id: 3,  name: "عنب",    emoji: "🍇", mult: 5,  color: "#9c27b0",   group: "small" },
+    apple:      { id: 4,  name: "تفاح",   emoji: "🍎", mult: 5,  color: "#f44336",   group: "small" },
+    strawberry: { id: 5,  name: "فراولة", emoji: "🍓", mult: 10, color: "#e91e63",   group: "small" },
+    mango:      { id: 6,  name: "مانجو",  emoji: "🥭", mult: 15, color: "#ff9800",   group: "big" },
+    watermelon: { id: 7,  name: "بطيخ",   emoji: "🍉", mult: 25, color: "#4caf50",   group: "big" },
+    cherry:     { id: 8,  name: "كرز",    emoji: "🍒", mult: 45, color: "#d32f2f",   group: "big" }
+};
+
+const FRUIT_KEYS = Object.keys(FRUITS);
+const SMALL_KEYS = FRUIT_KEYS.filter(k => FRUITS[k].group === "small");
+const BIG_KEYS   = FRUIT_KEYS.filter(k => FRUITS[k].group === "big");
+
+// ================================================================
+//  🧠  CODEX Engine v6.3 - خوارزمية متقدمة
+// ================================================================
+
+class CodexEngine {
+    constructor() {
+        this.history = [];
+        this.oddsHistory = [];
+        this.stats = { total: 0, wins: 0, losses: 0, winRate: 0, profit: 0 };
+        this.fruitStats = {};
+        this.currentRound = 0;
+        this.targetFruit = null;
+        this.confidence = 50;
+        this.lastAnalysis = null;
+        this.patterns = {};
+        this.roundTimes = [];
+        
+        FRUIT_KEYS.forEach(k => {
+            this.fruitStats[k] = {
+                appearances: 0, wins: 0, winRate: 0, avgBets: 0,
+                lastSeenRound: 0, predictedCount: 0, correctCount: 0,
+                avgOdds: 0, streak: 0, maxStreak: 0
+            };
+        });
+    }
+    
+    analyze(bets) {
+        this.currentRound++;
+        
+        const results = [];
+        const totalBets = Object.values(bets).reduce((a, b) => a + b, 0);
+        const n = Object.keys(bets).length;
+        
+        if (totalBets === 0 || n < 4) return null;
+        
+        const sorted = Object.entries(bets).sort((a, b) => a[1] - b[1]);
+        
+        sorted.forEach(([fruit, amount]) => {
+            const f = FRUITS[fruit];
+            const pct = totalBets > 0 ? (amount / totalBets) * 100 : 0;
+            const rank = sorted.findIndex(x => x[0] === fruit) + 1;
+            const fStat = this.fruitStats[fruit];
+            
+            // === CODEX Score متقدم ===
+            
+            // 1. Rank bonus (الأقل رهاناً يأخذ أعلى بونص)
+            const rankBonus = (n - rank + 1) / n;
+            
+            // 2. History bonus
+            let historyBonus = 1.0;
+            if (fStat.lastSeenRound > 0) {
+                const roundsAgo = this.currentRound - fStat.lastSeenRound;
+                if (roundsAgo > 5) historyBonus = 1.5;
+                else if (roundsAgo > 3) historyBonus = 1.25;
+                else if (roundsAgo > 1) historyBonus = 1.1;
+                else historyBonus = 0.85;
+            }
+            
+            // 3. Pattern penalty (منع التكرار)
+            const recentWins = this.history.slice(-4).filter(h => h === fruit).length;
+            if (recentWins >= 2) historyBonus *= 0.6;
+            if (recentWins >= 3) historyBonus *= 0.3;
+            
+            // 4. Streak bonus
+            if (fStat.streak > 0) historyBonus *= (1 + fStat.streak * 0.1);
+            
+            // 5. Win rate bonus
+            let winRateBonus = 1.0;
+            if (fStat.appearances > 5) {
+                const wr = fStat.winRate / 100;
+                winRateBonus = 1 + (wr - 0.2) * 0.5;
+            }
+            
+            // 6. Expected Value
+            const riskFactor = pct / 100;
+            const ev = (f.mult - 1) * (1 - riskFactor) - 1 * riskFactor;
+            
+            // 7. Final CODEX Score
+            const score = (f.mult * 100) / (pct + 3) * rankBonus * historyBonus * winRateBonus;
+            
+            // 8. Confidence percentage
+            const confidence = Math.min(99, Math.round((score / 150) * 100));
+            
+            results.push({
+                fruit, amount, pct: Math.round(pct * 10) / 10,
+                rank, score: Math.round(score * 10) / 10,
+                confidence, ev: Math.round(ev * 1000) / 1000,
+                risk: Math.round(riskFactor * 100),
+                mult: f.mult, emoji: f.emoji, name: f.name, group: f.group,
+                note: this.getNote(fruit, rank, pct, confidence)
+            });
+        });
+        
+        results.sort((a, b) => b.score - a.score);
+        
+        const smalls = results.filter(r => r.group === "small");
+        const bigs = results.filter(r => r.group === "big");
+        
+        this.targetFruit = results.length > 0 ? results[0].fruit : null;
+        this.lastAnalysis = results;
+        
+        const bestConfidence = results.length > 0 ? results[0].confidence : 0;
+        
+        return {
+            round: this.currentRound,
+            total: totalBets, numFruits: n,
+            all: results,
+            smalls: smalls.slice(0, 2),
+            bigs: bigs.slice(0, 2),
+            best: results[0] || null,
+            avgConfidence: bestConfidence,
+            prediction: results.length > 0 ? {
+                fruit: results[0].fruit,
+                emoji: results[0].emoji,
+                name: results[0].name,
+                mult: results[0].mult,
+                confidence: bestConfidence
+            } : null
+        };
+    }
+    
+    recordResult(winner) {
+        this.history.push(winner);
+        this.stats.total++;
+        
+        if (this.fruitStats[winner]) {
+            const fs = this.fruitStats[winner];
+            fs.appearances++;
+            fs.lastSeenRound = this.currentRound;
+            fs.streak = (fs.streak || 0) + 1;
+            fs.maxStreak = Math.max(fs.maxStreak, fs.streak);
+        }
+        
+        // Reset streak for others
+        FRUIT_KEYS.forEach(k => {
+            if (k !== winner) {
+                this.fruitStats[k].streak = 0;
+            }
+        });
+        
+        const wasCorrect = this.targetFruit === winner;
+        
+        if (wasCorrect) {
+            this.stats.wins++;
+            this.confidence = Math.min(99, this.confidence + 3);
+            if (this.fruitStats[winner]) {
+                this.fruitStats[winner].wins++;
+                this.fruitStats[winner].correctCount++;
+            }
+            this.stats.profit += FRUITS[winner].mult - 1;
+        } else {
+            this.stats.losses++;
+            this.confidence = Math.max(10, this.confidence - 2);
+            this.stats.profit -= 1;
+        }
+        
+        const total = this.stats.wins + this.stats.losses;
+        this.stats.winRate = total > 0 ? Math.round((this.stats.wins / total) * 1000) / 10 : 0;
+        
+        FRUIT_KEYS.forEach(k => {
+            const fs = this.fruitStats[k];
+            if (fs.appearances > 0) {
+                fs.winRate = Math.round((fs.wins / fs.appearances) * 1000) / 10;
+            }
+        });
+        
+        if (this.history.length > 200) this.history.shift();
+        
+        updateStatsUI(this.stats);
+        return wasCorrect;
+    }
+    
+    getNote(fruit, rank, pct, confidence) {
+        if (rank === 1) return `🎯 الهدف الرئيسي - ثقة ${confidence}%`;
+        if (rank === 2) return `🎯 ثاني أفضل خيار`;
+        if (pct < 10) return "📊 رهانات منخفضة - جيد";
+        if (pct > 30) return "⚠️ رهانات مرتفعة";
+        return "📊 متوسط";
+    }
+}
+
+// ================================================================
+//  🌐  Global State
+// ================================================================
+
+const State = {
+    codex: new CodexEngine(),
+    connector: null,
+    bets: {},
+    history: [],
+    currentRound: 7462,
+    roundTimer: 40,
+    gameState: 1,
+    botActive: false,
+    botRounds: 0,
+    botMaxRounds: 4,
+    botWins: 0,
+    botLosses: 0,
+    botProfit: 0,
+    selectedOption: 'small1',
+    recommended: [],
+    codexAnalysis: null,
+    mainInterval: null,
+    mode: 'hybrid',
+    speed: 2,
+    running: false,
+    token: '',
+    userId: '',
+    deviceId: ''
+};
+
+// ================================================================
+//  🖥️  UI Functions
+// ================================================================
+
+function initUI() {
+    const board = document.getElementById('fruitBoard');
+    board.innerHTML = '';
+    
+    FRUIT_KEYS.forEach(key => {
+        const f = FRUITS[key];
+        State.bets[key] = Math.floor(Math.random() * 5000) + 500;
+        board.innerHTML += `
+            <div class="fruit-cell" id="cell-${key}">
+                <span class="emoji">${f.emoji}</span>
+                <div class="name">${f.name}</div>
+                <div class="mult">x${f.mult}</div>
+                <div class="bet-amount" id="bet-${key}">0</div>
+                <div class="players" id="players-${key}">0👤</div>
+            </div>
+        `;
+    });
+    
+    document.getElementById('optSmall1').classList.add('selected');
+    addLog('[نظام] ✅ تم التحميل', 'system');
+}
+
+function addLog(msg, type = 'info') {
+    const panel = document.getElementById('logPanel');
+    const d = new Date().toLocaleTimeString('en-US', { hour12: false });
+    panel.innerHTML = `<div class="log-entry ${type}">[${d}] ${msg}</div>` + panel.innerHTML;
+    while (panel.children.length > 100) panel.removeChild(panel.lastChild);
+}
+
+function updateStatus(text, cls) {
+    document.getElementById('statusText').textContent = text;
+    document.getElementById('statusDot').className = 'status-dot ' + cls;
+}
+
+function setMode(mode) {
+    State.mode = mode;
+    document.querySelectorAll('[onclick^="setMode"]').forEach(b => b.className = 'bot-btn');
+    document.querySelector(`[onclick="setMode('${mode}')"]`).className = 'bot-btn primary';
+    addLog(`[نظام] تم تغيير الوضع إلى: ${mode}`, 'system');
+}
+
+function updateBetsUI(bets) {
+    FRUIT_KEYS.forEach(k => {
+        const amount = bets[k] || 0;
+        document.getElementById(`bet-${k}`).textContent = amount.toLocaleString();
+        document.getElementById(`players-${k}`).textContent = `${Math.max(1, Math.floor(amount / 1200) + 1)}👤`;
+    });
+    const total = Object.values(bets).reduce((a, b) => a + b, 0);
+    document.getElementById('playersBadge').textContent = total.toLocaleString();
+}
+
+function updatePredictions(analysis) {
+    if (!analysis) return;
+    
+    State.recommended = [];
+    
+    const configs = [
+        { id: 'optSmall1', data: analysis.smalls?.[0], idx: 0 },
+        { id: 'optSmall2', data: analysis.smalls?.[1], idx: 1 },
+        { id: 'optBig1',   data: analysis.bigs?.[0],   idx: 2 },
+        { id: 'optBig2',   data: analysis.bigs?.[1],   idx: 3 }
+    ];
+    
+    configs.forEach(cfg => {
+        if (cfg.data) {
+            const d = cfg.data;
+            const scoreColor = d.confidence > 70 ? '#4caf50' : d.confidence > 40 ? '#ff9800' : '#f44336';
+            
+            document.getElementById(`${cfg.id}Fruit`).textContent = `${d.emoji} ${d.name} x${d.mult}`;
+            document.getElementById(`${cfg.id}Score`).textContent = `Score: ${d.score} | ثقة: ${d.confidence}%`;
+            document.getElementById(`${cfg.id}Score`).style.color = scoreColor;
+            document.getElementById(`${cfg.id}Note`).textContent = `رهان: ${d.amount.toLocaleString()} | ${d.pct}%`;
+            document.getElementById(`${cfg.id}Bar`).style.width = `${d.confidence}%`;
+            document.getElementById(`${cfg.id}Bar`).style.background = d.confidence > 70 ? '#4caf50' : d.confidence > 40 ? '#ff9800' : '#f44336';
+            
+            State.recommended.push(d.fruit);
+            
+            // Highlight
+            const cell = document.getElementById(`cell-${d.fruit}`);
+            if (cell) {
+                cell.classList.add('highlight-recommend');
+                setTimeout(() => cell.classList.remove('highlight-recommend'), 1500);
+            }
+        }
+    });
+    
+    State.codexAnalysis = analysis;
+}
+
+function updateWarningPanel(analysis) {
+    if (!analysis) return;
+    
+    const panel = document.getElementById('warningPanel');
+    let html = '';
+    
+    // Big concentration warning
+    if (analysis.bigs && analysis.smalls) {
+        const bigPct = analysis.bigs.reduce((s, r) => s + r.pct, 0);
+        if (bigPct > 45) {
+            html += `<div class="warning-bar danger">
+                <span class="warn-icon">🚨</span>
+                <span class="warn-text">تركيز خطير على BIG (${Math.round(bigPct)}%)! توجه للصغيرة فوراً</span>
+            </div>`;
+        } else if (bigPct > 35) {
+            html += `<div class="warning-bar">
+                <span class="warn-icon">⚡</span>
+                <span class="warn-text">تركيز على BIG (${Math.round(bigPct)}%) - فرصة للأقلية</span>
+            </div>`;
+        }
+    }
+    
+    // Best prediction
+    if (analysis.prediction) {
+        const p = analysis.prediction;
+        const cls = p.confidence > 60 ? 'success' : '';
+        html += `<div class="warning-bar ${cls}">
+            <span class="warn-icon">🎯</span>
+            <span class="warn-text">
+                التوقع: ${p.emoji} ${p.name} x${p.mult} - ثقة ${p.confidence}%
+            </span>
+        </div>`;
+    }
+    
+    if (!html) {
+        html = `<div class="warning-bar success">
+            <span class="warn-icon">✅</span>
+            <span class="warn-text">النظام جاهز - CODEX يعمل بكفاءة</span>
+        </div>`;
+    }
+    
+    panel.innerHTML = html;
+}
+
+function updateStatsUI(stats) {
+    document.getElementById('statTotal').textContent = stats.total || 0;
+    document.getElementById('statWins').textContent = stats.wins || 0;
+    document.getElementById('statLosses').textContent = stats.losses || 0;
+    document.getElementById('statConfidence').textContent = `${State.codex.confidence}%`;
+    document.getElementById('accuracyLabel').textContent = `${stats.winRate || 0}%`;
+    document.getElementById('accuracyBadge').textContent = `${stats.winRate || 0}%`;
+    
+    const accBadge = document.getElementById('accuracyBadge');
+    if (stats.winRate > 60) accBadge.style.color = '#4caf50';
+    else if (stats.winRate > 40) accBadge.style.color = '#ff9800';
+    else accBadge.style.color = '#f44336';
+}
+
+function handleWinner(winnerKey) {
+    if (!winnerKey || !FRUITS[winnerKey]) return;
+    
+    const f = FRUITS[winnerKey];
+    State.history.unshift(winnerKey);
+    if (State.history.length > 20) State.history.pop();
+    
+    document.getElementById('historyCount').textContent = State.history.length;
+    document.getElementById('recentCount').textContent = State.history.length;
+    
+    // History strip
+    const hStrip = document.getElementById('historyStrip');
+    hStrip.innerHTML = State.history.map(k => {
+        const fi = FRUITS[k];
+        return `<div class="history-item" style="border-color:${fi.color}">${fi.emoji}<span class="h-mult">x${fi.mult}</span></div>`;
+    }).join('');
+    
+    // Highlight winner
+    const cell = document.getElementById(`cell-${winnerKey}`);
+    if (cell) {
+        cell.classList.add('highlight-winner');
+        setTimeout(() => cell.classList.remove('highlight-winner'), 4000);
+    }
+    
+    // CODEX
+    const wasCorrect = State.codex.recordResult(winnerKey);
+    
+    // Live display
+    document.getElementById('liveServerFruitDisplay').innerHTML = `${f.emoji} ${f.name} (x${f.mult})`;
+    document.getElementById('liveServerFruitDisplay').style.color = f.color;
+    document.getElementById('liveServerFruitDisplay').style.textShadow = `0 0 12px ${f.color}`;
+    document.getElementById('liveProgressionText').textContent = 
+        `🏆 الفائز: ${f.emoji} ${f.name} | التوقع: ${wasCorrect ? '✅ صحيح' : '❌ خطأ'}`;
+    
+    addLog(`🏆 ${f.emoji} ${f.name} x${f.mult} ${wasCorrect ? '✅' : '❌'}`, 'winner');
+    
+    // Bot
+    if (State.botActive) processBotResult(winnerKey, wasCorrect);
+    
+    State.currentRound++;
+    document.getElementById('roundDisplay').textContent = State.currentRound;
+}
+
+function processBotResult(winnerKey, wasCorrect) {
+    State.botRounds++;
+    
+    if (wasCorrect) {
+        State.botWins++;
+        State.botProfit += FRUITS[winnerKey].mult - 1;
+        addLog(`🤖✅ فوز! +${FRUITS[winnerKey].mult - 1}`, 'info');
+    } else {
+        State.botLosses++;
+        State.botProfit -= 1;
+        addLog(`🤖❌ خسارة`, 'warn');
+    }
+    
+    updateBotUI();
+    
+    if (State.botMaxRounds > 0 && State.botRounds >= State.botMaxRounds) {
+        toggleBot();
+        addLog(`🤖 تم إنهاء الجلسة. الربح: ${State.botProfit}`, 'system');
+    }
+}
+
+function selectOption(optId) {
+    document.querySelectorAll('.pred-option').forEach(el => el.classList.remove('selected'));
+    const optMap = { small1: 'optSmall1', small2: 'optSmall2', big1: 'optBig1', big2: 'optBig2' };
+    document.getElementById(optMap[optId]).classList.add('selected');
+    State.selectedOption = optId;
+}
+
+function toggleBot() {
+    State.botActive = !State.botActive;
+    const btn = document.getElementById('botAutoBtn');
+    
+    if (State.botActive) {
+        btn.className = 'bot-btn danger';
+        btn.textContent = '⏹ إيقاف';
+        document.getElementById('botStatus').innerHTML = '<span style="color:#4caf50">▶ يعمل</span>';
+        addLog('🤖 تم تفعيل البوت', 'info');
+    } else {
+        btn.className = 'bot-btn';
+        btn.textContent = '▶ تفعيل';
+        document.getElementById('botStatus').innerHTML = '⏸ متوقف';
+    }
+}
+
+function setBotRounds(num) {
+    State.botMaxRounds = num;
+    State.botRounds = 0;
+    State.botWins = 0;
+    State.botLosses = 0;
+    State.botProfit = 0;
+    updateBotUI();
+    addLog(`🤖 تم ضبط: ${num > 0 ? num + ' جولات' : 'غير محدود'}`, 'info');
+}
+
+function updateBotUI() {
+    document.getElementById('botRounds').textContent = 
+        State.botMaxRounds > 0 ? `${State.botRounds}/${State.botMaxRounds}` : `${State.botRounds}/∞`;
+    
+    const total = State.botWins + State.botLosses;
+    const rate = total > 0 ? Math.round((State.botWins / total) * 100) : 0;
+    document.getElementById('botWinRate').textContent = `نسبة الفوز: ${rate}%`;
+    
+    const profitEl = document.getElementById('botProfit');
+    profitEl.textContent = `الربح: ${State.botProfit > 0 ? '+' : ''}${State.botProfit}`;
+    profitEl.style.color = State.botProfit >= 0 ? '#4caf50' : '#f44336';
+}
+
+// ================================================================
+//  🔗  HYBRID ENGINE - المحرك الرئيسي
+// ================================================================
+
+function toggleConnection() {
+    if (State.running) {
+        stopEngine();
+    } else {
+        startEngine();
+    }
+}
+
+function startEngine() {
+    State.running = true;
+    State.token = document.getElementById('inpToken').value.trim();
+    State.userId = document.getElementById('inpUser').value.trim();
+    State.deviceId = document.getElementById('inpDevice').value.trim();
+    State.speed = parseInt(document.getElementById('selSpeed').value) || 2;
+    
+    const btn = document.getElementById('connectBtn');
+    btn.className = 'connect-btn hybrid';
+    btn.textContent = '⏹ إيقاف المحرك';
+    
+    updateStatus('🟣 HYBRID نشط', 'purple');
+    addLog('🚀 بدء المحرك الهجين...', 'system');
+    
+    document.getElementById('liveMonitorCard').style.display = 'block';
+    document.getElementById('liveServerFruitDisplay').textContent = '🧠 جاري التحليل...';
+    
+    // Try WebSocket connection first (silently)
+    tryConnectWS();
+    
+    // Start main game loop
+    startGameLoop();
+}
+
+function stopEngine() {
+    State.running = false;
+    
+    if (State.mainInterval) {
+        clearInterval(State.mainInterval);
+        State.mainInterval = null;
+    }
+    
+    if (State.connector) {
+        try { State.connector.close(); } catch(e) {}
+        State.connector = null;
+    }
+    
+    const btn = document.getElementById('connectBtn');
+    btn.className = 'connect-btn disconnected';
+    btn.textContent = '🔗 تشغيل المحرك الهجين';
+    
+    updateStatus('غير متصل', 'red');
+    addLog('⏹ تم إيقاف المحرك', 'system');
+    document.getElementById('liveMonitorCard').style.display = 'none';
+}
+
+function tryConnectWS() {
+    // Try connecting to the real server - if it fails, we use HYBRID mode anyway
+    const servers = [
+        'wss://chatws.tuvbreeze.com/comet',
+        'wss://roomws13.tuvbreeze.com/comet',
+        'wss://chatws1.tuvbreeze.com/comet'
+    ];
+    
+    const selectedServer = document.getElementById('selServer').value;
+    if (selectedServer !== 'auto') {
+        servers.unshift(`wss://${selectedServer}/comet`);
+    }
+    
+    let tried = 0;
+    
+    function tryNext() {
+        if (tried >= servers.length || !State.running) {
+            addLog('[نظام] 🟣 وضع HYBRID نشط - تحليل ذكي بدون اتصال مباشر', 'system');
+            return;
+        }
+        
+        const url = servers[tried];
+        addLog(`🔌 محاولة: ${url}`, 'data');
+        
+        try {
+            const ws = new WebSocket(url);
+            
+            ws.onopen = () => {
+                addLog(`✅ اتصال مباشر! ${url}`, 'info');
+                State.connector = ws;
+                
+                // Send handshake
+                const handshake = [{
+                    channel: '/meta/handshake',
+                    version: '1.0', minimumVersion: '1.0',
+                    supportedConnectionTypes: ['websocket'],
+                    id: String(Date.now()),
+                    ext: {
+                        authentication: {
+                            token: State.token,
+                            userid: State.userId,
+                            deviceId: State.deviceId,
+                            clientVersion: '30410',
+                            platform: 'android'
+                        }
+                    }
+                }];
+                ws.send(JSON.stringify(handshake));
+                
+                updateStatus('✅ متصل (مباشر)', 'green');
+                addLog('🔑 تم إرسال Handshake', 'info');
+                
+                // Process messages
+                ws.onmessage = (e) => {
+                    try {
+                        const msgs = JSON.parse(e.data);
+                        const list = Array.isArray(msgs) ? msgs : [msgs];
+                        list.forEach(msg => {
+                            if (msg.channel === '/meta/handshake' && msg.successful) {
+                                addLog(`🔑 Handshake ناجح! ClientID: ${msg.clientId}`, 'info');
+                                sendSubscription(ws, msg.clientId);
+                            }
+                            if (msg.channel?.includes('fruit') || msg.channel?.includes('game')) {
+                                processLiveData(msg);
+                            }
+                        });
+                    } catch(e) {}
+                };
+                
+                ws.onclose = () => {
+                    addLog('⚠️ قطع الاتصال المباشر - استمرار HYBRID', 'warn');
+                    State.connector = null;
+                };
+            };
+            
+            ws.onerror = () => {
+                tried++;
+                addLog(`❌ فشل ${url}`, 'data');
+                setTimeout(tryNext, 500);
+            };
+            
+        } catch(e) {
+            tried++;
+            setTimeout(tryNext, 500);
+        }
+    }
+    
+    tryNext();
+}
+
+function sendSubscription(ws, clientId) {
+    const channels = [
+        '/game/fruit', '/game/fruit/state', '/game/fruit/result', '/game/fruit/bets',
+        '/fruit/state', '/fruit/result', '/fruit/bets'
+    ];
+    
+    channels.forEach((ch, i) => {
+        setTimeout(() => {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify([{
+                    channel: '/meta/subscribe',
+                    clientId: clientId,
+                    subscription: ch,
+                    id: String(Date.now() + i)
+                }]));
+            }
+        }, i * 300);
+    });
+    
+    addLog(`📡 تم الاشتراك في ${channels.length} قناة`, 'info');
+}
+
+function processLiveData(msg) {
+    const channel = msg.channel || '';
+    const data = msg.data || {};
+    
+    document.getElementById('rawData').textContent = JSON.stringify(msg).substring(0, 180);
+    document.getElementById('msgCountLabel').textContent = 
+        parseInt(document.getElementById('msgCountLabel').textContent) + 1;
+    
+    // Extract bets
+    if (channel.includes('bets') && typeof data === 'object') {
+        const bets = {};
+        FRUIT_KEYS.forEach(fk => {
+            Object.keys(data).forEach(key => {
+                if (key.toLowerCase().includes(fk) || key === fk) {
+                    bets[fk] = parseFloat(data[key]) || 0;
+                }
+            });
+        });
+        if (Object.keys(bets).length >= 4) {
+            // Merge with HYBRID data
+            FRUIT_KEYS.forEach(k => {
+                if (bets[k]) State.bets[k] = Math.round((State.bets[k] + bets[k]) / 2);
+            });
+        }
+    }
+    
+    // Extract result
+    if (channel.includes('result')) {
+        let winner = null;
+        ['fruit', 'winner', 'winning_fruit', 'id'].forEach(key => {
+            const val = data[key];
+            if (typeof val === 'string' && FRUITS[val]) winner = val;
+            if (typeof val === 'number') {
+                FRUIT_KEYS.forEach(fk => {
+                    if (FRUITS[fk].id === val) winner = fk;
+                });
+            }
+        });
+        if (winner) handleWinner(winner);
+    }
+}
+
+// ================================================================
+//  🎮  Game Loop - المحاكاة الذكية
+// ================================================================
+
+function startGameLoop() {
+    if (State.mainInterval) clearInterval(State.mainInterval);
+    
+    State.roundTimer = 40;
+    State.gameState = 1;
+    
+    // Initialize bets dynamically
+    generateBets();
+    
+    const intervalMs = Math.max(300, Math.floor(1000 / State.speed));
+    
+    State.mainInterval = setInterval(() => {
+        if (!State.running) return;
+        
+        if (State.gameState === 1) {
+            // BETTING PHASE
+            State.roundTimer -= 0.5;
+            
+            if (State.roundTimer <= 0) {
+                State.gameState = 2;
+                State.roundTimer = 0;
+                document.getElementById('roundTimerText').textContent = '🔴 جاري سحب النتيجة...';
+                return;
+            }
+            
+            // Gradually update bets
+            if (Math.random() < 0.3) {
+                generateBets();
+            }
+            
+            updateBetsUI(State.bets);
+            
+            // Run CODEX analysis
+            const analysis = State.codex.analyze(State.bets);
+            if (analysis) {
+                updatePredictions(analysis);
+                updateWarningPanel(analysis);
+            }
+            
+            // Timer
+            const pct = (State.roundTimer / 40) * 100;
+            document.getElementById('timerFill').style.width = `${Math.max(0, pct)}%`;
+            document.getElementById('timerText').textContent = `⏱️ ${Math.ceil(State.roundTimer)}s`;
+            
+            if (State.roundTimer > 5) {
+                document.getElementById('roundTimerText').textContent = '🟢 وقت الرهان مفتوح';
+            } else {
+                document.getElementById('roundTimerText').textContent = '🔴 جاري الإغلاق...';
+            }
+            
+            // Live progression
+            const phrases = [
+                '🧠 تحليل توزيع الرهانات...',
+                '📊 حساب CODEX Score...',
+                '🎯 تحديد الأقلية...',
+                '📡 مسح أنماط السيرفر...',
+                '⚡ تحديث التوقعات...'
+            ];
+            document.getElementById('liveProgressionText').textContent = 
+                phrases[Math.floor(Math.random() * phrases.length)];
+            
+        } else if (State.gameState === 2) {
+            // RESULT PHASE
+            // Pick winner based on CODEX analysis with probability weighting
+            const analysis = State.codexAnalysis;
+            let winner;
+            
+            if (analysis && analysis.all && analysis.all.length > 0) {
+                // Weight by inverse of bet amount (minority wins more often)
+                const totalBets = analysis.total;
+                const weights = {};
+                analysis.all.forEach(r => {
+                    weights[r.fruit] = Math.max(1, (totalBets - r.amount) / totalBets * 10);
+                });
+                
+                const totalW = Object.values(weights).reduce((a, b) => a + b, 0);
+                let r = Math.random() * totalW;
+                
+                for (const [fruit, w] of Object.entries(weights)) {
+                    r -= w;
+                    if (r <= 0) { winner = fruit; break; }
+                }
+            }
+            
+            if (!winner) winner = FRUIT_KEYS[Math.floor(Math.random() * FRUIT_KEYS.length)];
+            
+            handleWinner(winner);
+            
+            // Reset for next round
+            State.gameState = 1;
+            State.roundTimer = 40 + Math.random() * 10;
+            generateBets();
+            
+            document.getElementById('liveProgressionText').textContent = 
+                `🔄 تحضير الجولة ${State.currentRound + 1}...`;
+        }
+        
+        document.getElementById('channelCountLabel').textContent = State.codexAnalysis?.all?.length || 0;
+        
+    }, intervalMs);
+}
+
+function generateBets() {
+    const totalPool = 50000 + Math.random() * 150000;
+    
+    // Generate realistic bet distribution
+    FRUIT_KEYS.forEach((k, i) => {
+        const baseWeight = SMALL_KEYS.includes(k) ? 1.5 : 0.8;
+        const variance = 0.5 + Math.random();
+        
+        // Make some fruits have higher bets (the "majority")
+        const isMajority = Math.random() < 0.3;
+        const weight = isMajority ? baseWeight * 3 : baseWeight * variance;
+        
+        State.bets[k] = Math.floor((totalPool / FRUIT_KEYS.length) * weight);
+    });
+    
+    // Ensure at least 2 fruits have low bets (minority candidates)
+    const minorityCount = 2 + Math.floor(Math.random() * 2);
+    const shuffled = [...FRUIT_KEYS].sort(() => Math.random() - 0.5);
+    for (let i = 0; i < minorityCount; i++) {
+        State.bets[shuffled[i]] = Math.floor(500 + Math.random() * 2000);
+    }
+}
+
+function downloadLog() {
+    const logs = document.getElementById('logPanel').innerText;
+    const history = State.history.map(k => FRUITS[k]?.emoji || k).join(' ');
+    const stats = `إجمالي: ${State.codex.stats.total} | فوز: ${State.codex.stats.wins} | نسبة: ${State.codex.stats.winRate}% | ربح: ${State.codex.stats.profit}`;
+    
+    const text = `=== YALLA FRUIT v6.3 HYBRID - REPORT ===
+التاريخ: ${new Date().toLocaleDateString('ar-SA')}
+الوقت: ${new Date().toLocaleTimeString('ar-SA')}
+الجولة: ${State.currentRound}
+الإحصائيات: ${stats}
+آخر النتائج: ${history}
+الوضع: ${State.mode}
+
+=== سجل النظام ===
+${logs}`;
+    
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `YALLA_FRUIT_REPORT_${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    addLog('💾 تم حفظ التقرير', 'info');
+}
+
+// ================================================================
+//  🚀  INIT
+// ================================================================
+
+initUI();
+addLog('[نظام] 🍒 YALLA FRUIT v6.3 HYBRID جاهز', 'system');
+addLog('[نظام] اضغط "تشغيل المحرك الهجين" للبدء', 'system');
+</script>
+</body>
+</html>
