@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -187,7 +188,30 @@
         .mode-badge.sim { background: #ff9800; color: #fff; }
         
         .ws-badge { font-size: 16px; font-weight: bold; color: #ffd700; text-shadow: 0 0 8px #ffd70044; }
+        
+        /* زر تسجيل الخروج لسهولة الإدارة */
+        .logout-btn {
+            background: #f4433622 !important;
+            color: #f44336 !important;
+            border: 1px solid #f4433644 !important;
+            font-size: 9px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
     </style>
+    
+    <!-- حارس البوابة: فحص صلاحية الاشتراك الفوري لمنع التخطي والدخول المباشر -->
+    <script>
+        const activeCode = localStorage.getItem('yalla_fruit_active_code');
+        const expiryTime = localStorage.getItem('yalla_fruit_expiry');
+        
+        if (!activeCode || !expiryTime || Date.now() > parseInt(expiryTime)) {
+            localStorage.removeItem('yalla_fruit_active_code');
+            localStorage.removeItem('yalla_fruit_expiry');
+            window.location.href = "login.html";
+        }
+    </script>
 </head>
 <body>
 <div class="container">
@@ -388,6 +412,10 @@
                 <option value="2" selected>2x (سريع)</option>
                 <option value="3">3x (فائق)</option>
             </select>
+        </div>
+        <div class="setting-row">
+            <span>إدارة الحساب</span>
+            <button class="logout-btn" onclick="logout()">🔐 تسجيل الخروج</button>
         </div>
         <div class="setting-row">
             <span>حفظ التقرير</span>
@@ -1229,6 +1257,15 @@ function generateBets() {
     }
 }
 
+function logout() {
+    localStorage.removeItem('yalla_fruit_active_code');
+    localStorage.removeItem('yalla_fruit_expiry');
+    addLog('🔐 تم تسجيل الخروج بنجاح.', 'system');
+    setTimeout(() => {
+        window.location.href = "login.html";
+    }, 500);
+}
+
 function downloadLog() {
     const logs = document.getElementById('logPanel').innerText;
     const history = State.history.map(k => FRUITS[k]?.emoji || k).join(' ');
@@ -1260,7 +1297,10 @@ ${logs}`;
 
 initUI();
 addLog('[نظام] 🍒 YALLA FRUIT v6.3 HYBRID جاهز', 'system');
+addLog('[نظام] تم التحقق من الكود بنجاح والاشتراك نشط', 'info');
 addLog('[نظام] اضغط "تشغيل المحرك الهجين" للبدء', 'system');
 </script>
 </body>
 </html>
+
+```
