@@ -123,10 +123,11 @@
 <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"></script>
 
 <script>
-// إعدادات Firebase
+// إعدادات Firebase المحدثة والمؤكدة
 const firebaseConfig = {
     apiKey: "AIzaSyAo4IaLd5SfVYHAAp_noJD7ZXBbhdVx9-0",
     authDomain: "fawakihyallalive.firebaseapp.com",
+    databaseURL: "https://fawakihyallalive-default-rtdb.firebaseio.com",
     projectId: "fawakihyallalive",
     storageBucket: "fawakihyallalive.firebasestorage.app",
     messagingSenderId: "917478913649",
@@ -145,8 +146,6 @@ window.onload = async () => {
     
     if (savedCode && expiryTime) {
         if (Date.now() < parseInt(expiryTime)) {
-            // ملاحظة: لو أردت أن يتحقق من الحظر في كل مرة يفتح التطبيق، يمكن وضع الفحص في index.html
-            // لكن لسرعة الدخول سنوجهه مباشرة، والحماية الأقوى تتم عند إدخال الكود.
             window.location.href = "index.html";
         } else {
             localStorage.removeItem('yalla_fruit_active_code');
@@ -232,7 +231,7 @@ async function validateAndLogin() {
 
         showStatus("✅ تم التحقق بنجاح! جاري الدخول...", "success");
         setTimeout(() => {
-            window.location.href = "index.html";
+            window.location.href = "index.html"; // توجيه لملف اللعبة
         }, 1200);
 
     } catch (error) {
