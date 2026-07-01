@@ -76,11 +76,14 @@
             background: #333; color: #fff; padding: 10px 20px; border-radius: 8px;
             display: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
+        .error-box {
+            background: #f4433622; color: #f44336; padding: 12px; border-radius: 8px;
+            border: 1px solid #f4433655; margin-bottom: 15px; font-size: 13px; text-align: right; display: none;
+        }
     </style>
 </head>
 <body>
 
-    <!-- شاشة تسجيل الدخول للإدارة -->
     <div id="authScreen">
         <div class="auth-box">
             <h2 style="color: #ffd700; margin-bottom: 10px;">🍒 YALLA FRUIT ADMIN</h2>
@@ -90,14 +93,14 @@
         </div>
     </div>
 
-    <!-- لوحة التحكم -->
     <div id="dashboardScreen">
         <div class="header">
             <h1>🍒 لوحة تحكم الاشتراكات</h1>
             <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="location.reload()">تسجيل خروج</button>
         </div>
 
-        <!-- قسم توليد الأكواد -->
+        <div class="error-box" id="globalErrorBox"></div>
+
         <div class="panel-section">
             <div class="panel-title">✨ إنشاء كود اشتراك جديد</div>
             <div class="form-row">
@@ -115,7 +118,6 @@
             </div>
         </div>
 
-        <!-- قسم عرض الأكواد -->
         <div class="panel-section">
             <div class="panel-title">📋 قائمة الاشتراكات والأكواد</div>
             <div class="table-responsive">
@@ -140,13 +142,11 @@
 
     <div id="toast">تمت العملية بنجاح!</div>
 
-<!-- تحميل حزمة Firebase متوافقة مع الكود القديم -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-// إعدادات Firebase الجديدة المستخرجة من ملف الـ JSON الخاص بك
 const firebaseConfig = {
     apiKey: "AIzaSyDr0kbQDE90hhEMohV6X1b4ndu4L7uZz24",
     authDomain: "mehamzaalanat.firebaseapp.com",
@@ -163,9 +163,17 @@ const db = firebase.firestore();
 const appId = "mehamzaalanat";
 const collectionPath = `artifacts/${appId}/public/data/subscriptions`;
 
-// ==========================================
-// 1. نظام الدخول للوحة (كلمة المرور الافتراضية: admin2024)
-// ==========================================
+function showError(msg, err) {
+    const box = document.getElementById('globalErrorBox');
+    box.style.display = 'block';
+    box.innerHTML = `⚠️ <b>${msg}</b><br><small>سبب الخطأ المباشر: ${err.message || err} (الكود: ${err.code || 'unknown'})</small>`;
+    console.error(err);
+}
+
+function clearError() {
+    document.getElementById('globalErrorBox').style.display = 'none';
+}
+
 function checkAdmin() {
     const pass = document.getElementById('adminPassword').value;
     if (pass === "admin2024") {
@@ -178,22 +186,20 @@ function checkAdmin() {
 }
 
 async function initAdmin() {
+    clearError();
     showToast("جاري الاتصال بقاعدة البيانات...");
     try {
         await auth.signInAnonymously();
         fetchCodes();
     } catch (error) {
-        console.error(error);
-        alert("حدث خطأ في الاتصال بقاعدة البيانات.");
+        showError("فشل تسجيل الدخول المجهول بالسيرفر. تأكد من تفعيل الـ Anonymous Auth من كونسول Firebase.", error);
+        document.getElementById('codesTableBody').innerHTML = `<tr><td colspan="6" style="color: #f44336;">خطأ في الاتصال بالسيرفر!</td></tr>`;
     }
 }
 
-// ==========================================
-// 2. توليد كود جديد
-// ==========================================
 async function generateCode() {
+    clearError();
     const duration = parseInt(document.getElementById('newDuration').value);
-    
     const randomPart1 = Math.random().toString(36).substring(2, 6).toUpperCase();
     const randomPart2 = Math.random().toString(36).substring(2, 6).toUpperCase();
     const newCode = `YF-${randomPart1}-${randomPart2}`;
@@ -214,15 +220,12 @@ async function generateCode() {
         showToast("✅ تم إنشاء الكود بنجاح!");
         fetchCodes();
     } catch (e) {
-        console.error(e);
-        alert("فشل في حفظ الكود!");
+        showError("فشل في حفظ الكود الجديد بـ Firestore. راجع قواعد الحماية Rules للـ Database.", e);
     }
 }
 
-// ==========================================
-// 3. جلب وعرض الأكواد
-// ==========================================
 async function fetchCodes() {
+    clearError();
     const tbody = document.getElementById('codesTableBody');
     tbody.innerHTML = '<tr><td colspan="6" style="color: #888;">جاري التحديث...</td></tr>';
     
@@ -237,7 +240,6 @@ async function fetchCodes() {
 
         const codes = [];
         snapshot.forEach(doc => codes.push(doc.data()));
-        
         codes.sort((a, b) => b.createdAt - a.createdAt);
 
         codes.forEach(data => {
@@ -284,39 +286,36 @@ async function fetchCodes() {
         
         tbody.innerHTML = html;
     } catch (e) {
-        console.error(e);
+        showError("فشل جلب الأكواد من مسار الـ Firestore Data.", e);
         tbody.innerHTML = '<tr><td colspan="6" style="color: #f44336;">فشل في جلب البيانات!</td></tr>';
     }
 }
 
-// ==========================================
-// 4. إجراءات الإدارة
-// ==========================================
 async function toggleBan(code, banStatus) {
     if(!confirm(banStatus ? "هل أنت متأكد من حظر هذا الكود؟" : "هل تريد فك الحظر عن هذا الكود؟")) return;
     try {
         await db.collection(collectionPath).doc(code).update({ isBanned: banStatus });
         showToast(banStatus ? "تم حظر الكود!" : "تم فك الحظر!");
         fetchCodes();
-    } catch(e) { alert("حدث خطأ!"); }
+    } catch(e) { showError("فشل تعديل حالة الحظر.", e); }
 }
 
 async function resetDevice(code) {
-    if(!confirm("هل تريد فك ارتباط الجهاز بهذا الكود ليتمكن المستخدم من الدخول بجهاز آخر؟")) return;
+    if(!confirm("هل تريد فك ارتباط الجهاز بهذا الكود؟")) return;
     try {
         await db.collection(collectionPath).doc(code).update({ usedByDeviceId: null });
         showToast("تم فك ارتباط الجهاز بنجاح!");
         fetchCodes();
-    } catch(e) { alert("حدث خطأ!"); }
+    } catch(e) { showError("فشل فك ارتباط الجهاز.", e); }
 }
 
 async function deleteCode(code) {
-    if(!confirm("⚠️ تحذير: هل أنت متأكد من حذف هذا الكود نهائياً؟ لا يمكن التراجع!")) return;
+    if(!confirm("⚠️ هل أنت متأكد من حذف هذا الكود نهائياً؟")) return;
     try {
         await db.collection(collectionPath).doc(code).delete();
         showToast("تم حذف الكود نهائياً!");
         fetchCodes();
-    } catch(e) { alert("حدث خطأ!"); }
+    } catch(e) { showError("فشل حذف الكود من السيرفر.", e); }
 }
 
 function showToast(msg) {
