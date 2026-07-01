@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🔐 بوابة تسجيل الدخول - YALLA FRUIT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #0a0a12);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* تأثير الزجاج (Glassmorphism) */
+        .login-card {
+            background: rgba(15, 15, 25, 0.45);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            border-radius: 24px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 0 20px rgba(255, 215, 0, 0.05);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo { 
+            font-size: 60px; 
+            margin-bottom: 15px; 
+            user-select: none;
+            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.4));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        h2 { 
+            font-size: 26px; 
+            color: #ffd700; 
+            margin-bottom: 5px; 
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5); 
+        }
+
+        .subtitle { 
+            font-size: 13px; 
+            color: #a0a0b5; 
+            margin-bottom: 30px; 
+            font-weight: 400;
+        }
+
+        .form-group { 
+            margin-bottom: 25px; 
+            text-align: right; 
+        }
+
+        label { 
+            display: block; 
+            font-size: 13px; 
+            color: #dcdcdc; 
+            margin-bottom: 10px; 
+            font-weight: 700;
+        }
+
+        input {
+            width: 100%; 
+            background: rgba(0, 0, 0, 0.3); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            color: #fff;
+            padding: 16px; 
+            border-radius: 12px; 
+            font-size: 18px; 
+            font-family: monospace;
+            outline: none; 
+            transition: all 0.3s ease; 
+            text-align: center; 
+            letter-spacing: 3px;
+        }
+
+        input:focus { 
+            border-color: #ffd700;
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+        }
+        
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+            letter-spacing: 1px;
+        }
+
+        .btn {
+            width: 100%; 
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%); 
+            color: #1a1a1a;
+            border: none; 
+            border-radius: 12px; 
+            padding: 16px; 
+            font-size: 16px; 
+            font-weight: 900;
+            font-family: 'Cairo', sans-serif;
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+            text-transform: uppercase;
+        }
+
+        .btn:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 12px 25px rgba(255, 215, 0, 0.5); 
+            background: linear-gradient(135deg, #ffde33 0%, #ffa526 100%);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .status-msg { 
+            margin-top: 20px; 
+            font-size: 13px; 
+            min-height: 20px; 
+            font-weight: 700; 
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        .status-msg.success { color: #00e676; text-shadow: 0 0 10px rgba(0, 230, 118, 0.3); }
+        .status-msg.error { 
+            color: #ff4d4d; 
+            background: rgba(255, 77, 77, 0.1); 
+            border: 1px solid rgba(255, 77, 77, 0.2);
+            padding: 10px; 
+            border-radius: 8px; 
+        }
+        .status-msg.loading { color: #00e5ff; text-shadow: 0 0 10px rgba(0, 229, 255, 0.3); }
+
+        /* دوائر جمالية في الخلفية */
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: 1;
+            opacity: 0.5;
+        }
+        .circle-1 { width: 300px; height: 300px; background: #4a148c; top: -100px; right: -100px; }
+        .circle-2 { width: 400px; height: 400px; background: #b71c1c; bottom: -150px; left: -150px; }
+
+    </style>
+</head>
+<body>
+
+<div class="bg-circle circle-1"></div>
+<div class="bg-circle circle-2"></div>
+
+<div class="login-card">
+    <div class="logo">🍒</div>
+    <h2>YALLA FRUIT HACK</h2>
+    <div class="subtitle">بوابة الدخول الآمنة والتحقق من الاشتراك المتميز</div>
+
+    <div class="form-group">
+        <label>أدخل كود الاشتراك الخاص بك:</label>
+        <input type="text" id="activationCode" placeholder="YF-XXXX-XXXX" autocomplete="off" style="text-transform: uppercase;">
+    </div>
+
+    <button class="btn" onclick="validateAndLogin()">🔑 التحقق والدخول</button>
+
+    <div class="status-msg" id="statusMessage"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script>
+// تم تشفير بيانات الاتصال بـ Base64 لمنع الروبوتات والمتطفلين من سرقتها بسهولة
+const _0x1a2b = "eyJhcGlLZXkiOiJBSXphU3lEcjBrYlFERTkwaGhFTW9oVjZBMWI0bmR1NEw3dVp6MjQiLCJhdXRoRG9tYWluIjoibWVoYW16YWFsYW5hdC5maXJlYmFzZWFwcC5jb20iLCJkYXRhYmFzZVVSTCI6Imh0dHBzOi8vbWVoYW16YWFsYW5hdC1kZWZhdWx0LXJ0ZGIuZXVyb3BlLXdlc3QxLmZpcmViYXNlZGF0YWJhc2UuYXBwIiwicHJvamVjdElkIjoibWVoYW16YWFsYW5hdCIsInN0b3JhZ2VCdWNrZXQiOiJtZWhhbXphYWxhbmF0LmZpcmViYXNlc3RvcmFnZS5hcHAiLCJtZXNzYWdpbmdTZW5kZXJJZCI6IjEwMjQ4NDk3MzEwIiwiYXBwSWQiOiIxOjEwMjQ4NDk3MzEwOmFuZHJvaWQ6YmMyYjg4OTgzNzM4ODI3ZjE1MzM4ZiJ9";
+const firebaseConfig = JSON.parse(atob(_0x1a2b));
+
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const appId = "mehamzaalanat";
+
+// دالة لجلب الوقت الحقيقي من سيرفر خارجي لمنع تلاعب المستخدم بوقت الهاتف
+async function getRealNetworkTime() {
+    try {
+        const response = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC');
+        const data = await response.json();
+        return new Date(data.utc_datetime).getTime();
+    } catch (e) {
+        // في حال فشل الاتصال بالسيرفر الزمني، نستخدم وقت الجهاز كحل بديل
+        return Date.now();
+    }
+}
+
+window.onload = async () => {
+    const savedCode = localStorage.getItem('yalla_fruit_active_code');
+    const expiryTime = localStorage.getItem('yalla_fruit_expiry');
+    
+    if (savedCode && expiryTime) {
+        const realTime = await getRealNetworkTime();
+        if (realTime < parseInt(expiryTime)) {
+            // التوجيه إلى الصفحة الجديدة حسب طلبك
+            window.location.href = "hamzaz.html";
+        } else {
+            localStorage.removeItem('yalla_fruit_active_code');
+            localStorage.removeItem('yalla_fruit_expiry');
+        }
+    }
+};
+
+function showStatus(text, type) {
+    const msg = document.getElementById('statusMessage');
+    msg.innerHTML = text;
+    msg.className = "status-msg " + type;
+}
+
+// دالة التشفير وبصمة الجهاز لمنع مشاركة الكود
+function getDeviceFingerprint() {
+    const navInfo = navigator.userAgent.replace(/\D+/g, '');
+    const screenInfo = screen.width + "x" + screen.height + "x" + screen.colorDepth;
+    return btoa(navInfo + screenInfo).substring(0, 32); 
+}
+
+async function validateAndLogin() {
+    const code = document.getElementById('activationCode').value.trim().toUpperCase();
+    if (!code) {
+        showStatus("⚠️ يرجى إدخال كود الاشتراك أولاً!", "error");
+        return;
+    }
+
+    showStatus("⏳ جاري التحقق من التشفير والاتصال الآمن...", "loading");
+
+    try {
+        await auth.signInAnonymously();
+
+        const codeDocRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('subscriptions').doc(code);
+        const docSnap = await codeDocRef.get();
+
+        if (!docSnap.exists) {
+            showStatus("❌ كود الاشتراك غير صحيح أو غير متوفر في النظام!", "error");
+            return;
+        }
+
+        const data = docSnap.data();
+        const now = await getRealNetworkTime(); // استخدام الوقت العالمي الحقيقي
+
+        if (data.isBanned) {
+            showStatus("🚫 تم حظر هذا الكود بشكل نهائي من قبل الإدارة!", "error");
+            return;
+        }
+
+        const currentDevice = getDeviceFingerprint();
+        
+        if (data.isUsed && data.usedByDeviceId && data.usedByDeviceId !== currentDevice) {
+            showStatus("📱 تم رصد تلاعب! هذا الكود مرتبط بجهاز آخر بالفعل.", "error");
+            return;
+        }
+
+        if (data.expiryTimestamp && now > data.expiryTimestamp) {
+            showStatus("⏳ انتهت صلاحية هذا الكود تماماً!", "error");
+            return;
+        }
+
+        let expiryTimestamp = data.expiryTimestamp;
+        if (!data.isUsed || !data.usedByDeviceId) {
+            const durationDays = data.durationDays || 30;
+            expiryTimestamp = data.expiryTimestamp || (now + (durationDays * 24 * 60 * 60 * 1000));
+            
+            await codeDocRef.update({
+                isUsed: true,
+                activatedAt: data.activatedAt || now,
+                expiryTimestamp: expiryTimestamp,
+                usedByDeviceId: currentDevice
+            });
+        }
+
+        localStorage.setItem('yalla_fruit_active_code', code);
+        localStorage.setItem('yalla_fruit_expiry', String(expiryTimestamp));
+
+        showStatus("✅ تم التحقق بنجاح! جاري التوجيه للوحة التحكم...", "success");
+        
+        // التوجيه إلى الصفحة الجديدة بعد نجاح الدخول
+        setTimeout(() => { window.location.href = "hamzaz.html"; }, 1500);
+
+    } catch (error) {
+        showStatus(`❌ حدث خطأ أمني أثناء الاتصال بالسيرفر.<br><small style='font-family:monospace;'>${error.code}</small>`, "error");
+    }
+}
+</script>
+</body>
+</html>
