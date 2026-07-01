@@ -14,7 +14,6 @@
             padding: 20px;
         }
         
-        /* واجهة الدخول للوحة التحكم */
         #authScreen {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             height: 80vh;
@@ -28,7 +27,6 @@
             padding: 12px; border-radius: 8px; margin: 15px 0; text-align: center;
         }
         
-        /* لوحة التحكم الرئيسية */
         #dashboardScreen { display: none; max-width: 1000px; margin: 0 auto; }
         .header {
             display: flex; justify-content: space-between; align-items: center;
@@ -56,7 +54,6 @@
         .btn-warning { background: #ff9800; }
         .btn-danger { background: #f44336; }
         
-        /* جدول الأكواد */
         .table-responsive { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; text-align: center; }
         th, td { padding: 12px; border-bottom: 1px solid #1a1a2a; }
@@ -143,27 +140,27 @@
 
     <div id="toast">تمت العملية بنجاح!</div>
 
-<!-- تحميل حزمة Firebase -->
-<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"></script>
+<!-- تحميل حزمة Firebase متوافقة مع الكود القديم -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-// إعدادات Firebase المحدثة والمؤكدة
+// إعدادات Firebase الجديدة المستخرجة من ملف الـ JSON الخاص بك
 const firebaseConfig = {
-    apiKey: "AIzaSyAo4IaLd5SfVYHAAp_noJD7ZXBbhdVx9-0",
-    authDomain: "fawakihyallalive.firebaseapp.com",
-    databaseURL: "https://fawakihyallalive-default-rtdb.firebaseio.com",
-    projectId: "fawakihyallalive",
-    storageBucket: "fawakihyallalive.firebasestorage.app",
-    messagingSenderId: "917478913649",
-    appId: "1:917478913649:android:fee5d42aca81c8a2e3cdd0"
+    apiKey: "AIzaSyDr0kbQDE90hhEMohV6X1b4ndu4L7uZz24",
+    authDomain: "mehamzaalanat.firebaseapp.com",
+    databaseURL: "https://mehamzaalanat-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "mehamzaalanat",
+    storageBucket: "mehamzaalanat.firebasestorage.app",
+    messagingSenderId: "10248497310",
+    appId: "1:10248497310:android:bc2b88983738827f15338f"
 };
 
 const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-const appId = "fawakihyallalive";
+const appId = "mehamzaalanat";
 const collectionPath = `artifacts/${appId}/public/data/subscriptions`;
 
 // ==========================================
@@ -171,7 +168,7 @@ const collectionPath = `artifacts/${appId}/public/data/subscriptions`;
 // ==========================================
 function checkAdmin() {
     const pass = document.getElementById('adminPassword').value;
-    if (pass === "admin2024") { // يمكنك تغيير كلمة المرور من هنا
+    if (pass === "admin2024") {
         document.getElementById('authScreen').style.display = 'none';
         document.getElementById('dashboardScreen').style.display = 'block';
         initAdmin();
@@ -197,7 +194,6 @@ async function initAdmin() {
 async function generateCode() {
     const duration = parseInt(document.getElementById('newDuration').value);
     
-    // توليد كود بصيغة YF-XXXX-XXXX
     const randomPart1 = Math.random().toString(36).substring(2, 6).toUpperCase();
     const randomPart2 = Math.random().toString(36).substring(2, 6).toUpperCase();
     const newCode = `YF-${randomPart1}-${randomPart2}`;
@@ -214,7 +210,7 @@ async function generateCode() {
     };
 
     try {
-        await db.doc(`${collectionPath}/${newCode}`).set(codeData);
+        await db.collection(collectionPath).doc(newCode).set(codeData);
         showToast("✅ تم إنشاء الكود بنجاح!");
         fetchCodes();
     } catch (e) {
@@ -242,7 +238,6 @@ async function fetchCodes() {
         const codes = [];
         snapshot.forEach(doc => codes.push(doc.data()));
         
-        // ترتيب الأكواد (الأحدث أولاً)
         codes.sort((a, b) => b.createdAt - a.createdAt);
 
         codes.forEach(data => {
@@ -250,7 +245,6 @@ async function fetchCodes() {
             let statusHtml = '';
             let isExpired = data.expiryTimestamp && now > data.expiryTimestamp;
 
-            // تحديد الحالة
             if (data.isBanned) {
                 statusHtml = '<span class="badge b-banned">محظور 🚫</span>';
             } else if (isExpired) {
@@ -264,7 +258,6 @@ async function fetchCodes() {
             const createdDate = new Date(data.createdAt).toLocaleDateString('en-GB');
             const expiryDate = data.expiryTimestamp ? new Date(data.expiryTimestamp).toLocaleDateString('en-GB') : '-';
             
-            // أزرار الإجراءات
             const banBtn = data.isBanned 
                 ? `<button class="btn btn-success" onclick="toggleBan('${data.code}', false)">فك الحظر</button>`
                 : `<button class="btn btn-warning" onclick="toggleBan('${data.code}', true)">حظر</button>`;
@@ -297,12 +290,12 @@ async function fetchCodes() {
 }
 
 // ==========================================
-// 4. إجراءات الإدارة (حظر، فك جهاز، حذف)
+// 4. إجراءات الإدارة
 // ==========================================
 async function toggleBan(code, banStatus) {
     if(!confirm(banStatus ? "هل أنت متأكد من حظر هذا الكود؟" : "هل تريد فك الحظر عن هذا الكود؟")) return;
     try {
-        await db.doc(`${collectionPath}/${code}`).update({ isBanned: banStatus });
+        await db.collection(collectionPath).doc(code).update({ isBanned: banStatus });
         showToast(banStatus ? "تم حظر الكود!" : "تم فك الحظر!");
         fetchCodes();
     } catch(e) { alert("حدث خطأ!"); }
@@ -311,8 +304,7 @@ async function toggleBan(code, banStatus) {
 async function resetDevice(code) {
     if(!confirm("هل تريد فك ارتباط الجهاز بهذا الكود ليتمكن المستخدم من الدخول بجهاز آخر؟")) return;
     try {
-        // إزالة بصمة الجهاز ليتمكن من التسجيل من جديد
-        await db.doc(`${collectionPath}/${code}`).update({ usedByDeviceId: null });
+        await db.collection(collectionPath).doc(code).update({ usedByDeviceId: null });
         showToast("تم فك ارتباط الجهاز بنجاح!");
         fetchCodes();
     } catch(e) { alert("حدث خطأ!"); }
@@ -321,7 +313,7 @@ async function resetDevice(code) {
 async function deleteCode(code) {
     if(!confirm("⚠️ تحذير: هل أنت متأكد من حذف هذا الكود نهائياً؟ لا يمكن التراجع!")) return;
     try {
-        await db.doc(`${collectionPath}/${code}`).delete();
+        await db.collection(collectionPath).doc(code).delete();
         showToast("تم حذف الكود نهائياً!");
         fetchCodes();
     } catch(e) { alert("حدث خطأ!"); }
