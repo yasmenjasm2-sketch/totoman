@@ -26,77 +26,26 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             text-align: center;
         }
-        .logo {
-            font-size: 48px;
-            margin-bottom: 10px;
-            user-select: none;
-        }
-        h2 {
-            font-size: 20px;
-            color: #ffd700;
-            margin-bottom: 8px;
-            text-shadow: 0 0 10px #ffd70033;
-        }
-        .subtitle {
-            font-size: 12px;
-            color: #888;
-            margin-bottom: 24px;
-        }
-        .form-group {
-            margin-bottom: 18px;
-            text-align: right;
-        }
-        label {
-            display: block;
-            font-size: 11px;
-            color: #aaa;
-            margin-bottom: 6px;
-        }
+        .logo { font-size: 48px; margin-bottom: 10px; user-select: none; }
+        h2 { font-size: 20px; color: #ffd700; margin-bottom: 8px; text-shadow: 0 0 10px #ffd70033; }
+        .subtitle { font-size: 12px; color: #888; margin-bottom: 24px; }
+        .form-group { margin-bottom: 18px; text-align: right; }
+        label { display: block; font-size: 11px; color: #aaa; margin-bottom: 6px; }
         input {
-            width: 100%;
-            background: #050510;
-            border: 1px solid #1a1a2a;
-            color: #fff;
-            padding: 14px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-family: monospace;
-            outline: none;
-            transition: border-color 0.3s;
-            text-align: center;
-            letter-spacing: 2px;
+            width: 100%; background: #050510; border: 1px solid #1a1a2a; color: #fff;
+            padding: 14px; border-radius: 8px; font-size: 16px; font-family: monospace;
+            outline: none; transition: border-color 0.3s; text-align: center; letter-spacing: 2px;
         }
-        input:focus {
-            border-color: #ffd700;
-        }
+        input:focus { border-color: #ffd700; }
         .btn {
-            width: 100%;
-            background: linear-gradient(135deg, #ffd700, #ffa500);
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            padding: 14px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+            width: 100%; background: linear-gradient(135deg, #ffd700, #ffa500); color: #000;
+            border: none; border-radius: 8px; padding: 14px; font-size: 15px; font-weight: bold;
+            cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
         }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
-        }
-        .btn:active {
-            transform: translateY(0);
-        }
-        .status-msg {
-            margin-top: 15px;
-            font-size: 12px;
-            min-height: 18px;
-            font-weight: bold;
-        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4); }
+        .status-msg { margin-top: 15px; font-size: 12px; min-height: 18px; font-weight: bold; line-height: 1.5; }
         .status-msg.success { color: #4caf50; }
-        .status-msg.error { color: #f44336; }
+        .status-msg.error { color: #f44336; background: rgba(244, 67, 54, 0.1); padding: 8px; border-radius: 6px; }
         .status-msg.loading { color: #00bcd4; }
     </style>
 </head>
@@ -117,13 +66,11 @@
     <div class="status-msg" id="statusMessage"></div>
 </div>
 
-<!-- تحميل حزمة Firebase الأساسية ومتوافقة مع الصيغة المستخدمة بالكود -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-// إعدادات Firebase الجديدة المستخرجة من ملف الـ JSON الخاص بك
 const firebaseConfig = {
     apiKey: "AIzaSyDr0kbQDE90hhEMohV6X1b4ndu4L7uZz24",
     authDomain: "mehamzaalanat.firebaseapp.com",
@@ -139,25 +86,17 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 const appId = "mehamzaalanat";
 
-// التحقق من وجود جلسة صالحة مسبقاً
 window.onload = async () => {
     const savedCode = localStorage.getItem('yalla_fruit_active_code');
     const expiryTime = localStorage.getItem('yalla_fruit_expiry');
-    
-    if (savedCode && expiryTime) {
-        if (Date.now() < parseInt(expiryTime)) {
-            window.location.href = "index.html";
-        } else {
-            localStorage.removeItem('yalla_fruit_active_code');
-            localStorage.removeItem('yalla_fruit_expiry');
-            showStatus("انتهت صلاحية اشتراكك السابق. يرجى تجديده وكتابة كود جديد.", "error");
-        }
+    if (savedCode && expiryTime && Date.now() < parseInt(expiryTime)) {
+        window.location.href = "index.html";
     }
 };
 
 function showStatus(text, type) {
     const msg = document.getElementById('statusMessage');
-    msg.textContent = text;
+    msg.innerHTML = text;
     msg.className = "status-msg " + type;
 }
 
@@ -165,7 +104,6 @@ function getDeviceFingerprint() {
     return navigator.userAgent.replace(/\D+/g, '') + screen.width + screen.height;
 }
 
-// تسجيل الدخول
 async function validateAndLogin() {
     const code = document.getElementById('activationCode').value.trim().toUpperCase();
     if (!code) {
@@ -176,41 +114,37 @@ async function validateAndLogin() {
     showStatus("⏳ جاري التحقق من الاشتراك وصلاحيته...", "loading");
 
     try {
+        // خطوة تسجيل الدخول المجهول
         await auth.signInAnonymously();
 
         const codeDocRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('subscriptions').doc(code);
         const docSnap = await codeDocRef.get();
 
         if (!docSnap.exists) {
-            showStatus("❌ كود الاشتراك غير صحيح أو غير متوفر!", "error");
+            showStatus("❌ كود الاشتراك غير صحيح أو غير متوفر في السيرفر الجديد!", "error");
             return;
         }
 
         const data = docSnap.data();
         const now = Date.now();
 
-        // 1. التحقق من الحظر
         if (data.isBanned) {
             showStatus("🚫 تم حظر هذا الكود من قبل الإدارة!", "error");
             return;
         }
 
-        // 2. التحقق من الجهاز
         const currentDevice = getDeviceFingerprint();
         if (data.isUsed && data.usedByDeviceId && data.usedByDeviceId !== currentDevice) {
-            showStatus("📱 هذا الكود مستخدم بالفعل على هاتف آخر! تواصل مع الإدارة لفك الارتباط.", "error");
+            showStatus("📱 هذا الكود مستخدم بالفعل على هاتف آخر!", "error");
             return;
         }
 
-        // 3. التحقق من انتهاء الصلاحية
         if (data.expiryTimestamp && now > data.expiryTimestamp) {
             showStatus("⏳ انتهت صلاحية هذا الكود!", "error");
             return;
         }
 
-        // 4. تفعيل الكود إذا كان جديداً
         let expiryTimestamp = data.expiryTimestamp;
-        
         if (!data.isUsed || !data.usedByDeviceId) {
             const durationDays = data.durationDays || 30;
             expiryTimestamp = data.expiryTimestamp || (now + (durationDays * 24 * 60 * 60 * 1000));
@@ -223,18 +157,15 @@ async function validateAndLogin() {
             });
         }
 
-        // حفظ الدخول في الهاتف
         localStorage.setItem('yalla_fruit_active_code', code);
         localStorage.setItem('yalla_fruit_expiry', String(expiryTimestamp));
 
         showStatus("✅ تم التحقق بنجاح! جاري الدخول...", "success");
-        setTimeout(() => {
-            window.location.href = "index.html";
-        }, 1200);
+        setTimeout(() => { window.location.href = "index.html"; }, 1200);
 
     } catch (error) {
-        console.error("Authentication Error:", error);
-        showStatus("❌ حدث خطأ في الاتصال بالسيرفر. تأكد من الإنترنت.", "error");
+        // عرض الخطأ التقني كاملاً لتحديده وإصلاحه فوراً في كونسول جوجل
+        showStatus(`❌ فشل الاتصال بالسيرفر.<br><small style='font-family:monospace;'>السبب: ${error.message}<br>كود: ${error.code}</small>`, "error");
     }
 }
 </script>
