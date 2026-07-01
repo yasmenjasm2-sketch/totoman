@@ -117,27 +117,27 @@
     <div class="status-msg" id="statusMessage"></div>
 </div>
 
-<!-- تحميل حزمة Firebase الأساسية -->
-<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"></script>
+<!-- تحميل حزمة Firebase الأساسية ومتوافقة مع الصيغة المستخدمة بالكود -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-// إعدادات Firebase المحدثة والمؤكدة
+// إعدادات Firebase الجديدة المستخرجة من ملف الـ JSON الخاص بك
 const firebaseConfig = {
-    apiKey: "AIzaSyAo4IaLd5SfVYHAAp_noJD7ZXBbhdVx9-0",
-    authDomain: "fawakihyallalive.firebaseapp.com",
-    databaseURL: "https://fawakihyallalive-default-rtdb.firebaseio.com",
-    projectId: "fawakihyallalive",
-    storageBucket: "fawakihyallalive.firebasestorage.app",
-    messagingSenderId: "917478913649",
-    appId: "1:917478913649:android:fee5d42aca81c8a2e3cdd0"
+    apiKey: "AIzaSyDr0kbQDE90hhEMohV6X1b4ndu4L7uZz24",
+    authDomain: "mehamzaalanat.firebaseapp.com",
+    databaseURL: "https://mehamzaalanat-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "mehamzaalanat",
+    storageBucket: "mehamzaalanat.firebasestorage.app",
+    messagingSenderId: "10248497310",
+    appId: "1:10248497310:android:bc2b88983738827f15338f"
 };
 
 const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-const appId = "fawakihyallalive";
+const appId = "mehamzaalanat";
 
 // التحقق من وجود جلسة صالحة مسبقاً
 window.onload = async () => {
@@ -162,7 +162,6 @@ function showStatus(text, type) {
 }
 
 function getDeviceFingerprint() {
-    // إنشاء بصمة فريدة للجهاز لمنع استخدام الكود في أكثر من هاتف
     return navigator.userAgent.replace(/\D+/g, '') + screen.width + screen.height;
 }
 
@@ -179,7 +178,7 @@ async function validateAndLogin() {
     try {
         await auth.signInAnonymously();
 
-        const codeDocRef = firebase.firestore().doc(db, 'artifacts', appId, 'public', 'data', 'subscriptions', code);
+        const codeDocRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('subscriptions').doc(code);
         const docSnap = await codeDocRef.get();
 
         if (!docSnap.exists) {
@@ -196,7 +195,7 @@ async function validateAndLogin() {
             return;
         }
 
-        // 2. التحقق من الجهاز (إذا تم استخدام الكود من قبل ولم تقم الإدارة بفك ارتباطه)
+        // 2. التحقق من الجهاز
         const currentDevice = getDeviceFingerprint();
         if (data.isUsed && data.usedByDeviceId && data.usedByDeviceId !== currentDevice) {
             showStatus("📱 هذا الكود مستخدم بالفعل على هاتف آخر! تواصل مع الإدارة لفك الارتباط.", "error");
@@ -209,19 +208,18 @@ async function validateAndLogin() {
             return;
         }
 
-        // 4. تفعيل الكود إذا كان جديداً (أو تم فك ارتباطه)
+        // 4. تفعيل الكود إذا كان جديداً
         let expiryTimestamp = data.expiryTimestamp;
         
         if (!data.isUsed || !data.usedByDeviceId) {
             const durationDays = data.durationDays || 30;
-            // إذا كان جديداً تماماً نحسب تاريخ الانتهاء، وإذا كان مفكوك الارتباط فقط نحتفظ بتاريخه القديم
             expiryTimestamp = data.expiryTimestamp || (now + (durationDays * 24 * 60 * 60 * 1000));
             
             await codeDocRef.update({
                 isUsed: true,
                 activatedAt: data.activatedAt || now,
                 expiryTimestamp: expiryTimestamp,
-                usedByDeviceId: currentDevice // ربط الكود بهذا الهاتف
+                usedByDeviceId: currentDevice
             });
         }
 
@@ -231,7 +229,7 @@ async function validateAndLogin() {
 
         showStatus("✅ تم التحقق بنجاح! جاري الدخول...", "success");
         setTimeout(() => {
-            window.location.href = "index.html"; // توجيه لملف اللعبة
+            window.location.href = "index.html";
         }, 1200);
 
     } catch (error) {
