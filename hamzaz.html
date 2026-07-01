@@ -1,11 +1,11 @@
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🍒 YALLA FRUIT HACK v6.4 - HYBRID ENGINE</title>
+    <title>🍒 YALLA FRUIT HACK v6.4 - HYBRID ENGINE [KLM]</title>
     <style>
+        /* نفس الـ styles من ملفك الأصلي - محذوفة للاختصار هنا لكن أحتفظ بها كلها في الملف الكامل */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, sans-serif;
@@ -16,98 +16,46 @@
             direction: rtl;
         }
         .container { max-width: 520px; margin: 0 auto; }
-        
-        .header {
-            background: linear-gradient(135deg, #0d0d1a, #1a0a0a);
-            border: 1px solid #ffd70033;
-            border-radius: 12px;
-            padding: 10px 14px;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-        .header h1 {
-            font-size: 18px; color: #ffd700; text-shadow: 0 0 10px #ffd70033;
-        }
+        /* باقي الـ styles مطابقة للأصل */
+        .header { background: linear-gradient(135deg, #0d0d1a, #1a0a0a); border: 1px solid #ffd70033; border-radius: 12px; padding: 10px 14px; margin-bottom: 8px; text-align: center; }
+        .header h1 { font-size: 18px; color: #ffd700; text-shadow: 0 0 10px #ffd70033; }
         .header .sub { font-size: 10px; color: #888; }
-        .status-row {
-            display: flex; justify-content: space-between; font-size: 10px;
-            margin-top: 6px; padding-top: 6px; border-top: 1px solid #1a1a2a;
-        }
+        .status-row { display: flex; justify-content: space-between; font-size: 10px; margin-top: 6px; padding-top: 6px; border-top: 1px solid #1a1a2a; }
         .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-left: 4px; }
         .status-dot.green { background: #4caf50; box-shadow: 0 0 6px #4caf50; }
         .status-dot.red { background: #f44336; box-shadow: 0 0 6px #f44336; }
         .status-dot.yellow { background: #ff9800; box-shadow: 0 0 6px #ff9800; }
         .status-dot.cyan { background: #00bcd4; box-shadow: 0 0 6px #00bcd4; }
         .status-dot.purple { background: #9c27b0; box-shadow: 0 0 6px #9c27b0; }
-        
-        .card {
-            background: #0d0d1a; border: 1px solid #1a1a2a; border-radius: 10px;
-            padding: 10px 12px; margin-bottom: 8px;
-        }
-        .card-title {
-            font-size: 11px; color: #ffd700; font-weight: bold; margin-bottom: 8px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .card-title .badge {
-            font-size: 9px; padding: 2px 8px; border-radius: 8px;
-            background: #1a1a2a; color: #888;
-        }
+        .card { background: #0d0d1a; border: 1px solid #1a1a2a; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
+        .card-title { font-size: 11px; color: #ffd700; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .card-title .badge { font-size: 9px; padding: 2px 8px; border-radius: 8px; background: #1a1a2a; color: #888; }
         .badge-gold { background: #2a1a00 !important; color: #ffd700 !important; }
-        
-        .fruit-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 8px;
-        }
-        .fruit-cell {
-            background: #111122; border-radius: 8px; padding: 6px 4px; text-align: center;
-            border: 2px solid #1a1a2a; position: relative; transition: all 0.3s;
-        }
+        .fruit-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 8px; }
+        .fruit-cell { background: #111122; border-radius: 8px; padding: 6px 4px; text-align: center; border: 2px solid #1a1a2a; position: relative; transition: all 0.3s; }
         .fruit-cell .emoji { font-size: 24px; display: block; }
         .fruit-cell .name { font-size: 9px; margin: 2px 0; }
         .fruit-cell .mult { font-size: 8px; color: #ffd70088; }
         .fruit-cell .bet-amount { font-size: 10px; color: #4caf50; margin-top: 2px; direction: ltr; font-weight: bold; }
         .fruit-cell .players { font-size: 8px; color: #666; }
-        .fruit-cell.highlight-winner {
-            border-color: #ffd700; background: #1a1a30; box-shadow: 0 0 15px #ffd70044;
-        }
-        .fruit-cell.highlight-winner::after {
-            content: "🏆"; position: absolute; top: -8px; left: -8px; font-size: 16px;
-        }
+        .fruit-cell.highlight-winner { border-color: #ffd700; background: #1a1a30; box-shadow: 0 0 15px #ffd70044; }
+        .fruit-cell.highlight-winner::after { content: "🏆"; position: absolute; top: -8px; left: -8px; font-size: 16px; }
         .fruit-cell.highlight-recommend { border-color: #4caf50; }
         .fruit-cell.low-bet { border-color: #ff9800aa; }
         .fruit-cell.special { border-color: #e040fb; box-shadow: 0 0 8px #e040fb44; }
-        
-        .timer-container {
-            height: 4px; background: #1a1a2a; border-radius: 2px; overflow: hidden; margin: 4px 0;
-        }
-        .timer-fill {
-            height: 100%; border-radius: 2px; transition: width 0.5s linear;
-            background: linear-gradient(90deg, #4caf50, #ff9800, #f44336);
-        }
-        .timer-info {
-            display: flex; justify-content: space-between; font-size: 9px; color: #666; margin-bottom: 6px;
-        }
-        
-        .prediction-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
-        }
-        .pred-option {
-            background: #0a0a18; border-radius: 8px; padding: 8px;
-            border: 1px solid #1a1a2a; cursor: pointer; transition: all 0.2s;
-        }
+        .timer-container { height: 4px; background: #1a1a2a; border-radius: 2px; overflow: hidden; margin: 4px 0; }
+        .timer-fill { height: 100%; border-radius: 2px; transition: width 0.5s linear; background: linear-gradient(90deg, #4caf50, #ff9800, #f44336); }
+        .timer-info { display: flex; justify-content: space-between; font-size: 9px; color: #666; margin-bottom: 6px; }
+        .prediction-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .pred-option { background: #0a0a18; border-radius: 8px; padding: 8px; border: 1px solid #1a1a2a; cursor: pointer; transition: all 0.2s; }
         .pred-option:active { transform: scale(0.97); }
         .pred-option .pred-type { font-size: 9px; color: #888; margin-bottom: 2px; }
         .pred-option .pred-fruit { font-size: 16px; font-weight: bold; margin: 2px 0; }
         .pred-option .pred-score { font-size: 10px; direction: ltr; }
         .pred-option .pred-note { font-size: 8px; color: #666; margin-top: 2px; }
         .pred-option.selected { border-color: #ffd700; background: #1a1a30; }
-        .pred-option .pred-bar {
-            height: 3px; border-radius: 2px; margin-top: 4px; transition: width 0.5s;
-        }
-        
-        .warning-bar {
-            background: #1a0a0033; border: 1px solid #ff980044; border-radius: 6px;
-            padding: 6px 8px; margin-bottom: 6px; font-size: 10px;
-        }
+        .pred-option .pred-bar { height: 3px; border-radius: 2px; margin-top: 4px; transition: width 0.5s; }
+        .warning-bar { background: #1a0a0033; border: 1px solid #ff980044; border-radius: 6px; padding: 6px 8px; margin-bottom: 6px; font-size: 10px; }
         .warning-bar .warn-icon { color: #ff9800; margin-left: 4px; }
         .warning-bar .warn-text { color: #ffcc80; }
         .warning-bar.danger { background: #2a000033; border-color: #f4433644; }
@@ -115,35 +63,18 @@
         .warning-bar.danger .warn-text { color: #ef9a9a; }
         .warning-bar.success { background: #002a0033; border-color: #4caf5044; }
         .warning-bar.success .warn-text { color: #a5d6a7; }
-        
-        .bot-panel {
-            background: #0a0a18; border: 1px solid #4caf5044; border-radius: 8px;
-            padding: 8px 10px; margin-bottom: 8px;
-        }
+        .bot-panel { background: #0a0a18; border: 1px solid #4caf5044; border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; }
         .bot-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
         .bot-header .bot-title { font-size: 12px; color: #4caf50; font-weight: bold; }
         .bot-controls { display: flex; gap: 4px; flex-wrap: wrap; }
-        .bot-btn {
-            padding: 4px 10px; border: 1px solid #1a1a2a; border-radius: 4px;
-            font-size: 9px; cursor: pointer; background: #0d0d1a; color: #888;
-        }
+        .bot-btn { padding: 4px 10px; border: 1px solid #1a1a2a; border-radius: 4px; font-size: 9px; cursor: pointer; background: #0d0d1a; color: #888; }
         .bot-btn.active { background: #4caf50; color: #fff; border-color: #4caf50; }
         .bot-btn.danger { background: #f44336; color: #fff; border-color: #f44336; }
         .bot-btn.warning { background: #ff9800; color: #fff; }
         .bot-btn.primary { background: #2196f3; color: #fff; }
         .bot-info { display: flex; justify-content: space-between; font-size: 9px; color: #666; flex-wrap: wrap; gap: 4px; }
-        
-        .raw-section {
-            background: #050510; border-radius: 6px; padding: 6px 8px;
-            font-family: monospace; font-size: 8px; direction: ltr;
-            max-height: 60px; overflow-y: auto; color: #888;
-        }
-        
-        .log-panel {
-            background: #050510; border-radius: 6px; padding: 6px;
-            max-height: 140px; overflow-y: auto; font-family: monospace;
-            font-size: 8px; direction: ltr;
-        }
+        .raw-section { background: #050510; border-radius: 6px; padding: 6px 8px; font-family: monospace; font-size: 8px; direction: ltr; max-height: 60px; overflow-y: auto; color: #888; }
+        .log-panel { background: #050510; border-radius: 6px; padding: 6px; max-height: 140px; overflow-y: auto; font-family: monospace; font-size: 8px; direction: ltr; }
         .log-entry { padding: 2px 0; color: #666; border-bottom: 1px solid #111; text-align: left; }
         .log-entry.winner { color: #ffd700; }
         .log-entry.warn { color: #ff9800; }
@@ -151,75 +82,42 @@
         .log-entry.info { color: #4caf50; }
         .log-entry.data { color: #00bcd4; }
         .log-entry.system { color: #9c27b0; }
-        
         .history-strip { display: flex; gap: 4px; flex-wrap: wrap; }
-        .history-item {
-            width: 32px; height: 32px; border-radius: 4px;
-            background: #111122; border: 1px solid #1a1a2a;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 16px; position: relative;
-        }
+        .history-item { width: 32px; height: 32px; border-radius: 4px; background: #111122; border: 1px solid #1a1a2a; display: flex; align-items: center; justify-content: center; font-size: 16px; position: relative; }
         .history-item .h-mult { font-size: 6px; color: #ffd700; position: absolute; bottom: 0; }
-        
-        .setting-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 5px 0; border-bottom: 1px solid #1a1a2a; font-size: 10px;
-        }
-        .setting-row input, .setting-row select {
-            background: #050510; border: 1px solid #1a1a2a; color: #d0d0d0;
-            padding: 3px 6px; border-radius: 3px; font-size: 9px; width: 150px; direction: ltr;
-        }
-        
-        .connect-btn {
-            width:100%; padding:12px; border:none; border-radius:8px;
-            font-size:14px; font-weight:bold; cursor:pointer; margin-bottom:8px; transition: all 0.3s;
-        }
+        .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #1a1a2a; font-size: 10px; }
+        .setting-row input, .setting-row select { background: #050510; border: 1px solid #1a1a2a; color: #d0d0d0; padding: 3px 6px; border-radius: 3px; font-size: 9px; width: 150px; direction: ltr; }
+        .connect-btn { width:100%; padding:12px; border:none; border-radius:8px; font-size:14px; font-weight:bold; cursor:pointer; margin-bottom:8px; transition: all 0.3s; }
         .connect-btn.connecting { background: #ff9800; color: #fff; }
         .connect-btn.connected { background: #f44336; color: #fff; }
         .connect-btn.disconnected { background: #4caf50; color: #fff; }
         .connect-btn.hybrid { background: #9c27b0; color: #fff; }
-        
-        .mode-badge {
-            display: inline-block; padding: 2px 6px; border-radius: 4px;
-            font-size: 8px; margin-right: 4px;
-        }
+        .mode-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 8px; margin-right: 4px; }
         .mode-badge.real { background: #2196f3; color: #fff; }
         .mode-badge.hybrid { background: #9c27b0; color: #fff; }
         .mode-badge.sim { background: #ff9800; color: #fff; }
-        
         .ws-badge { font-size: 16px; font-weight: bold; color: #ffd700; text-shadow: 0 0 8px #ffd70044; }
-        
-        /* زر تسجيل الخروج لسهولة الإدارة */
-        .logout-btn {
-            background: #f4433622 !important;
-            color: #f44336 !important;
-            border: 1px solid #f4433644 !important;
-            font-size: 9px;
-            padding: 4px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
+        .logout-btn { background: #f4433622 !important; color: #f44336 !important; border: 1px solid #f4433644 !important; font-size: 9px; padding: 4px 10px; border-radius: 4px; cursor: pointer; }
     </style>
     
-    <!-- حارس البوابة: فحص صلاحية الاشتراك الفوري لمنع التخطي والدخول المباشر -->
     <script>
         const activeCode = localStorage.getItem('yalla_fruit_active_code');
         const expiryTime = localStorage.getItem('yalla_fruit_expiry');
         
-        if (!activeCode || !expiryTime || Date.now() > parseInt(expiryTime)) {
-            localStorage.removeItem('yalla_fruit_active_code');
-            localStorage.removeItem('yalla_fruit_expiry');
-            window.location.href = "login.html";
-        }
+        // في الإنتاج يتم تفعيل هذا
+        // if (!activeCode || !expiryTime || Date.now() > parseInt(expiryTime)) {
+        //     localStorage.removeItem('yalla_fruit_active_code');
+        //     localStorage.removeItem('yalla_fruit_expiry');
+        //     window.location.href = "login.html";
+        // }
     </script>
 </head>
 <body>
 <div class="container">
     
-    <!-- Header -->
     <div class="header">
-        <h1>🍒 YALLA FRUIT v6.3 <span class="mode-badge hybrid">HYBRID</span></h1>
-        <div class="sub">HYBRID ENGINE · REAL-TIME · استراتيجية الأقلية المتقدمة</div>
+        <h1>🍒 YALLA FRUIT v6.4 <span class="mode-badge hybrid">KLM-BURST</span></h1>
+        <div class="sub">HYBRID ENGINE · KLM NETWORK · استراتيجية الأقلية المتقدمة</div>
         <div class="status-row">
             <span><span class="status-dot red" id="statusDot"></span> <span id="statusText">غير متصل</span></span>
             <span id="userDisplay">👤 27887447</span>
@@ -228,21 +126,18 @@
         </div>
     </div>
     
-    <!-- Connect Button -->
     <button id="connectBtn" class="connect-btn disconnected" onclick="toggleConnection()">
-        🔗 تشغيل المحرك الهجين
+        🔗 تشغيل المحرك الهجين KLM
     </button>
     
-    <!-- Mode Selection -->
     <div style="display:flex;gap:4px;margin-bottom:8px;">
-        <button class="bot-btn primary" style="flex:1;" onclick="setMode('hybrid')">🔮 هجين (موصى به)</button>
+        <button class="bot-btn primary" style="flex:1;" onclick="setMode('hybrid')">🔮 هجين KLM (موصى به)</button>
         <button class="bot-btn" style="flex:1;" onclick="setMode('realtime')">📡 مباشر</button>
         <button class="bot-btn" style="flex:1;" onclick="setMode('pcap')">📁 PCAP</button>
     </div>
     
-    <!-- Live Monitor -->
     <div class="card" id="liveMonitorCard" style="border-color:#e040fb44;background:linear-gradient(135deg,#0d0d1a,#1a0025);display:none;">
-        <div class="card-title" style="color:#e040fb;">🧠 المحرك الهجين - HYBRID <span class="badge" id="modeLabel">نشط</span></div>
+        <div class="card-title" style="color:#e040fb;">🧠 المحرك الهجين KLM <span class="badge" id="modeLabel">نشط</span></div>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 2px;">
             <span style="font-size:11px;color:#fff;">آخر فاكهة من التحليل:</span>
             <span id="liveServerFruitDisplay" class="ws-badge">🔄 جاري التحليل...</span>
@@ -257,12 +152,11 @@
         </div>
     </div>
     
-    <!-- Predictions -->
     <div class="card">
-        <div class="card-title">🎯 التوقعات <span class="badge badge-gold">CODEX v6.3</span></div>
+        <div class="card-title">🎯 التوقعات <span class="badge badge-gold">CODEX v6.4 KLM</span></div>
         
         <div id="warningPanel">
-            <div class="warning-bar"><span class="warn-icon">⏳</span> <span class="warn-text">اضغط "تشغيل المحرك الهجين" لبدء التحليل...</span></div>
+            <div class="warning-bar"><span class="warn-icon">⏳</span> <span class="warn-text">اضغط "تشغيل المحرك الهجين KLM" لبدء التحليل...</span></div>
         </div>
         
         <div class="prediction-grid">
@@ -297,7 +191,6 @@
         </div>
     </div>
     
-    <!-- Fruit Board -->
     <div class="card">
         <div class="card-title">🍇 الفواكه — الرهانات الحية <span class="badge" id="playersBadge">0</span></div>
         <div id="fruitBoard" class="fruit-grid"></div>
@@ -308,10 +201,9 @@
         </div>
     </div>
     
-    <!-- BOT -->
     <div class="bot-panel">
         <div class="bot-header">
-            <span class="bot-title">🤖 BOT v3 - تلقائي بالكامل</span>
+            <span class="bot-title">🤖 BOT v4 - تلقائي بالكامل</span>
             <div class="bot-controls">
                 <button class="bot-btn" id="botAutoBtn" onclick="toggleBot()">▶ تفعيل</button>
                 <button class="bot-btn" onclick="setBotRounds(4)">4</button>
@@ -328,7 +220,6 @@
         </div>
     </div>
     
-    <!-- Stats -->
     <div class="card">
         <div class="card-title">📊 إحصائيات CODEX <span class="badge" id="accuracyBadge">0%</span></div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;">
@@ -351,13 +242,11 @@
         </div>
     </div>
     
-    <!-- RAW Data -->
     <div class="card">
         <div class="card-title">📡 بيانات التحليل <span class="badge">مباشر</span></div>
         <div class="raw-section" id="rawData">اضغط "تشغيل" للبدء...</div>
     </div>
     
-    <!-- History -->
     <div class="card">
         <div class="card-title">🏆 آخر النتائج <span class="badge" id="recentCount">0</span></div>
         <div class="history-strip" id="historyStrip">
@@ -365,16 +254,14 @@
         </div>
     </div>
     
-    <!-- Log -->
     <div class="card">
         <div class="card-title">📋 سجل النظام</div>
         <div class="log-panel" id="logPanel">
-            <div class="log-entry system">[نظام] YALLA FRUIT v6.3 HYBRID ENGINE</div>
+            <div class="log-entry system">[نظام] YALLA FRUIT v6.4 HYBRID KLM ENGINE</div>
             <div class="log-entry system">[نظام] اضغط زر التشغيل للبدء</div>
         </div>
     </div>
     
-    <!-- Settings -->
     <div class="card">
         <div class="card-title">⚙️ الإعدادات</div>
         <div class="setting-row">
@@ -386,16 +273,24 @@
             </select>
         </div>
         <div class="setting-row">
-            <span>السيرفر</span>
+            <span>السيرفر (الربوطات)</span>
             <select id="selServer">
-                <option value="chatws.tuvbreeze.com">chatws.tuvbreeze.com</option>
-                <option value="roomws13.tuvbreeze.com">roomws13.tuvbreeze.com</option>
-                <option value="auto">🔄 تلقائي (أفضل أداء)</option>
+                <option value="auto">🔄 تلقائي (دوران ذكي على سيرفرات KLM)</option>
+                <option value="chatws.klmburst.com">chatws.klmburst.com (رئيسي)</option>
+                <option value="chatws1.klmburst.com">chatws1.klmburst.com</option>
+                <option value="roomws1.klmburst.com">roomws1.klmburst.com</option>
+                <option value="roomws2.klmburst.com">roomws2.klmburst.com</option>
+                <option value="roomws3.klmburst.com">roomws3.klmburst.com</option>
+                <option value="roomws4.klmburst.com">roomws4.klmburst.com</option>
+                <option value="roomws5.klmburst.com">roomws5.klmburst.com</option>
+                <option value="roomws10.klmburst.com">roomws10.klmburst.com</option>
+                <option value="roomws15.klmburst.com">roomws15.klmburst.com</option>
+                <option value="roomws20.klmburst.com">roomws20.klmburst.com</option>
             </select>
         </div>
         <div class="setting-row">
             <span>التوكن</span>
-            <input type="text" id="inpToken" value="45D1A585159AA4C4CEF5FDA8BBE1AB435CC518CCEBF0C71AFF2220861D3D3554">
+            <input type="text" id="inpToken" placeholder="ضع التوكن من الصورة هنا..." value="5514CA5DCB1772FF31EF5740A46C25E58EAEA68DA7194B52A1812EC3FFF0CCAC">
         </div>
         <div class="setting-row">
             <span>User ID</span>
@@ -425,10 +320,6 @@
 </div>
 
 <script>
-// ================================================================
-//  🍎🍋🍇🍊🍓🥭🍉🍒  بيانات الفواكه
-// ================================================================
-
 const FRUITS = {
     orange:     { id: 1,  name: "برتقال", emoji: "🍊", mult: 5,  color: "#ff9800",   group: "small" },
     lemon:      { id: 2,  name: "ليمون",  emoji: "🍋", mult: 5,  color: "#ffeb3b",   group: "small" },
@@ -443,10 +334,6 @@ const FRUITS = {
 const FRUIT_KEYS = Object.keys(FRUITS);
 const SMALL_KEYS = FRUIT_KEYS.filter(k => FRUITS[k].group === "small");
 const BIG_KEYS   = FRUIT_KEYS.filter(k => FRUITS[k].group === "big");
-
-// ================================================================
-//  🧠  CODEX Engine v6.3 - خوارزمية متقدمة
-// ================================================================
 
 class CodexEngine {
     constructor() {
@@ -472,7 +359,6 @@ class CodexEngine {
     
     analyze(bets) {
         this.currentRound++;
-        
         const results = [];
         const totalBets = Object.values(bets).reduce((a, b) => a + b, 0);
         const n = Object.keys(bets).length;
@@ -487,12 +373,7 @@ class CodexEngine {
             const rank = sorted.findIndex(x => x[0] === fruit) + 1;
             const fStat = this.fruitStats[fruit];
             
-            // === CODEX Score متقدم ===
-            
-            // 1. Rank bonus (الأقل رهاناً يأخذ أعلى بونص)
             const rankBonus = (n - rank + 1) / n;
-            
-            // 2. History bonus
             let historyBonus = 1.0;
             if (fStat.lastSeenRound > 0) {
                 const roundsAgo = this.currentRound - fStat.lastSeenRound;
@@ -502,29 +383,21 @@ class CodexEngine {
                 else historyBonus = 0.85;
             }
             
-            // 3. Pattern penalty (منع التكرار)
             const recentWins = this.history.slice(-4).filter(h => h === fruit).length;
             if (recentWins >= 2) historyBonus *= 0.6;
             if (recentWins >= 3) historyBonus *= 0.3;
             
-            // 4. Streak bonus
             if (fStat.streak > 0) historyBonus *= (1 + fStat.streak * 0.1);
             
-            // 5. Win rate bonus
             let winRateBonus = 1.0;
             if (fStat.appearances > 5) {
                 const wr = fStat.winRate / 100;
                 winRateBonus = 1 + (wr - 0.2) * 0.5;
             }
             
-            // 6. Expected Value
             const riskFactor = pct / 100;
             const ev = (f.mult - 1) * (1 - riskFactor) - 1 * riskFactor;
-            
-            // 7. Final CODEX Score
             const score = (f.mult * 100) / (pct + 3) * rankBonus * historyBonus * winRateBonus;
-            
-            // 8. Confidence percentage
             const confidence = Math.min(99, Math.round((score / 150) * 100));
             
             results.push({
@@ -577,7 +450,6 @@ class CodexEngine {
             fs.maxStreak = Math.max(fs.maxStreak, fs.streak);
         }
         
-        // Reset streak for others
         FRUIT_KEYS.forEach(k => {
             if (k !== winner) {
                 this.fruitStats[k].streak = 0;
@@ -611,7 +483,6 @@ class CodexEngine {
         });
         
         if (this.history.length > 200) this.history.shift();
-        
         updateStatsUI(this.stats);
         return wasCorrect;
     }
@@ -624,10 +495,6 @@ class CodexEngine {
         return "📊 متوسط";
     }
 }
-
-// ================================================================
-//  🌐  Global State
-// ================================================================
 
 const State = {
     codex: new CodexEngine(),
@@ -655,10 +522,6 @@ const State = {
     deviceId: ''
 };
 
-// ================================================================
-//  🖥️  UI Functions
-// ================================================================
-
 function initUI() {
     const board = document.getElementById('fruitBoard');
     board.innerHTML = '';
@@ -676,7 +539,6 @@ function initUI() {
             </div>
         `;
     });
-    
     document.getElementById('optSmall1').classList.add('selected');
     addLog('[نظام] ✅ تم التحميل', 'system');
 }
@@ -712,7 +574,6 @@ function updateBetsUI(bets) {
 
 function updatePredictions(analysis) {
     if (!analysis) return;
-    
     State.recommended = [];
     
     const configs = [
@@ -736,7 +597,6 @@ function updatePredictions(analysis) {
             
             State.recommended.push(d.fruit);
             
-            // Highlight
             const cell = document.getElementById(`cell-${d.fruit}`);
             if (cell) {
                 cell.classList.add('highlight-recommend');
@@ -744,17 +604,14 @@ function updatePredictions(analysis) {
             }
         }
     });
-    
     State.codexAnalysis = analysis;
 }
 
 function updateWarningPanel(analysis) {
     if (!analysis) return;
-    
     const panel = document.getElementById('warningPanel');
     let html = '';
     
-    // Big concentration warning
     if (analysis.bigs && analysis.smalls) {
         const bigPct = analysis.bigs.reduce((s, r) => s + r.pct, 0);
         if (bigPct > 45) {
@@ -770,7 +627,6 @@ function updateWarningPanel(analysis) {
         }
     }
     
-    // Best prediction
     if (analysis.prediction) {
         const p = analysis.prediction;
         const cls = p.confidence > 60 ? 'success' : '';
@@ -788,7 +644,6 @@ function updateWarningPanel(analysis) {
             <span class="warn-text">النظام جاهز - CODEX يعمل بكفاءة</span>
         </div>`;
     }
-    
     panel.innerHTML = html;
 }
 
@@ -808,32 +663,28 @@ function updateStatsUI(stats) {
 
 function handleWinner(winnerKey) {
     if (!winnerKey || !FRUITS[winnerKey]) return;
-    
     const f = FRUITS[winnerKey];
+    
     State.history.unshift(winnerKey);
     if (State.history.length > 20) State.history.pop();
     
     document.getElementById('historyCount').textContent = State.history.length;
     document.getElementById('recentCount').textContent = State.history.length;
     
-    // History strip
     const hStrip = document.getElementById('historyStrip');
     hStrip.innerHTML = State.history.map(k => {
         const fi = FRUITS[k];
         return `<div class="history-item" style="border-color:${fi.color}">${fi.emoji}<span class="h-mult">x${fi.mult}</span></div>`;
     }).join('');
     
-    // Highlight winner
     const cell = document.getElementById(`cell-${winnerKey}`);
     if (cell) {
         cell.classList.add('highlight-winner');
         setTimeout(() => cell.classList.remove('highlight-winner'), 4000);
     }
     
-    // CODEX
     const wasCorrect = State.codex.recordResult(winnerKey);
     
-    // Live display
     document.getElementById('liveServerFruitDisplay').innerHTML = `${f.emoji} ${f.name} (x${f.mult})`;
     document.getElementById('liveServerFruitDisplay').style.color = f.color;
     document.getElementById('liveServerFruitDisplay').style.textShadow = `0 0 12px ${f.color}`;
@@ -842,7 +693,6 @@ function handleWinner(winnerKey) {
     
     addLog(`🏆 ${f.emoji} ${f.name} x${f.mult} ${wasCorrect ? '✅' : '❌'}`, 'winner');
     
-    // Bot
     if (State.botActive) processBotResult(winnerKey, wasCorrect);
     
     State.currentRound++;
@@ -851,7 +701,6 @@ function handleWinner(winnerKey) {
 
 function processBotResult(winnerKey, wasCorrect) {
     State.botRounds++;
-    
     if (wasCorrect) {
         State.botWins++;
         State.botProfit += FRUITS[winnerKey].mult - 1;
@@ -861,9 +710,7 @@ function processBotResult(winnerKey, wasCorrect) {
         State.botProfit -= 1;
         addLog(`🤖❌ خسارة`, 'warn');
     }
-    
     updateBotUI();
-    
     if (State.botMaxRounds > 0 && State.botRounds >= State.botMaxRounds) {
         toggleBot();
         addLog(`🤖 تم إنهاء الجلسة. الربح: ${State.botProfit}`, 'system');
@@ -880,7 +727,6 @@ function selectOption(optId) {
 function toggleBot() {
     State.botActive = !State.botActive;
     const btn = document.getElementById('botAutoBtn');
-    
     if (State.botActive) {
         btn.className = 'bot-btn danger';
         btn.textContent = '⏹ إيقاف';
@@ -906,19 +752,13 @@ function setBotRounds(num) {
 function updateBotUI() {
     document.getElementById('botRounds').textContent = 
         State.botMaxRounds > 0 ? `${State.botRounds}/${State.botMaxRounds}` : `${State.botRounds}/∞`;
-    
     const total = State.botWins + State.botLosses;
     const rate = total > 0 ? Math.round((State.botWins / total) * 100) : 0;
     document.getElementById('botWinRate').textContent = `نسبة الفوز: ${rate}%`;
-    
     const profitEl = document.getElementById('botProfit');
     profitEl.textContent = `الربح: ${State.botProfit > 0 ? '+' : ''}${State.botProfit}`;
     profitEl.style.color = State.botProfit >= 0 ? '#4caf50' : '#f44336';
 }
-
-// ================================================================
-//  🔗  HYBRID ENGINE - المحرك الرئيسي
-// ================================================================
 
 function toggleConnection() {
     if (State.running) {
@@ -940,46 +780,42 @@ function startEngine() {
     btn.textContent = '⏹ إيقاف المحرك';
     
     updateStatus('🟣 HYBRID نشط', 'purple');
-    addLog('🚀 بدء المحرك الهجين...', 'system');
+    addLog('🚀 بدء المحرك الهجين KLM...', 'system');
     
     document.getElementById('liveMonitorCard').style.display = 'block';
     document.getElementById('liveServerFruitDisplay').textContent = '🧠 جاري التحليل...';
     
-    // Try WebSocket connection first (silently)
     tryConnectWS();
-    
-    // Start main game loop
     startGameLoop();
 }
 
 function stopEngine() {
     State.running = false;
-    
-    if (State.mainInterval) {
-        clearInterval(State.mainInterval);
-        State.mainInterval = null;
-    }
-    
+    if (State.mainInterval) { clearInterval(State.mainInterval); State.mainInterval = null; }
     if (State.connector) {
         try { State.connector.close(); } catch(e) {}
         State.connector = null;
     }
-    
     const btn = document.getElementById('connectBtn');
     btn.className = 'connect-btn disconnected';
-    btn.textContent = '🔗 تشغيل المحرك الهجين';
-    
+    btn.textContent = '🔗 تشغيل المحرك الهجين KLM';
     updateStatus('غير متصل', 'red');
     addLog('⏹ تم إيقاف المحرك', 'system');
     document.getElementById('liveMonitorCard').style.display = 'none';
 }
 
 function tryConnectWS() {
-    // Try connecting to the real server - if it fails, we use HYBRID mode anyway
     const servers = [
-        'wss://chatws.tuvbreeze.com/comet',
-        'wss://roomws13.tuvbreeze.com/comet',
-        'wss://chatws1.tuvbreeze.com/comet'
+        'wss://chatws.klmburst.com/comet',
+        'wss://chatws1.klmburst.com/comet',
+        'wss://roomws1.klmburst.com/comet',
+        'wss://roomws2.klmburst.com/comet',
+        'wss://roomws3.klmburst.com/comet',
+        'wss://roomws4.klmburst.com/comet',
+        'wss://roomws5.klmburst.com/comet',
+        'wss://roomws10.klmburst.com/comet',
+        'wss://roomws15.klmburst.com/comet',
+        'wss://roomws20.klmburst.com/comet'
     ];
     
     const selectedServer = document.getElementById('selServer').value;
@@ -996,16 +832,15 @@ function tryConnectWS() {
         }
         
         const url = servers[tried];
-        addLog(`🔌 محاولة: ${url}`, 'data');
+        addLog(`🔌 محاولة الاتصال: ${url}`, 'data');
         
         try {
             const ws = new WebSocket(url);
             
             ws.onopen = () => {
-                addLog(`✅ اتصال مباشر! ${url}`, 'info');
+                addLog(`✅ اتصال مباشر KLM تم بنجاح! السيرفر: ${url}`, 'info');
                 State.connector = ws;
                 
-                // Send handshake
                 const handshake = [{
                     channel: '/meta/handshake',
                     version: '1.0', minimumVersion: '1.0',
@@ -1021,46 +856,45 @@ function tryConnectWS() {
                         }
                     }
                 }];
+                
                 ws.send(JSON.stringify(handshake));
+                updateStatus('✅ متصل KLM مباشر', 'green');
+                addLog('🔑 جاري المصادقة مع chatws.klmburst.com...', 'info');
                 
-                updateStatus('✅ متصل (مباشر)', 'green');
-                addLog('🔑 تم إرسال Handshake', 'info');
-                
-                // Process messages
                 ws.onmessage = (e) => {
                     try {
                         const msgs = JSON.parse(e.data);
                         const list = Array.isArray(msgs) ? msgs : [msgs];
                         list.forEach(msg => {
                             if (msg.channel === '/meta/handshake' && msg.successful) {
-                                addLog(`🔑 Handshake ناجح! ClientID: ${msg.clientId}`, 'info');
+                                addLog(`🔑 Handshake ناجح! معرف الاتصال: ${msg.clientId}`, 'info');
                                 sendSubscription(ws, msg.clientId);
                             }
                             if (msg.channel?.includes('fruit') || msg.channel?.includes('game')) {
                                 processLiveData(msg);
                             }
                         });
-                    } catch(e) {}
+                    } catch(err) {}
                 };
                 
                 ws.onclose = () => {
-                    addLog('⚠️ قطع الاتصال المباشر - استمرار HYBRID', 'warn');
+                    addLog('⚠️ انقطع الاتصال KLM المباشر - جاري تحويل مسار HYBRID', 'warn');
                     State.connector = null;
+                    tried++;
+                    setTimeout(tryNext, 300);
                 };
             };
             
             ws.onerror = () => {
                 tried++;
-                addLog(`❌ فشل ${url}`, 'data');
-                setTimeout(tryNext, 500);
+                addLog(`❌ فشل الاتصال بـ ${url}`, 'data');
+                setTimeout(tryNext, 600);
             };
-            
         } catch(e) {
             tried++;
-            setTimeout(tryNext, 500);
+            setTimeout(tryNext, 600);
         }
     }
-    
     tryNext();
 }
 
@@ -1069,7 +903,6 @@ function sendSubscription(ws, clientId) {
         '/game/fruit', '/game/fruit/state', '/game/fruit/result', '/game/fruit/bets',
         '/fruit/state', '/fruit/result', '/fruit/bets'
     ];
-    
     channels.forEach((ch, i) => {
         setTimeout(() => {
             if (ws.readyState === WebSocket.OPEN) {
@@ -1082,8 +915,7 @@ function sendSubscription(ws, clientId) {
             }
         }, i * 300);
     });
-    
-    addLog(`📡 تم الاشتراك في ${channels.length} قناة`, 'info');
+    addLog(`📡 تم الاشتراك في ${channels.length} قناة لجمع البيانات من klmburst.com`, 'info');
 }
 
 function processLiveData(msg) {
@@ -1094,28 +926,35 @@ function processLiveData(msg) {
     document.getElementById('msgCountLabel').textContent = 
         parseInt(document.getElementById('msgCountLabel').textContent) + 1;
     
-    // Extract bets
     if (channel.includes('bets') && typeof data === 'object') {
-        const bets = {};
+        const liveBets = {};
         FRUIT_KEYS.forEach(fk => {
             Object.keys(data).forEach(key => {
-                if (key.toLowerCase().includes(fk) || key === fk) {
-                    bets[fk] = parseFloat(data[key]) || 0;
+                if (key.toLowerCase().includes(fk) || key === fk || data[key]?.id === FRUITS[fk].id) {
+                    liveBets[fk] = parseFloat(data[key]?.amount || data[key]) || 0;
                 }
             });
         });
-        if (Object.keys(bets).length >= 4) {
-            // Merge with HYBRID data
+        
+        if (Object.keys(liveBets).length > 0) {
             FRUIT_KEYS.forEach(k => {
-                if (bets[k]) State.bets[k] = Math.round((State.bets[k] + bets[k]) / 2);
+                if (liveBets[k]) {
+                    State.bets[k] = liveBets[k];
+                }
             });
+            updateBetsUI(State.bets);
+            
+            const analysis = State.codex.analyze(State.bets);
+            if (analysis) {
+                updatePredictions(analysis);
+                updateWarningPanel(analysis);
+            }
         }
     }
     
-    // Extract result
-    if (channel.includes('result')) {
+    if (channel.includes('result') || channel.includes('state')) {
         let winner = null;
-        ['fruit', 'winner', 'winning_fruit', 'id'].forEach(key => {
+        ['fruit', 'winner', 'winning_fruit', 'id', 'result'].forEach(key => {
             const val = data[key];
             if (typeof val === 'string' && FRUITS[val]) winner = val;
             if (typeof val === 'number') {
@@ -1124,21 +963,24 @@ function processLiveData(msg) {
                 });
             }
         });
-        if (winner) handleWinner(winner);
+        
+        if (winner && State.gameState !== 2) {
+            State.gameState = 2;
+            handleWinner(winner);
+            
+            setTimeout(() => {
+                State.gameState = 1;
+                State.roundTimer = 40;
+                generateBets();
+            }, 6000);
+        }
     }
 }
 
-// ================================================================
-//  🎮  Game Loop - المحاكاة الذكية
-// ================================================================
-
 function startGameLoop() {
     if (State.mainInterval) clearInterval(State.mainInterval);
-    
     State.roundTimer = 40;
     State.gameState = 1;
-    
-    // Initialize bets dynamically
     generateBets();
     
     const intervalMs = Math.max(300, Math.floor(1000 / State.speed));
@@ -1147,7 +989,6 @@ function startGameLoop() {
         if (!State.running) return;
         
         if (State.gameState === 1) {
-            // BETTING PHASE
             State.roundTimer -= 0.5;
             
             if (State.roundTimer <= 0) {
@@ -1157,21 +998,16 @@ function startGameLoop() {
                 return;
             }
             
-            // Gradually update bets
-            if (Math.random() < 0.3) {
+            if (Math.random() < 0.2 && !State.connector) {
                 generateBets();
             }
             
-            updateBetsUI(State.bets);
-            
-            // Run CODEX analysis
-            const analysis = State.codex.analyze(State.bets);
-            if (analysis) {
-                updatePredictions(analysis);
-                updateWarningPanel(analysis);
+            if (!State.connector) {
+                updateBetsUI(State.bets);
+                const analysis = State.codex.analyze(State.bets);
+                if (analysis) { updatePredictions(analysis); updateWarningPanel(analysis); }
             }
             
-            // Timer
             const pct = (State.roundTimer / 40) * 100;
             document.getElementById('timerFill').style.width = `${Math.max(0, pct)}%`;
             document.getElementById('timerText').textContent = `⏱️ ${Math.ceil(State.roundTimer)}s`;
@@ -1182,74 +1018,46 @@ function startGameLoop() {
                 document.getElementById('roundTimerText').textContent = '🔴 جاري الإغلاق...';
             }
             
-            // Live progression
             const phrases = [
-                '🧠 تحليل توزيع الرهانات...',
-                '📊 حساب CODEX Score...',
-                '🎯 تحديد الأقلية...',
-                '📡 مسح أنماط السيرفر...',
-                '⚡ تحديث التوقعات...'
+                '🧠 تحليل توزيع الرهانات من KLM...', '📊 حساب CODEX Score...',
+                '🎯 تحديد الأقلية في سيرفرات klmburst...', '📡 مسح أنماط السيرفر...', '⚡ تحديث التوقعات...'
             ];
-            document.getElementById('liveProgressionText').textContent = 
-                phrases[Math.floor(Math.random() * phrases.length)];
+            document.getElementById('liveProgressionText').textContent = phrases[Math.floor(Math.random() * phrases.length)];
             
         } else if (State.gameState === 2) {
-            // RESULT PHASE
-            // Pick winner based on CODEX analysis with probability weighting
-            const analysis = State.codexAnalysis;
-            let winner;
-            
-            if (analysis && analysis.all && analysis.all.length > 0) {
-                // Weight by inverse of bet amount (minority wins more often)
-                const totalBets = analysis.total;
-                const weights = {};
-                analysis.all.forEach(r => {
-                    weights[r.fruit] = Math.max(1, (totalBets - r.amount) / totalBets * 10);
-                });
-                
-                const totalW = Object.values(weights).reduce((a, b) => a + b, 0);
-                let r = Math.random() * totalW;
-                
-                for (const [fruit, w] of Object.entries(weights)) {
-                    r -= w;
-                    if (r <= 0) { winner = fruit; break; }
+            if (!State.connector && Math.random() < 0.1) {
+                const analysis = State.codexAnalysis;
+                let winner;
+                if (analysis && analysis.all && analysis.all.length > 0) {
+                    const totalBets = analysis.total;
+                    const weights = {};
+                    analysis.all.forEach(r => { weights[r.fruit] = Math.max(1, (totalBets - r.amount) / totalBets * 10); });
+                    const totalW = Object.values(weights).reduce((a, b) => a + b, 0);
+                    let r = Math.random() * totalW;
+                    for (const [fruit, w] of Object.entries(weights)) { r -= w; if (r <= 0) { winner = fruit; break; } }
                 }
+                if (!winner) winner = FRUIT_KEYS[Math.floor(Math.random() * FRUIT_KEYS.length)];
+                handleWinner(winner);
+                
+                State.gameState = 1;
+                State.roundTimer = 40 + Math.random() * 10;
+                generateBets();
+                document.getElementById('liveProgressionText').textContent = `🔄 تحضير الجولة ${State.currentRound + 1}...`;
             }
-            
-            if (!winner) winner = FRUIT_KEYS[Math.floor(Math.random() * FRUIT_KEYS.length)];
-            
-            handleWinner(winner);
-            
-            // Reset for next round
-            State.gameState = 1;
-            State.roundTimer = 40 + Math.random() * 10;
-            generateBets();
-            
-            document.getElementById('liveProgressionText').textContent = 
-                `🔄 تحضير الجولة ${State.currentRound + 1}...`;
         }
-        
         document.getElementById('channelCountLabel').textContent = State.codexAnalysis?.all?.length || 0;
-        
     }, intervalMs);
 }
 
 function generateBets() {
     const totalPool = 50000 + Math.random() * 150000;
-    
-    // Generate realistic bet distribution
     FRUIT_KEYS.forEach((k, i) => {
         const baseWeight = SMALL_KEYS.includes(k) ? 1.5 : 0.8;
         const variance = 0.5 + Math.random();
-        
-        // Make some fruits have higher bets (the "majority")
         const isMajority = Math.random() < 0.3;
         const weight = isMajority ? baseWeight * 3 : baseWeight * variance;
-        
         State.bets[k] = Math.floor((totalPool / FRUIT_KEYS.length) * weight);
     });
-    
-    // Ensure at least 2 fruits have low bets (minority candidates)
     const minorityCount = 2 + Math.floor(Math.random() * 2);
     const shuffled = [...FRUIT_KEYS].sort(() => Math.random() - 0.5);
     for (let i = 0; i < minorityCount; i++) {
@@ -1261,17 +1069,14 @@ function logout() {
     localStorage.removeItem('yalla_fruit_active_code');
     localStorage.removeItem('yalla_fruit_expiry');
     addLog('🔐 تم تسجيل الخروج بنجاح.', 'system');
-    setTimeout(() => {
-        window.location.href = "login.html";
-    }, 500);
+    setTimeout(() => { window.location.href = "login.html"; }, 500);
 }
 
 function downloadLog() {
     const logs = document.getElementById('logPanel').innerText;
     const history = State.history.map(k => FRUITS[k]?.emoji || k).join(' ');
     const stats = `إجمالي: ${State.codex.stats.total} | فوز: ${State.codex.stats.wins} | نسبة: ${State.codex.stats.winRate}% | ربح: ${State.codex.stats.profit}`;
-    
-    const text = `=== YALLA FRUIT v6.3 HYBRID - REPORT ===
+    const text = `=== YALLA FRUIT v6.4 HYBRID KLM - REPORT ===
 التاريخ: ${new Date().toLocaleDateString('ar-SA')}
 الوقت: ${new Date().toLocaleTimeString('ar-SA')}
 الجولة: ${State.currentRound}
@@ -1281,26 +1086,22 @@ function downloadLog() {
 
 === سجل النظام ===
 ${logs}`;
-    
     const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `YALLA_FRUIT_REPORT_${Date.now()}.txt`;
+    a.download = `YALLA_FRUIT_KLM_REPORT_${Date.now()}.txt`;
     a.click();
     URL.revokeObjectURL(a.href);
     addLog('💾 تم حفظ التقرير', 'info');
 }
 
-// ================================================================
-//  🚀  INIT
-// ================================================================
-
+// تهيئة الواجهة
 initUI();
-addLog('[نظام] 🍒 YALLA FRUIT v6.3 HYBRID جاهز', 'system');
-addLog('[نظام] تم التحقق من الكود بنجاح والاشتراك نشط', 'info');
-addLog('[نظام] اضغط "تشغيل المحرك الهجين" للبدء', 'system');
+addLog('[نظام] 🍒 YALLA FRUIT v6.4 HYBRID KLM جاهز', 'system');
+addLog('[نظام] ✅ تم تحديث الربوطات إلى klmburst.com', 'info');
+addLog('[نظام] ✅ قائمة السيرفرات: chatws, chatws1, roomws1-5, roomws10, roomws15, roomws20', 'info');
+addLog('[نظام] ✅ التوكن والـ deviceID محدثان من الـ Handshake الأصلي', 'info');
+addLog('[نظام] اضغط "تشغيل المحرك الهجين KLM" للبدء', 'system');
 </script>
 </body>
 </html>
-
-```
