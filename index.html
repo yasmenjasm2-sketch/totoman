@@ -4,6 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- ===== إثبات ملكية موقع جوجل (Google Search Console) ===== -->
+  <meta name="google-site-verification" content="googleb4b340427f945794" />
+  <meta name="google-site-verification" content="b4b340427f945794" />
+
+  <!-- ===== لوجو الموقع (Favicon) ===== -->
+  <link rel="icon" type="image/jpeg" href="hamza.jpg" />
+  <link rel="apple-touch-icon" href="hamza.jpg" />
+
   <!-- ===== SEO: العنوان والوصف ===== -->
   <title>فواكه AI | تطبيق تخمين الفواكه بالذكاء الاصطناعي - يلا لايف</title>
   <meta name="description" content="فواكه AI هو أقوى تطبيق لتخمين الفواكه في يلا لايف مدعوم بذكاء اصطناعي Gemini AI. احصل على تخمينات دقيقة، دفع آمن عبر PayPal والعملات الرقمية، ودعم فني متكامل." />
@@ -15,19 +23,19 @@
     يلا لايف فواكه,
     تخمين فواكه يلا لايف,
     فواكه ذكاء اصطناعي,
-    Gemini AI فواكه,
+    Gemini AI فواكه تخمين لفواكه,
     تطبيق فواكه مدفوع,
     yalla live fruit game,
     fruit guessing AI app,
     فواكه شات يلا لايف,
     تخمين فاكهة بالذكاء الاصطناعي,
-    برنامج تخمين فواكه,
+    برنامج تخمين فواكه يلا لايف,
     تطبيق دردشة صوتية فواكه,
     فواكه AI تحميل,
     fawakihAI download,
     fawakihAI2,
     yasmenjasm fawakihAI,
-    تخمين فاكهة بدقة,
+    تخمين فاكهه فواكه يلا لايف دردشه صوتيه,
     أفضل بوت فواكه يلا لايف,
     دفع باي بال فواكه,
     عملات رقمية فواكه يلا لايف,
@@ -43,11 +51,13 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://yasmenjasm2-sketch.github.io/fawakihAI2/" />
   <meta property="og:locale" content="ar_AR" />
+  <meta property="og:image" content="hamza.jpg" />
 
   <!-- ===== Twitter Card ===== -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="فواكه AI | تخمين الفواكه بالذكاء الاصطناعي" />
   <meta name="twitter:description" content="أقوى تطبيق تخمين فواكه في يلا لايف - مدعوم بـ Gemini AI" />
+  <meta name="twitter:image" content="hamza.jpg" />
 
   <!-- ===== Robots & Canonical ===== -->
   <meta name="robots" content="index, follow" />
@@ -64,6 +74,7 @@
     "applicationCategory": "GameApplication",
     "operatingSystem": "Web",
     "url": "https://yasmenjasm2-sketch.github.io/fawakihAI2/",
+    "image": "hamza.jpg",
     "offers": {
       "@type": "Offer",
       "price": "مدفوع",
@@ -94,6 +105,7 @@
     "headline": "فواكه AI: التطبيق الأذكى لتخمين الفواكه في يلا لايف",
     "description": "مقالة تعريفية شاملة عن تطبيق فواكه AI، طريقة التحميل، الميزات، سياسة الاستخدام، وبوابات الدفع المتاحة.",
     "keywords": "فواكه AI, يلا لايف, تخمين فواكه, Gemini AI, FawakihAI",
+    "image": "hamza.jpg",
     "url": "https://yasmenjasm2-sketch.github.io/fawakihAI2/",
     "inLanguage": "ar",
     "datePublished": "2025-01-01",
@@ -154,6 +166,12 @@
       background: linear-gradient(135deg, var(--gold), var(--orange));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-logo img {
+      width: 32px; height: 32px; border-radius: 50%; object-fit: cover;
     }
     .nav-links { display: flex; gap: 28px; list-style: none; }
     .nav-links a {
@@ -297,13 +315,19 @@
       padding: 40px 32px;
       text-align: center;
       position: relative; overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .what-visual::before {
       content: '';
       position: absolute; top: -50%; right: -50%; width: 100%; height: 100%;
       background: radial-gradient(circle, rgba(255,107,53,0.08) 0%, transparent 70%);
     }
-    .app-icon-big { font-size: 6rem; display: block; margin-bottom: 16px; }
+    .app-icon-big {
+      width: 96px; height: 96px; border-radius: 24px; margin-bottom: 16px;
+      object-fit: cover; box-shadow: 0 8px 20px rgba(255,107,53,0.3);
+    }
     .app-name-big {
       font-size: 1.6rem; font-weight: 900;
       background: linear-gradient(135deg, var(--gold), var(--orange));
@@ -441,6 +465,13 @@
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
       margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .footer-logo img {
+      width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
     }
     .footer-desc { color: var(--muted); font-size: 0.9rem; max-width: 500px; margin: 0 auto 28px; }
     .footer-links { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
@@ -471,7 +502,10 @@
 
 <!-- ===== NAV ===== -->
 <nav>
-  <div class="nav-logo">FawakihAI</div>
+  <div class="nav-logo">
+    <img src="hamza.jpg" alt="FawakihAI Logo" />
+    FawakihAI
+  </div>
   <ul class="nav-links">
     <li><a href="#about">ما هو التطبيق</a></li>
     <li><a href="#features">المميزات</a></li>
@@ -551,7 +585,7 @@
     </div>
 
     <div class="what-visual">
-      <span class="app-icon-big">🍉</span>
+      <img src="hamza.jpg" alt="FawakihAI App Logo" class="app-icon-big" />
       <div class="app-name-big">فواكه AI</div>
       <div class="app-version">يلا لايف × Gemini AI</div>
       <div class="tech-pills">
@@ -848,7 +882,10 @@
 
 <!-- ===== FOOTER ===== -->
 <footer>
-  <div class="footer-logo">FawakihAI</div>
+  <div class="footer-logo">
+    <img src="hamza.jpg" alt="FawakihAI Logo" />
+    FawakihAI
+  </div>
   <p class="footer-desc">
     تطبيق تخمين الفواكه الأذكى لمنصة يلا لايف، مدعوم بتقنية Gemini AI.
     جميع الحقوق محفوظة.
