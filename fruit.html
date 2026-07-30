@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fruit Party Guesser</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0b0c10;
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* حاوية الصورة لتحديد الإحداثيات بدقة */
+        .game-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            max-width: 450px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+            background: #1f2833;
+        }
+
+        .game-image {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        /* تنسيق علامة الصح ✅ */
+        .marker {
+            position: absolute;
+            font-size: 45px;
+            /* توسيط العلامة بالضبط على النقطة المطلوبة */
+            transform: translate(-50%, -50%);
+            display: none;
+            filter: drop-shadow(0px 0px 8px rgba(0, 0, 0, 1));
+            z-index: 10;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* زر التخمين */
+        .guess-btn {
+            margin-top: 30px;
+            padding: 15px 50px;
+            font-size: 22px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ff9800, #ffeb3b);
+            color: #111;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255, 152, 0, 0.4);
+            transition: transform 0.1s, box-shadow 0.2s;
+        }
+
+        .guess-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 4px 10px rgba(255, 152, 0, 0.4);
+        }
+
+        .result-text {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #45a29e;
+            font-weight: bold;
+            height: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>تخمين اللعبة الفائزة</h2>
+
+    <div class="game-container">
+        <!-- الصورة المطلوبة: تأكد من وجود ملف vipvip.jpg في نفس المجلد -->
+        <img src="vipvip.jpg" alt="Fruit Party" class="game-image">
+        
+        <!-- علامة الصح التي ستتحرك -->
+        <div id="marker" class="marker">✅</div>
+    </div>
+
+    <button class="guess-btn" onclick="makeGuess()">تخمين الآن</button>
+    <div class="result-text" id="result-text">اضغط على الزر للبدء</div>
+
+    <script>
+        // تحديد إحداثيات الفواكه على الصورة (كنسبة مئوية من حجم الصورة)
+        // تم ضبط هذه النسب بناءً على شبكة 3x3 الموجودة في اللعبة
+        const fruits = [
+            { id: 1, name: 'الليمون', top: '56%', left: '26%' },
+            { id: 2, name: 'التوت', top: '56%', left: '50%' },
+            { id: 3, name: 'الكيوي', top: '56%', left: '74%' },
+            { id: 4, name: 'الكرز', top: '67%', left: '26%' },
+            { id: 5, name: 'البرقوق', top: '67%', left: '74%' },
+            { id: 6, name: 'البطيخ', top: '78%', left: '26%' },
+            { id: 7, name: 'الموز', top: '78%', left: '50%' },
+            { id: 8, name: 'الفواكه المشكلة', top: '78%', left: '74%' }
+        ];
+
+        // مصفوفة لتخزين آخر التخمينات لضمان التنوع وعدم التكرار المباشر
+        let recentGuesses = [];
+        const memoryLimit = 4; // منع تكرار آخر 4 فواكه ظهرت في الجولات السابقة
+
+        function makeGuess() {
+            // تصفية الفواكه المتاحة بحيث نستبعد الفواكه التي ظهرت مؤخراً
+            let availableFruits = fruits.filter(f => !recentGuesses.includes(f.id));
+
+            // كإجراء احتياطي، إذا امتلأت الذاكرة، نفرغها
+            if (availableFruits.length === 0) {
+                availableFruits = fruits;
+                recentGuesses = [];
+            }
+
+            // اختيار فاكهة عشوائية من القائمة المفلترة (لضمان التنوع المطلق)
+            const randomIndex = Math.floor(Math.random() * availableFruits.length);
+            const selectedFruit = availableFruits[randomIndex];
+
+            // تحديث ذاكرة التخمينات
+            recentGuesses.push(selectedFruit.id);
+            if (recentGuesses.length > memoryLimit) {
+                recentGuesses.shift(); // إزالة أقدم تخمين من الذاكرة
+            }
+
+            // تحريك علامة ✅ إلى إحداثيات الفاكهة المختارة
+            const marker = document.getElementById('marker');
+            const resultText = document.getElementById('result-text');
+
+            marker.style.top = selectedFruit.top;
+            marker.style.left = selectedFruit.left;
+            marker.style.display = 'block';
+
+            // إضافة تأثير حركي (Animation) للعلامة عند التحديث
+            marker.style.transform = 'translate(-50%, -50%) scale(1.5)';
+            setTimeout(() => {
+                marker.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 200);
+
+            // تحديث النص ليعرض اسم الفاكهة
+            resultText.innerText = `النتيجة المتوقعة: ${selectedFruit.name}`;
+        }
+    </script>
+
+</body>
+</html>
