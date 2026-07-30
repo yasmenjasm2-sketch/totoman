@@ -69,82 +69,100 @@
 
         .result-text {
             margin-top: 20px;
-            font-size: 20px;
+            font-size: 18px;
             color: #45a29e;
             font-weight: bold;
-            height: 30px;
+            min-height: 30px;
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
 
-    <h2>تخمين اللعبة الفائزة</h2>
+    <h2>تخمين اللعبة الفائزة (4 خانات)</h2>
 
     <div class="game-container">
-        <!-- الصورة المطلوبة: تأكد من وجود ملف vipvip.jpg في نفس المجلد -->
+        <!-- تأكد من وجود ملف الصورة في نفس المجلد -->
         <img src="vipvip.jpg" alt="Fruit Party" class="game-image">
         
-        <!-- علامة الصح التي ستتحرك -->
-        <div id="marker" class="marker">✅</div>
+        <!-- 4 علامات صح للـ 4 خانات -->
+        <div id="marker-1" class="marker">✅</div>
+        <div id="marker-2" class="marker">✅</div>
+        <div id="marker-3" class="marker">✅</div>
+        <div id="marker-4" class="marker">✅</div>
     </div>
 
     <button class="guess-btn" onclick="makeGuess()">تخمين الآن</button>
-    <div class="result-text" id="result-text">اضغط على الزر للبدء</div>
+    <div class="result-text" id="result-text">اضغط على الزر لبدء التخمين</div>
 
     <script>
-        // تحديد إحداثيات الفواكه على الصورة (كنسبة مئوية من حجم الصورة)
-        // تم ضبط هذه النسب بناءً على شبكة 3x3 الموجودة في اللعبة
+        // إحداثيات دقيقة لشبكة 3x3 بناءً على مراكز المربعات
         const fruits = [
-            { id: 1, name: 'الليمون', top: '56%', left: '26%' },
-            { id: 2, name: 'التوت', top: '56%', left: '50%' },
-            { id: 3, name: 'الكيوي', top: '56%', left: '74%' },
-            { id: 4, name: 'الكرز', top: '67%', left: '26%' },
-            { id: 5, name: 'البرقوق', top: '67%', left: '74%' },
-            { id: 6, name: 'البطيخ', top: '78%', left: '26%' },
-            { id: 7, name: 'الموز', top: '78%', left: '50%' },
-            { id: 8, name: 'الفواكه المشكلة', top: '78%', left: '74%' }
+            { id: 1, name: 'الليمون', top: '17%', left: '17%' },
+            { id: 2, name: 'التوت', top: '17%', left: '50%' },
+            { id: 3, name: 'الكيوي', top: '17%', left: '83%' },
+            { id: 4, name: 'الكرز', top: '50%', left: '17%' },
+            // تم استبعاد المركز (50%, 50%) لأنه يحتوي على المؤقت (00)
+            { id: 5, name: 'البرقوق', top: '50%', left: '83%' },
+            { id: 6, name: 'البطيخ', top: '83%', left: '17%' },
+            { id: 7, name: 'الموز', top: '83%', left: '50%' },
+            { id: 8, name: 'الفراولة', top: '83%', left: '83%' }
         ];
 
-        // مصفوفة لتخزين آخر التخمينات لضمان التنوع وعدم التكرار المباشر
-        let recentGuesses = [];
-        const memoryLimit = 4; // منع تكرار آخر 4 فواكه ظهرت في الجولات السابقة
+        let previousSelection = [];
+
+        // دالة لخلط المصفوفة بشكل عشوائي
+        function shuffleArray(array) {
+            let newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
 
         function makeGuess() {
-            // تصفية الفواكه المتاحة بحيث نستبعد الفواكه التي ظهرت مؤخراً
-            let availableFruits = fruits.filter(f => !recentGuesses.includes(f.id));
+            let selectedFruits = [];
 
-            // كإجراء احتياطي، إذا امتلأت الذاكرة، نفرغها
-            if (availableFruits.length === 0) {
-                availableFruits = fruits;
-                recentGuesses = [];
+            if (previousSelection.length === 0) {
+                // الجولة الأولى: اختيار 4 فواكه عشوائية بالكامل
+                selectedFruits = shuffleArray(fruits).slice(0, 4);
+            } else {
+                // الجولات التالية: ضمان تنوع عالي وعدم تطابق مع الجولة السابقة
+                // نأخذ 3 فواكه لم تظهر في الجولة السابقة، وفاكهة واحدة فقط من الجولة السابقة
+                let notPickedLastTime = fruits.filter(f => !previousSelection.includes(f.id));
+                let pickedLastTime = fruits.filter(f => previousSelection.includes(f.id));
+                
+                notPickedLastTime = shuffleArray(notPickedLastTime);
+                pickedLastTime = shuffleArray(pickedLastTime);
+                
+                selectedFruits = notPickedLastTime.slice(0, 3).concat(pickedLastTime.slice(0, 1));
+                selectedFruits = shuffleArray(selectedFruits); // خلط النتيجة النهائية
             }
 
-            // اختيار فاكهة عشوائية من القائمة المفلترة (لضمان التنوع المطلق)
-            const randomIndex = Math.floor(Math.random() * availableFruits.length);
-            const selectedFruit = availableFruits[randomIndex];
+            // تحديث الذاكرة للجولة القادمة
+            previousSelection = selectedFruits.map(f => f.id);
 
-            // تحديث ذاكرة التخمينات
-            recentGuesses.push(selectedFruit.id);
-            if (recentGuesses.length > memoryLimit) {
-                recentGuesses.shift(); // إزالة أقدم تخمين من الذاكرة
-            }
+            let names = [];
 
-            // تحريك علامة ✅ إلى إحداثيات الفاكهة المختارة
-            const marker = document.getElementById('marker');
-            const resultText = document.getElementById('result-text');
+            // تحريك وعرض الـ 4 علامات
+            selectedFruits.forEach((fruit, index) => {
+                let marker = document.getElementById('marker-' + (index + 1));
+                marker.style.top = fruit.top;
+                marker.style.left = fruit.left;
+                marker.style.display = 'block';
 
-            marker.style.top = selectedFruit.top;
-            marker.style.left = selectedFruit.left;
-            marker.style.display = 'block';
+                // إضافة تأثير الحركة عند التحديث
+                marker.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                setTimeout(() => {
+                    marker.style.transform = 'translate(-50%, -50%) scale(1)';
+                }, 200);
 
-            // إضافة تأثير حركي (Animation) للعلامة عند التحديث
-            marker.style.transform = 'translate(-50%, -50%) scale(1.5)';
-            setTimeout(() => {
-                marker.style.transform = 'translate(-50%, -50%) scale(1)';
-            }, 200);
+                names.push(fruit.name);
+            });
 
-            // تحديث النص ليعرض اسم الفاكهة
-            resultText.innerText = `النتيجة المتوقعة: ${selectedFruit.name}`;
+            // تحديث النص ليعرض الـ 4 نتائج
+            document.getElementById('result-text').innerText = `النتيجة المتوقعة:\n ${names.join('  -  ')}`;
         }
     </script>
 
