@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fruit Party Guesser - VIP Edition</title>
+    
+    <!-- Firebase SDK (Version 8) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <style>
         :root {
             --primary: #f2c94c;
@@ -13,6 +18,7 @@
             --text-main: #f8f9fa;
             --text-muted: #a0aab2;
             --success: #4CAF50;
+            --error: #f44336;
         }
 
         * {
@@ -45,7 +51,55 @@
             letter-spacing: 1px;
         }
 
-        /* حاوية اللعبة بتصميم احترافي (Glassmorphism) */
+        /* شاشة تسجيل الدخول */
+        #login-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: var(--bg-card);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .login-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(242, 201, 76, 0.3);
+        }
+
+        .login-msg {
+            margin-top: 15px;
+            font-size: 14px;
+            color: var(--error);
+            font-weight: bold;
+            min-height: 20px;
+        }
+
+        /* حاوية اللعبة */
+        #game-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
         .game-container {
             position: relative;
             display: inline-block;
@@ -84,7 +138,6 @@
             opacity: 1;
         }
 
-        /* تنسيق علامة الصح ✅ بشكل جميل ومضيء */
         .marker {
             position: absolute;
             font-size: 42px;
@@ -96,11 +149,10 @@
             text-shadow: 0 0 25px rgba(76, 175, 80, 0.9);
         }
 
-        /* زر التخمين الاحترافي */
-        .guess-btn {
-            margin-top: 40px;
+        .btn {
+            margin-top: 20px;
             padding: 16px 65px;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: #111;
@@ -111,19 +163,28 @@
             transition: all 0.3s ease;
             letter-spacing: 1px;
             text-transform: uppercase;
+            width: 100%;
+            max-width: 300px;
         }
 
-        .guess-btn:hover {
+        .btn:hover:not(.disabled) {
             transform: translateY(-3px);
             box-shadow: 0 15px 35px rgba(242, 201, 76, 0.4);
         }
 
-        .guess-btn:active {
+        .btn:active:not(.disabled) {
             transform: translateY(2px) scale(0.97);
             box-shadow: 0 5px 15px rgba(242, 201, 76, 0.3);
         }
 
-        /* نص النتيجة */
+        .btn.disabled {
+            background: #555;
+            color: #888;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
         .result-text {
             margin-top: 30px;
             font-size: 19px;
@@ -146,36 +207,152 @@
             box-shadow: 0 5px 15px rgba(76, 175, 80, 0.1);
             transform: scale(1.05);
         }
+        
+        .loader {
+            display: none;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
 
-    <h2>تخمين اللعبة الفائزة VIP</h2>
-
-    <div class="game-container">
-        <div class="image-wrapper">
-            <!-- تأكد من وجود ملف الصورة في نفس المجلد -->
-            <img src="vipvip.jpg" alt="Fruit Party" class="game-image">
-            
-            <!-- 4 علامات صح للـ 4 خانات -->
-            <div id="marker-1" class="marker">✅</div>
-            <div id="marker-2" class="marker">✅</div>
-            <div id="marker-3" class="marker">✅</div>
-            <div id="marker-4" class="marker">✅</div>
-        </div>
+    <!-- شاشة تسجيل الدخول -->
+    <div id="login-screen">
+        <h2>تسجيل الدخول VIP</h2>
+        <input type="text" id="sub-code" class="login-input" placeholder="أدخل كود الاشتراك هنا">
+        <button class="btn" onclick="login()">تفعيل الدخول</button>
+        <div class="loader" id="login-loader"></div>
+        <p id="login-msg" class="login-msg"></p>
     </div>
 
-    <button class="guess-btn" onclick="makeGuess()">تخمين الآن</button>
-    <div class="result-text" id="result-text">اضغط على الزر لبدء التخمين</div>
+    <!-- شاشة اللعبة -->
+    <div id="game-screen">
+        <h2>تخمين اللعبة الفائزة VIP</h2>
+
+        <div class="game-container">
+            <div class="image-wrapper">
+                <img src="vipvip.jpg" alt="Fruit Party" class="game-image">
+                
+                <div id="marker-1" class="marker">✅</div>
+                <div id="marker-2" class="marker">✅</div>
+                <div id="marker-3" class="marker">✅</div>
+                <div id="marker-4" class="marker">✅</div>
+            </div>
+        </div>
+
+        <button id="guess-btn" class="btn" onclick="makeGuess()">تخمين الآن</button>
+        <div class="result-text" id="result-text">اضغط على الزر لبدء التخمين</div>
+    </div>
 
     <script>
-        // إحداثيات دقيقة لشبكة 3x3 (تمت إزالة أسماء الفواكه كما طلبت)
+        // إعدادات Firebase من طلبك
+        const firebaseConfig = {
+            apiKey: "AIzaSyAo4IaLd5SfVYHAAp_noJD7ZXBbhdVx9-0",
+            databaseURL: "https://fawakihyallalive-default-rtdb.firebaseio.com",
+            projectId: "fawakihyallalive",
+            storageBucket: "fawakihyallalive.firebasestorage.app",
+            appId: "1:917478913649:android:fee5d42aca81c8a2e3cdd0"
+        };
+        
+        // تهيئة Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // الأكواد المسموح بها (كما طلبت)
+        const allowedCodes = ["hamzagmail34567", "nbras.vip23"];
+
+        // توليد أو جلب معرف فريد للجهاز (لضمان عمل الكود على جهاز واحد فقط)
+        function getDeviceId() {
+            let id = localStorage.getItem('unique_device_id');
+            if (!id) {
+                id = 'device_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+                localStorage.setItem('unique_device_id', id);
+            }
+            return id;
+        }
+
+        // تشفير الكود باستخدام Base64 ليكون مشفر داخل قاعدة البيانات
+        function encryptCode(code) {
+            return btoa(code); 
+        }
+
+        // دالة تسجيل الدخول
+        function login() {
+            const codeInput = document.getElementById('sub-code').value.trim();
+            const msgBox = document.getElementById('login-msg');
+            const loader = document.getElementById('login-loader');
+            
+            msgBox.innerText = "";
+            
+            if (!codeInput) {
+                msgBox.innerText = "الرجاء إدخال كود الاشتراك.";
+                return;
+            }
+
+            if (!allowedCodes.includes(codeInput)) {
+                msgBox.innerText = "كود الاشتراك غير صالح أو منتهي الصلاحية.";
+                return;
+            }
+
+            loader.style.display = "block";
+            const deviceId = getDeviceId();
+            const encryptedCode = encryptCode(codeInput); // تشفير الكود لحفظه بآمان
+            const dbRef = db.ref('subscriptions_vip/' + encryptedCode);
+
+            // التحقق من قاعدة البيانات
+            dbRef.once('value').then((snapshot) => {
+                const data = snapshot.val();
+                
+                if (data && data.deviceId) {
+                    // الكود مسجل مسبقاً، نتحقق إذا كان نفس الجهاز
+                    if (data.deviceId === deviceId) {
+                        startGameScreen();
+                    } else {
+                        loader.style.display = "none";
+                        msgBox.innerText = "❌ هذا الكود مرتبط بجهاز آخر بالفعل، لا يمكن استخدامه هنا.";
+                    }
+                } else {
+                    // الكود غير مسجل بعد، نقوم بربطه بهذا الجهاز
+                    dbRef.set({
+                        deviceId: deviceId,
+                        activationDate: new Date().toISOString(),
+                        originalCode: codeInput
+                    }).then(() => {
+                        startGameScreen();
+                    }).catch(error => {
+                        loader.style.display = "none";
+                        msgBox.innerText = "حدث خطأ أثناء الاتصال بالخادم.";
+                    });
+                }
+            }).catch(error => {
+                loader.style.display = "none";
+                msgBox.innerText = "خطأ في الشبكة، تحقق من اتصالك بالإنترنت.";
+            });
+        }
+
+        function startGameScreen() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+        }
+
+        // ----------------- منطق اللعبة ----------------- //
+
         const slots = [
             { id: 1, top: '17%', left: '17%' },
             { id: 2, top: '17%', left: '50%' },
             { id: 3, top: '17%', left: '83%' },
             { id: 4, top: '50%', left: '17%' },
-            // المركز مستبعد
             { id: 5, top: '50%', left: '83%' },
             { id: 6, top: '83%', left: '17%' },
             { id: 7, top: '83%', left: '50%' },
@@ -183,8 +360,9 @@
         ];
 
         let previousSelection = [];
+        let isGuessingAllowed = true;
+        let countdownTimer;
 
-        // دالة لخلط المصفوفة بشكل عشوائي
         function shuffleArray(array) {
             let newArray = [...array];
             for (let i = newArray.length - 1; i > 0; i--) {
@@ -195,13 +373,13 @@
         }
 
         function makeGuess() {
+            if (!isGuessingAllowed) return; // منع الضغط إذا كان العداد يعمل
+
             let selectedSlots = [];
 
             if (previousSelection.length === 0) {
-                // الجولة الأولى
                 selectedSlots = shuffleArray(slots).slice(0, 4);
             } else {
-                // الجولات التالية: نفس اللوجيك السابق لضمان التنوع
                 let notPickedLastTime = slots.filter(s => !previousSelection.includes(s.id));
                 let pickedLastTime = slots.filter(s => previousSelection.includes(s.id));
                 
@@ -212,33 +390,51 @@
                 selectedSlots = shuffleArray(selectedSlots);
             }
 
-            // تحديث الذاكرة
             previousSelection = selectedSlots.map(s => s.id);
 
-            // تحريك وعرض الـ 4 علامات
             selectedSlots.forEach((slot, index) => {
                 let marker = document.getElementById('marker-' + (index + 1));
                 marker.style.top = slot.top;
                 marker.style.left = slot.left;
                 marker.style.display = 'block';
 
-                // إضافة تأثير الحركة الاحترافي عند التحديث
                 marker.style.transform = 'translate(-50%, -50%) scale(1.8)';
                 setTimeout(() => {
                     marker.style.transform = 'translate(-50%, -50%) scale(1)';
                 }, 250);
             });
 
-            // إخفاء أسماء الفواكه والاكتفاء برسالة تأكيد أنيقة
             const resultBox = document.getElementById('result-text');
             resultBox.innerText = "🎯 تم تحديد المواقع المتوقعة بنجاح!";
             
-            // إضافة كلاس التفعيل للحصول على تأثير لوني
             resultBox.classList.remove('active');
-            // تأخير بسيط لإعادة تشغيل الـ animation
             setTimeout(() => {
                 resultBox.classList.add('active');
             }, 50);
+
+            // تشغيل عداد الـ 28 ثانية
+            startCooldown();
+        }
+
+        function startCooldown() {
+            isGuessingAllowed = false;
+            let timeLeft = 28;
+            const btn = document.getElementById('guess-btn');
+            
+            btn.classList.add('disabled');
+            btn.innerText = `الرجاء الانتظار (${timeLeft}) ثانية`;
+
+            countdownTimer = setInterval(() => {
+                timeLeft--;
+                if (timeLeft > 0) {
+                    btn.innerText = `الرجاء الانتظار (${timeLeft}) ثانية`;
+                } else {
+                    clearInterval(countdownTimer);
+                    isGuessingAllowed = true;
+                    btn.classList.remove('disabled');
+                    btn.innerText = "تخمين الآن";
+                }
+            }, 1000);
         }
     </script>
 </body>
