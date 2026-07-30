@@ -309,7 +309,7 @@
             <div class="pulse-dot"></div>
             <span>المتصلين الآن:</span>
             <span class="online-numbers">
-                <span id="online-count" class="current-players">1432</span> / 5430
+                <span id="online-count" class="current-players">0</span> / <span id="bots-count">0</span>
             </span>
         </div>
     </div>
@@ -502,21 +502,42 @@
 
         // محاكي المتصلين الوهمي الاحترافي
         function startOnlinePlayersSimulator() {
-            let currentPlayers = 1432;
+            let currentPlayers = 0;
+            let totalBots = 0;
             const counterElement = document.getElementById('online-count');
+            const botsElement = document.getElementById('bots-count');
             
-            setInterval(() => {
-                // إضافة أو طرح رقم عشوائي بين -3 و +6 لتبدو الحركة حقيقية
-                const fluctuation = Math.floor(Math.random() * 10) - 3;
-                currentPlayers += fluctuation;
+            // Initial animation to climb up to a baseline
+            let initialInterval = setInterval(() => {
+                currentPlayers += Math.floor(Math.random() * 50) + 20;
+                totalBots = Math.floor(currentPlayers * 3.7); // Roughly 3-5 times
                 
-                // الحفاظ على الرقم ضمن نطاق واقعي
-                if (currentPlayers < 1350) currentPlayers += 25;
-                if (currentPlayers > 1580) currentPlayers -= 25;
-                
+                if (currentPlayers >= 1432) {
+                    clearInterval(initialInterval);
+                    // Start normal fast fluctuation
+                    startFastFluctuation(currentPlayers, totalBots);
+                }
                 counterElement.innerText = currentPlayers;
-                
-            }, 3000); // يتحدث الرقم كل 3 ثوانٍ تقريباً
+                botsElement.innerText = totalBots;
+            }, 100);
+            
+            function startFastFluctuation(basePlayers, baseBots) {
+                 setInterval(() => {
+                    const fluctuation = Math.floor(Math.random() * 15) - 7;
+                    basePlayers += fluctuation;
+                    
+                    if (basePlayers < 1350) basePlayers += 25;
+                    if (basePlayers > 1580) basePlayers -= 25;
+                    
+                    // Total bots should be around 3 to 5 times the base players
+                    const multiplier = 3 + (Math.random() * 2); // random between 3 and 5
+                    baseBots = Math.floor(basePlayers * multiplier);
+
+                    counterElement.innerText = basePlayers;
+                    botsElement.innerText = baseBots;
+                    
+                }, 1000); // تحديث كل ثانية
+            }
         }
     </script>
 </body>
