@@ -3,115 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fruit Party Guesser</title>
+    <title>Fruit Party AI Guesser</title>
     <style>
+        :root {
+            --primary-bg: #120a1f;
+            --container-bg: #1e1133;
+            --accent-gold: #ffd700;
+            --accent-glow: rgba(255, 215, 0, 0.4);
+            --text-main: #f4f4f9;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0b0c10;
-            color: white;
+            background: radial-gradient(circle at top, var(--container-bg) 0%, var(--primary-bg) 100%);
+            color: var(--text-main);
             text-align: center;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
         }
 
-        /* حاوية الصورة لتحديد الإحداثيات بدقة */
+        h2 {
+            font-size: 26px;
+            color: var(--accent-gold);
+            text-shadow: 0 2px 10px var(--accent-glow);
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+        }
+
+        /* حاوية الصورة بتصميم أنيق */
         .game-container {
             position: relative;
             display: inline-block;
-            width: 100%;
-            max-width: 450px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            width: 90%;
+            max-width: 420px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 15px var(--accent-glow);
+            border: 2px solid rgba(255, 215, 0, 0.2);
             overflow: hidden;
-            background: #1f2833;
+            background: var(--container-bg);
+            transition: transform 0.3s ease;
         }
 
         .game-image {
             display: block;
             width: 100%;
             height: auto;
+            opacity: 0.95;
         }
 
-        /* تنسيق علامة الصح ✅ */
+        /* تنسيق علامة الصح ✅ مع تأثيرات حركية متقدمة */
         .marker {
             position: absolute;
-            font-size: 45px;
-            /* توسيط العلامة بالضبط على النقطة المطلوبة */
-            transform: translate(-50%, -50%);
+            font-size: 42px;
+            transform: translate(-50%, -50%) scale(0);
             display: none;
-            filter: drop-shadow(0px 0px 8px rgba(0, 0, 0, 1));
+            filter: drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.8));
             z-index: 10;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
         }
 
-        /* زر التخمين */
+        .marker.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        /* زر التخمين الاحترافي */
         .guess-btn {
-            margin-top: 30px;
-            padding: 15px 50px;
+            margin-top: 35px;
+            padding: 16px 55px;
             font-size: 22px;
-            font-weight: bold;
-            background: linear-gradient(135deg, #ff9800, #ffeb3b);
-            color: #111;
+            font-weight: 900;
+            background: linear-gradient(135deg, #f6d365 0%, #ffb347 100%);
+            color: #1a0b2e;
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 8px 20px rgba(255, 152, 0, 0.4);
-            transition: transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 10px 25px rgba(255, 179, 71, 0.5);
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .guess-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255, 179, 71, 0.7);
         }
 
         .guess-btn:active {
-            transform: scale(0.95);
-            box-shadow: 0 4px 10px rgba(255, 152, 0, 0.4);
+            transform: translateY(2px) scale(0.97);
+            box-shadow: 0 5px 15px rgba(255, 179, 71, 0.4);
         }
 
+        .guess-btn.loading {
+            background: linear-gradient(135deg, #a8a8a8 0%, #6e6e6e 100%);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+            color: #fff;
+        }
+
+        /* النص السفلي */
         .result-text {
-            margin-top: 20px;
+            margin-top: 25px;
             font-size: 18px;
-            color: #45a29e;
-            font-weight: bold;
+            color: #a89bc0;
+            font-weight: 500;
             min-height: 30px;
-            line-height: 1.5;
+            letter-spacing: 0.5px;
+        }
+
+        .highlight {
+            color: var(--accent-gold);
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <h2>تخمين اللعبة الفائزة (4 خانات)</h2>
+    <h2>✨ VIP PREDICTOR ✨</h2>
 
     <div class="game-container">
-        <!-- تأكد من وجود ملف الصورة في نفس المجلد -->
-        <img src="vipvip.jpg" alt="Fruit Party" class="game-image">
+        <!-- الصورة المطلوبة (تأكد من وجود vipvip.jpg في نفس المجلد) -->
+        <img src="vipvip.jpg" alt="Fruit Party Board" class="game-image">
         
-        <!-- 4 علامات صح للـ 4 خانات -->
+        <!-- علامات الصح المخفية للـ 4 خانات -->
         <div id="marker-1" class="marker">✅</div>
         <div id="marker-2" class="marker">✅</div>
         <div id="marker-3" class="marker">✅</div>
         <div id="marker-4" class="marker">✅</div>
     </div>
 
-    <button class="guess-btn" onclick="makeGuess()">تخمين الآن</button>
-    <div class="result-text" id="result-text">اضغط على الزر لبدء التخمين</div>
+    <button id="main-btn" class="guess-btn" onclick="startPrediction()">تفعيل التخمين</button>
+    
+    <div class="result-text" id="result-text">في انتظار البدء...</div>
 
     <script>
-        // إحداثيات دقيقة لشبكة 3x3 بناءً على مراكز المربعات
-        const fruits = [
-            { id: 1, name: 'الليمون', top: '17%', left: '17%' },
-            { id: 2, name: 'التوت', top: '17%', left: '50%' },
-            { id: 3, name: 'الكيوي', top: '17%', left: '83%' },
-            { id: 4, name: 'الكرز', top: '50%', left: '17%' },
-            // تم استبعاد المركز (50%, 50%) لأنه يحتوي على المؤقت (00)
-            { id: 5, name: 'البرقوق', top: '50%', left: '83%' },
-            { id: 6, name: 'البطيخ', top: '83%', left: '17%' },
-            { id: 7, name: 'الموز', top: '83%', left: '50%' },
-            { id: 8, name: 'الفراولة', top: '83%', left: '83%' }
+        // تم إزالة الأسماء نهائياً والاكتفاء بالإحداثيات فقط
+        const gridPositions = [
+            { id: 1, top: '17%', left: '17%' },
+            { id: 2, top: '17%', left: '50%' },
+            { id: 3, top: '17%', left: '83%' },
+            { id: 4, top: '50%', left: '17%' },
+            // المركز مستبعد (50%, 50%) لوجود المؤقت (00)
+            { id: 5, top: '50%', left: '83%' },
+            { id: 6, top: '83%', left: '17%' },
+            { id: 7, top: '83%', left: '50%' },
+            { id: 8, top: '83%', left: '83%' }
         ];
 
         let previousSelection = [];
 
-        // دالة لخلط المصفوفة بشكل عشوائي
+        // دالة مساعدة لخلط المصفوفة بفعالية
         function shuffleArray(array) {
             let newArray = [...array];
             for (let i = newArray.length - 1; i > 0; i--) {
@@ -121,48 +168,72 @@
             return newArray;
         }
 
-        function makeGuess() {
-            let selectedFruits = [];
+        // دالة التخمين مع محرك العشوائية المطور
+        function calculatePrediction() {
+            let selectedPositions = [];
 
             if (previousSelection.length === 0) {
-                // الجولة الأولى: اختيار 4 فواكه عشوائية بالكامل
-                selectedFruits = shuffleArray(fruits).slice(0, 4);
+                selectedPositions = shuffleArray(gridPositions).slice(0, 4);
             } else {
-                // الجولات التالية: ضمان تنوع عالي وعدم تطابق مع الجولة السابقة
-                // نأخذ 3 فواكه لم تظهر في الجولة السابقة، وفاكهة واحدة فقط من الجولة السابقة
-                let notPickedLastTime = fruits.filter(f => !previousSelection.includes(f.id));
-                let pickedLastTime = fruits.filter(f => previousSelection.includes(f.id));
+                // خوارزمية تضمن تبايناً عالياً بين الجولات لتجنب التكرار النمطي
+                let notPickedLastTime = gridPositions.filter(pos => !previousSelection.includes(pos.id));
+                let pickedLastTime = gridPositions.filter(pos => previousSelection.includes(pos.id));
                 
                 notPickedLastTime = shuffleArray(notPickedLastTime);
                 pickedLastTime = shuffleArray(pickedLastTime);
                 
-                selectedFruits = notPickedLastTime.slice(0, 3).concat(pickedLastTime.slice(0, 1));
-                selectedFruits = shuffleArray(selectedFruits); // خلط النتيجة النهائية
+                // اختيار متغير لتفادي نمط (أ - ب - أ - ب) المستمر
+                let pickCountFromOld = Math.floor(Math.random() * 2) + 1; // إما 1 أو 2
+                let pickCountFromNew = 4 - pickCountFromOld; 
+                
+                selectedPositions = notPickedLastTime.slice(0, pickCountFromNew).concat(pickedLastTime.slice(0, pickCountFromOld));
+                selectedPositions = shuffleArray(selectedPositions); 
             }
 
-            // تحديث الذاكرة للجولة القادمة
-            previousSelection = selectedFruits.map(f => f.id);
+            previousSelection = selectedPositions.map(pos => pos.id);
+            return selectedPositions;
+        }
 
-            let names = [];
+        // دالة التأثير الحركي والتشغيل
+        function startPrediction() {
+            const btn = document.getElementById('main-btn');
+            const resultText = document.getElementById('result-text');
+            
+            // إخفاء العلامات القديمة إن وجدت
+            for (let i = 1; i <= 4; i++) {
+                let marker = document.getElementById('marker-' + i);
+                marker.classList.remove('show');
+                marker.style.display = 'none';
+            }
 
-            // تحريك وعرض الـ 4 علامات
-            selectedFruits.forEach((fruit, index) => {
-                let marker = document.getElementById('marker-' + (index + 1));
-                marker.style.top = fruit.top;
-                marker.style.left = fruit.left;
-                marker.style.display = 'block';
+            // تحويل الزر لحالة التحميل
+            btn.classList.add('loading');
+            btn.innerText = 'جاري تحليل الخوارزمية...';
+            resultText.innerHTML = 'يرجى الانتظار...';
 
-                // إضافة تأثير الحركة عند التحديث
-                marker.style.transform = 'translate(-50%, -50%) scale(1.5)';
-                setTimeout(() => {
-                    marker.style.transform = 'translate(-50%, -50%) scale(1)';
-                }, 200);
+            // تأخير لإعطاء واقعية لعملية الذكاء الاصطناعي
+            setTimeout(() => {
+                const finalPositions = calculatePrediction();
 
-                names.push(fruit.name);
-            });
+                // عرض العلامات الجديدة
+                finalPositions.forEach((pos, index) => {
+                    let marker = document.getElementById('marker-' + (index + 1));
+                    marker.style.top = pos.top;
+                    marker.style.left = pos.left;
+                    marker.style.display = 'block';
+                    
+                    // تأخير طفيف بين كل علامة وأخرى لتأثير بصري رائع
+                    setTimeout(() => {
+                        marker.classList.add('show');
+                    }, index * 100); 
+                });
 
-            // تحديث النص ليعرض الـ 4 نتائج
-            document.getElementById('result-text').innerText = `النتيجة المتوقعة:\n ${names.join('  -  ')}`;
+                // إعادة الزر والنص للحالة الطبيعية
+                btn.classList.remove('loading');
+                btn.innerText = 'تخمين جديد';
+                resultText.innerHTML = '<span class="highlight">✓ تم التحديد بنجاح</span>';
+
+            }, 600); // 600 ملي ثانية مدة التحميل الوهمي
         }
     </script>
 
