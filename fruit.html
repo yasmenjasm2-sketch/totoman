@@ -11,14 +11,14 @@
 
     <style>
         :root {
-            --primary: #f2c94c;
-            --secondary: #f2994a;
-            --bg-dark: #0f1115;
-            --bg-card: rgba(30, 34, 45, 0.65);
+            --primary: #FFD700; /* لون ذهبي ملكي */
+            --secondary: #FF8C00; /* برتقالي عميق */
+            --bg-dark: #090a0f; /* خلفية داكنة احترافية */
+            --bg-card: rgba(20, 24, 34, 0.75);
             --text-main: #f8f9fa;
-            --text-muted: #a0aab2;
+            --text-muted: #b0bac3;
             --success: #4CAF50;
-            --error: #f44336;
+            --error: #ff4757;
         }
 
         * {
@@ -29,7 +29,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(circle at 50% 0%, #232732 0%, var(--bg-dark) 100%);
+            background: radial-gradient(circle at 50% 0%, #1c202a 0%, var(--bg-dark) 100%);
             color: var(--text-main);
             text-align: center;
             min-height: 100vh;
@@ -41,14 +41,14 @@
         }
 
         h2 {
-            font-size: 28px;
-            font-weight: 800;
+            font-size: 30px;
+            font-weight: 900;
             margin-bottom: 30px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0px 4px 15px rgba(242, 201, 76, 0.15);
-            letter-spacing: 1px;
+            text-shadow: 0px 4px 20px rgba(255, 215, 0, 0.2);
+            letter-spacing: 1.5px;
         }
 
         /* شاشة تسجيل الدخول */
@@ -57,31 +57,33 @@
             flex-direction: column;
             align-items: center;
             background: var(--bg-card);
-            backdrop-filter: blur(15px);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            padding: 45px 35px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 215, 0, 0.15);
             width: 100%;
             max-width: 400px;
         }
 
         .login-input {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             margin-bottom: 20px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            background: rgba(0, 0, 0, 0.4);
             color: white;
             font-size: 16px;
             text-align: center;
             outline: none;
             transition: all 0.3s;
+            letter-spacing: 1px;
         }
 
         .login-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(242, 201, 76, 0.3);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            background: rgba(0, 0, 0, 0.6);
         }
 
         .login-msg {
@@ -90,6 +92,7 @@
             color: var(--error);
             font-weight: bold;
             min-height: 20px;
+            text-shadow: 0 0 10px rgba(255, 71, 87, 0.4);
         }
 
         /* حاوية اللعبة */
@@ -106,30 +109,31 @@
             width: 100%;
             max-width: 450px;
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1.5px rgba(255, 215, 0, 0.15);
             background: var(--bg-card);
             backdrop-filter: blur(15px);
-            padding: 12px;
-            transition: transform 0.3s ease;
+            padding: 14px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .game-container:hover {
             transform: translateY(-5px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 0 1.5px rgba(255, 215, 0, 0.3);
         }
 
         .image-wrapper {
             position: relative;
-            border-radius: 12px;
+            border-radius: 14px;
             overflow: hidden;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-            background-color: #1a1a24;
+            box-shadow: inset 0 0 25px rgba(0,0,0,0.7);
+            background-color: #12141a;
         }
 
         .game-image {
             display: block;
             width: 100%;
             height: auto;
-            border-radius: 12px;
+            border-radius: 14px;
             opacity: 0.95;
             transition: opacity 0.3s ease;
         }
@@ -138,55 +142,57 @@
             opacity: 1;
         }
 
+        /* تعديل حجم علامة الصح لتكون أصغر وأكثر احترافية */
         .marker {
             position: absolute;
-            font-size: 42px;
+            font-size: 26px; /* الحجم الجديد المصغر */
             transform: translate(-50%, -50%);
             display: none;
-            filter: drop-shadow(0px 5px 12px rgba(0, 0, 0, 0.9));
+            filter: drop-shadow(0px 3px 8px rgba(0, 0, 0, 0.9));
             z-index: 10;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-shadow: 0 0 25px rgba(76, 175, 80, 0.9);
+            text-shadow: 0 0 15px rgba(76, 175, 80, 0.9);
         }
 
         .btn {
-            margin-top: 20px;
-            padding: 16px 65px;
+            margin-top: 25px;
+            padding: 18px 65px;
             font-size: 20px;
             font-weight: 800;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: #111;
+            color: #000;
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 10px 25px rgba(242, 201, 76, 0.25);
+            box-shadow: 0 10px 30px rgba(255, 140, 0, 0.3);
             transition: all 0.3s ease;
             letter-spacing: 1px;
             text-transform: uppercase;
             width: 100%;
-            max-width: 300px;
+            max-width: 320px;
         }
 
         .btn:hover:not(.disabled) {
             transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(242, 201, 76, 0.4);
+            box-shadow: 0 15px 40px rgba(255, 140, 0, 0.5);
         }
 
         .btn:active:not(.disabled) {
             transform: translateY(2px) scale(0.97);
-            box-shadow: 0 5px 15px rgba(242, 201, 76, 0.3);
+            box-shadow: 0 5px 15px rgba(255, 140, 0, 0.4);
         }
 
         .btn.disabled {
-            background: #555;
+            background: linear-gradient(135deg, #444, #333);
             color: #888;
             cursor: not-allowed;
-            box-shadow: none;
+            box-shadow: inset 0 3px 10px rgba(0,0,0,0.5);
             transform: none;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
         .result-text {
-            margin-top: 30px;
+            margin-top: 25px;
             font-size: 19px;
             color: var(--text-muted);
             font-weight: 600;
@@ -204,19 +210,63 @@
             color: var(--success);
             background: rgba(76, 175, 80, 0.1);
             border-color: rgba(76, 175, 80, 0.25);
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.1);
+            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.15);
             transform: scale(1.05);
         }
         
         .loader {
             display: none;
-            border: 3px solid rgba(255,255,255,0.1);
+            border: 3px solid rgba(255,255,255,0.05);
             border-top: 3px solid var(--primary);
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             animation: spin 1s linear infinite;
-            margin: 10px auto;
+            margin: 15px auto;
+        }
+
+        /* ستايل عداد اللاعبين المتصلين */
+        .online-stats {
+            margin-top: 35px;
+            padding: 10px 22px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-muted);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            background-color: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--success);
+            animation: pulse 1.5s infinite;
+        }
+
+        .online-numbers {
+            direction: ltr; /* لضمان ظهور الأرقام بشكل صحيح */
+            display: inline-block;
+        }
+
+        .current-players {
+            color: var(--primary);
+            font-weight: 800;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+            transition: color 0.3s;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(76, 175, 80, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
         }
 
         @keyframes spin {
@@ -253,10 +303,19 @@
 
         <button id="guess-btn" class="btn" onclick="makeGuess()">تخمين الآن</button>
         <div class="result-text" id="result-text">اضغط على الزر لبدء التخمين</div>
+
+        <!-- عداد اللاعبين المتصلين -->
+        <div class="online-stats">
+            <div class="pulse-dot"></div>
+            <span>المتصلين الآن:</span>
+            <span class="online-numbers">
+                <span id="online-count" class="current-players">1432</span> / 5430
+            </span>
+        </div>
     </div>
 
     <script>
-        // إعدادات Firebase من طلبك
+        // إعدادات Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAo4IaLd5SfVYHAAp_noJD7ZXBbhdVx9-0",
             databaseURL: "https://fawakihyallalive-default-rtdb.firebaseio.com",
@@ -265,14 +324,21 @@
             appId: "1:917478913649:android:fee5d42aca81c8a2e3cdd0"
         };
         
-        // تهيئة Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // الأكواد المسموح بها (كما طلبت)
+        // الأكواد المسموحة
         const allowedCodes = ["hamzagmail34567", "nbras.vip23"];
 
-        // توليد أو جلب معرف فريد للجهاز (لضمان عمل الكود على جهاز واحد فقط)
+        // التحقق من حالة تسجيل الدخول عند تحميل الصفحة
+        window.onload = function() {
+            if (localStorage.getItem('is_vip_logged_in') === 'true') {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('game-screen').style.display = 'flex';
+                startOnlinePlayersSimulator();
+            }
+        };
+
         function getDeviceId() {
             let id = localStorage.getItem('unique_device_id');
             if (!id) {
@@ -282,12 +348,10 @@
             return id;
         }
 
-        // تشفير الكود باستخدام Base64 ليكون مشفر داخل قاعدة البيانات
         function encryptCode(code) {
             return btoa(code); 
         }
 
-        // دالة تسجيل الدخول
         function login() {
             const codeInput = document.getElementById('sub-code').value.trim();
             const msgBox = document.getElementById('login-msg');
@@ -307,15 +371,13 @@
 
             loader.style.display = "block";
             const deviceId = getDeviceId();
-            const encryptedCode = encryptCode(codeInput); // تشفير الكود لحفظه بآمان
+            const encryptedCode = encryptCode(codeInput);
             const dbRef = db.ref('subscriptions_vip/' + encryptedCode);
 
-            // التحقق من قاعدة البيانات
             dbRef.once('value').then((snapshot) => {
                 const data = snapshot.val();
                 
                 if (data && data.deviceId) {
-                    // الكود مسجل مسبقاً، نتحقق إذا كان نفس الجهاز
                     if (data.deviceId === deviceId) {
                         startGameScreen();
                     } else {
@@ -323,7 +385,6 @@
                         msgBox.innerText = "❌ هذا الكود مرتبط بجهاز آخر بالفعل، لا يمكن استخدامه هنا.";
                     }
                 } else {
-                    // الكود غير مسجل بعد، نقوم بربطه بهذا الجهاز
                     dbRef.set({
                         deviceId: deviceId,
                         activationDate: new Date().toISOString(),
@@ -342,8 +403,10 @@
         }
 
         function startGameScreen() {
+            localStorage.setItem('is_vip_logged_in', 'true'); // إضافة حفظ حالة الدخول
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'flex';
+            startOnlinePlayersSimulator(); // بدء المحاكي الوهمي بعد الدخول
         }
 
         // ----------------- منطق اللعبة ----------------- //
@@ -373,7 +436,7 @@
         }
 
         function makeGuess() {
-            if (!isGuessingAllowed) return; // منع الضغط إذا كان العداد يعمل
+            if (!isGuessingAllowed) return;
 
             let selectedSlots = [];
 
@@ -398,7 +461,7 @@
                 marker.style.left = slot.left;
                 marker.style.display = 'block';
 
-                marker.style.transform = 'translate(-50%, -50%) scale(1.8)';
+                marker.style.transform = 'translate(-50%, -50%) scale(1.6)';
                 setTimeout(() => {
                     marker.style.transform = 'translate(-50%, -50%) scale(1)';
                 }, 250);
@@ -412,13 +475,13 @@
                 resultBox.classList.add('active');
             }, 50);
 
-            // تشغيل عداد الـ 28 ثانية
+            // تشغيل عداد الـ 35 ثانية
             startCooldown();
         }
 
         function startCooldown() {
             isGuessingAllowed = false;
-            let timeLeft = 28;
+            let timeLeft = 35; // تم التعديل إلى 35 ثانية
             const btn = document.getElementById('guess-btn');
             
             btn.classList.add('disabled');
@@ -435,6 +498,25 @@
                     btn.innerText = "تخمين الآن";
                 }
             }, 1000);
+        }
+
+        // محاكي المتصلين الوهمي الاحترافي
+        function startOnlinePlayersSimulator() {
+            let currentPlayers = 1432;
+            const counterElement = document.getElementById('online-count');
+            
+            setInterval(() => {
+                // إضافة أو طرح رقم عشوائي بين -3 و +6 لتبدو الحركة حقيقية
+                const fluctuation = Math.floor(Math.random() * 10) - 3;
+                currentPlayers += fluctuation;
+                
+                // الحفاظ على الرقم ضمن نطاق واقعي
+                if (currentPlayers < 1350) currentPlayers += 25;
+                if (currentPlayers > 1580) currentPlayers -= 25;
+                
+                counterElement.innerText = currentPlayers;
+                
+            }, 3000); // يتحدث الرقم كل 3 ثوانٍ تقريباً
         }
     </script>
 </body>
