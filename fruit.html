@@ -11,11 +11,11 @@
 
     <style>
         :root {
-            --primary: #dcb0ff; /* بنفسجي فاتح مضيء */
-            --secondary: #9d4edd; /* بنفسجي عميق */
-            --gold: #FFD700; /* ذهبي VIP */
-            --bg-dark: #0f0518; /* خلفية داكنة جداً */
-            --bg-card: rgba(40, 15, 65, 0.5); /* زجاج بنفسجي */
+            --primary: #dcb0ff;
+            --secondary: #9d4edd;
+            --gold: #FFD700;
+            --bg-dark: #0f0518;
+            --bg-card: rgba(40, 15, 65, 0.5);
             --text-main: #f8f9fa;
             --text-muted: #c8b6d9;
             --success: #00ff88;
@@ -43,7 +43,6 @@
             overflow-x: hidden;
         }
 
-        /* الخط المتحرك الشفاف والخفيف على الأجهزة */
         body::before {
             content: '';
             position: fixed;
@@ -66,7 +65,7 @@
         h2 {
             font-size: 30px;
             font-weight: 900;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             background: linear-gradient(135deg, var(--gold), var(--primary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -74,7 +73,66 @@
             letter-spacing: 1.5px;
         }
 
-        /* شاشة تسجيل الدخول */
+        /* ----- قسم المبرمج ----- */
+        #dev-logo {
+            position: absolute;
+            top: 20px;
+            left: 20px; /* الزاوية العلوية اليسرى */
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid var(--gold);
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        #dev-logo:hover {
+            transform: scale(1.1);
+        }
+
+        #dev-info {
+            position: absolute;
+            top: 75px;
+            left: 20px;
+            background: rgba(20, 10, 40, 0.85);
+            border: 1px solid var(--primary);
+            padding: 12px 20px;
+            border-radius: 12px;
+            text-align: center;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+        }
+
+        #dev-info.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dev-name {
+            color: var(--gold);
+            font-weight: 800;
+            font-size: 15px;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .dev-sub {
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* ---------------------- */
+
         #login-screen {
             display: flex;
             flex-direction: column;
@@ -120,12 +178,31 @@
             text-shadow: 0 0 10px rgba(255, 71, 87, 0.4);
         }
 
-        /* حاوية اللعبة */
         #game-screen {
             display: none;
             flex-direction: column;
             align-items: center;
             width: 100%;
+        }
+
+        /* عداد الجولة العلوي */
+        .round-timer-box {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            background: rgba(20, 10, 40, 0.6);
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+        }
+
+        .round-timer-box span {
+            color: var(--gold);
+            font-size: 18px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
         }
 
         .game-container {
@@ -168,20 +245,19 @@
             text-shadow: 0 0 15px rgba(0, 255, 136, 0.9);
         }
 
-        /* شارات عدد اللاعبين الزجاجية الأنيقة */
         .slot-players-badge {
             position: absolute;
-            background: rgba(20, 10, 40, 0.75);
-            border: 1px solid rgba(157, 78, 221, 0.4);
+            background: rgba(20, 10, 40, 0.85);
+            border: 1px solid rgba(157, 78, 221, 0.5);
             backdrop-filter: blur(4px);
             color: var(--primary);
-            font-size: 10px;
+            font-size: 11px;
             padding: 3px 8px;
             border-radius: 10px;
             z-index: 5;
             font-weight: bold;
             transform: translate(-50%, -50%);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
             transition: transform 0.2s ease, color 0.3s ease;
             direction: ltr;
         }
@@ -297,6 +373,13 @@
 </head>
 <body>
 
+    <!-- أيقونة المبرمج -->
+    <img src="kmale.jpg" id="dev-logo" alt="Developer" onclick="showDevInfo()">
+    <div id="dev-info">
+        <div class="dev-name">hamza elhumada</div>
+        <div class="dev-sub">nbras</div>
+    </div>
+
     <!-- شاشة تسجيل الدخول -->
     <div id="login-screen">
         <h2>تسجيل الدخول VIP</h2>
@@ -309,6 +392,11 @@
     <!-- شاشة اللعبة -->
     <div id="game-screen">
         <h2>تخمين اللعبة الفائزة VIP</h2>
+
+        <!-- عداد الجولة -->
+        <div class="round-timer-box">
+            وقت الجولة المتبقي: <span id="round-timer">35</span> ثانية
+        </div>
 
         <div class="game-container">
             <div class="image-wrapper" id="img-wrap">
@@ -337,6 +425,15 @@
     </div>
 
     <script>
+        // دالة إظهار معلومات المبرمج
+        function showDevInfo() {
+            const infoBox = document.getElementById('dev-info');
+            infoBox.classList.add('show');
+            setTimeout(() => {
+                infoBox.classList.remove('show');
+            }, 3000); // تختفي تلقائياً بعد 3 ثواني
+        }
+
         // إعدادات Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAo4IaLd5SfVYHAAp_noJD7ZXBbhdVx9-0",
@@ -363,14 +460,16 @@
             { id: 8, top: '83%', left: '83%' }
         ];
 
+        // مبالغ الرهان التراكمية لكل مربع
+        let slotAmounts = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
+        let currentRoundTime = 35; // مدة الجولة بالثواني
+
         window.onload = function() {
-            // إنشاء شارات العدادات ديناميكياً أسفل كل فاكهة
             const wrapper = document.getElementById('img-wrap');
             slots.forEach(slot => {
                 let badge = document.createElement('div');
                 badge.id = 'slot-badge-' + slot.id;
                 badge.className = 'slot-players-badge';
-                // إزاحة الشارة لأسفل منتصف الفاكهة بقليل
                 badge.style.top = `calc(${slot.top} + 11%)`; 
                 badge.style.left = slot.left;
                 badge.innerText = '👥 0';
@@ -380,7 +479,7 @@
             if (localStorage.getItem('is_vip_logged_in') === 'true') {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('game-screen').style.display = 'flex';
-                startAlgorithmSimulator();
+                startRoundSystem();
             }
         };
 
@@ -440,7 +539,7 @@
             localStorage.setItem('is_vip_logged_in', 'true');
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'flex';
-            startAlgorithmSimulator(); 
+            startRoundSystem(); 
         }
 
         let previousSelection = [];
@@ -517,17 +616,42 @@
         }
 
         // ==========================================
-        // خوارزمية حساب الأشخاص المتطابقة مع الكود السابق
+        // نظام الجولات وتصاعد اللاعبين
         // ==========================================
-        function updateLiveStats() {
+        
+        function startRoundSystem() {
+            updateLiveStats(true); // تصفير أولي
+            
+            setInterval(() => {
+                currentRoundTime--;
+                
+                if (currentRoundTime <= 0) {
+                    currentRoundTime = 35; // إعادة ضبط الجولة
+                    updateLiveStats(true); // تصفير الأرقام (بداية جولة جديدة)
+                } else {
+                    updateLiveStats(false); // إضافة تراكمية وتصاعدية
+                }
+                
+                document.getElementById('round-timer').innerText = currentRoundTime;
+            }, 1000); // تحديث العداد كل ثانية
+        }
+
+        function updateLiveStats(isReset) {
             let totalPlayersOnSlots = 0;
 
             slots.forEach(slot => {
-                // توليد رهان وهمي عشوائي لكل فاكهة بين 500 و 25,000
-                let simulatedBet = Math.floor(Math.random() * 24500) + 500;
+                if (isReset) {
+                    slotAmounts[slot.id] = 0; // تصفير المبالغ عند بداية جولة جديدة
+                } else {
+                    // تصاعدي فقط: إضافة مبلغ رهان عشوائي للمبلغ التراكمي في هذه الجولة
+                    let addedBet = Math.floor(Math.random() * 2000) + 100;
+                    slotAmounts[slot.id] += addedBet; 
+                }
                 
-                // تطبيق نفس الخوارزمية بالضبط: Math.floor(amount / 1200) + 1
-                let playersCount = Math.floor(simulatedBet / 1200) + 1;
+                let amount = slotAmounts[slot.id];
+                
+                // تطبيق خوارزمية الحساب الدقيقة
+                let playersCount = amount > 0 ? (Math.floor(amount / 1200) + 1) : 0;
                 totalPlayersOnSlots += playersCount;
 
                 // تحديث العداد الزجاجي الخاص بالفاكهة
@@ -535,30 +659,30 @@
                 if (badge) {
                     badge.innerText = `👥 ${playersCount}`;
                     
-                    // تأثير نبض خفيف عند التحديث
-                    badge.style.transform = 'translate(-50%, -50%) scale(1.1)';
-                    setTimeout(() => {
-                        badge.style.transform = 'translate(-50%, -50%) scale(1)';
-                    }, 200);
+                    // تأثير نبض خفيف عشوائي عند الزيادة لإعطاء واقعية
+                    if (!isReset && Math.random() > 0.4) {
+                        badge.style.transform = 'translate(-50%, -50%) scale(1.15)';
+                        setTimeout(() => {
+                            badge.style.transform = 'translate(-50%, -50%) scale(1)';
+                        }, 250);
+                    }
                 }
             });
 
-            // حساب الإجمالي: مجموع الأشخاص على الفواكه + زوار في اللوبي (عشوائي)
-            let lobbyObservers = Math.floor(Math.random() * 150) + 30;
-            let grandTotalOnline = totalPlayersOnSlots + lobbyObservers;
+            // حساب الإجمالي وعرضه
+            let grandTotalOnline = 0;
+            if (isReset) {
+                grandTotalOnline = 0;
+            } else {
+                let lobbyObservers = Math.floor(Math.random() * 150) + 30; // زوار في اللوبي
+                grandTotalOnline = totalPlayersOnSlots + lobbyObservers;
+            }
 
-            // تحديث عدادات المتصلين الإجمالية
             document.getElementById('online-count').innerText = grandTotalOnline;
             
-            // حساب البوتات كنسبة من العدد الإجمالي
-            let botsMultiplier = 3 + (Math.random() * 1.5); // بين 3 و 4.5 أضعاف
+            // حساب البوتات
+            let botsMultiplier = 3 + (Math.random() * 1.5);
             document.getElementById('bots-count').innerText = Math.floor(grandTotalOnline * botsMultiplier);
-        }
-
-        let statsInterval;
-        function startAlgorithmSimulator() {
-            updateLiveStats(); // تشغيل فوري أول مرة
-            statsInterval = setInterval(updateLiveStats, 3000); // تحديث الأرقام كل 3 ثواني باحترافية
         }
     </script>
 </body>
