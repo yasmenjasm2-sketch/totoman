@@ -374,7 +374,7 @@
 <body>
 
     <!-- أيقونة المبرمج -->
-    <img src="kmale.jpg" id="dev-logo" alt="Developer" onclick="showDevInfo()">
+    <img src="hamza.jpg" id="dev-logo" alt="Developer" onclick="showDevInfo()">
     <div id="dev-info">
         <div class="dev-name">hamza elhumada</div>
         <div class="dev-sub">nbras</div>
@@ -395,7 +395,7 @@
 
         <!-- عداد الجولة -->
         <div class="round-timer-box">
-            وقت الجولة المتبقي: <span id="round-timer">35</span> ثانية
+            وقت الجولة المتبقي: <span id="round-timer">0</span> ثانية
         </div>
 
         <div class="game-container">
@@ -411,8 +411,8 @@
             </div>
         </div>
 
-        <button id="guess-btn" class="btn" onclick="makeGuess()">تخمين الآن</button>
-        <div class="result-text" id="result-text">اضغط على الزر لبدء التخمين</div>
+        <button id="guess-btn" class="btn" onclick="makeGuess()">تخمين الآن (بدء الجولة)</button>
+        <div class="result-text" id="result-text">اضغط على الزر لبدء الجولة والتخمين</div>
 
         <!-- عداد اللاعبين المتصلين -->
         <div class="online-stats">
@@ -463,6 +463,9 @@
         // مبالغ الرهان التراكمية لكل مربع
         let slotAmounts = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
         let currentRoundTime = 35; // مدة الجولة بالثواني
+        let roundInterval;
+        let isGuessingAllowed = true;
+        let previousSelection = [];
 
         window.onload = function() {
             const wrapper = document.getElementById('img-wrap');
@@ -479,7 +482,8 @@
             if (localStorage.getItem('is_vip_logged_in') === 'true') {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('game-screen').style.display = 'flex';
-                startRoundSystem();
+                // التأكد من أن كل الأرقام صفر عند التحميل
+                updateLiveStats(true); 
             }
         };
 
@@ -539,12 +543,8 @@
             localStorage.setItem('is_vip_logged_in', 'true');
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'flex';
-            startRoundSystem(); 
+            updateLiveStats(true); // التأكد أن كل الأرقام صفر عند الدخول الأول
         }
-
-        let previousSelection = [];
-        let isGuessingAllowed = true;
-        let countdownTimer;
 
         function shuffleArray(array) {
             let newArray = [...array];
@@ -559,6 +559,7 @@
             if (!isGuessingAllowed) return;
             let selectedSlots = [];
 
+            // خوارزمية اختيار الفواكه العشوائية
             if (previousSelection.length === 0) {
                 selectedSlots = shuffleArray(slots).slice(0, 4);
             } else {
@@ -574,6 +575,7 @@
 
             previousSelection = selectedSlots.map(s => s.id);
 
+            // وضع علامات (✅) على الفواكه المختارة
             selectedSlots.forEach((slot, index) => {
                 let marker = document.getElementById('marker-' + (index + 1));
                 marker.style.top = slot.top;
@@ -587,53 +589,54 @@
             });
 
             const resultBox = document.getElementById('result-text');
-            resultBox.innerText = "🎯 تم تحديد المواقع المتوقعة بنجاح!";
+            resultBox.innerText = "🎯 تم تحديد المواقع المتوقعة بنجاح! الجولة بدأت.";
             resultBox.classList.remove('active');
             setTimeout(() => { resultBox.classList.add('active'); }, 50);
 
-            startCooldown();
+            // بدء الجولة والعدادات
+            startActiveRound();
         }
 
-        function startCooldown() {
-            isGuessingAllowed = false;
-            let timeLeft = 35;
+        // ==========================================
+        // بدء الجولة، تصاعد اللاعبين، ثم التصفير عند النهاية
+        // ==========================================
+        function startActiveRound() {
+            isGuessingAllowed = false; // تعطيل زر التخمين
+            currentRoundTime = 35; // إعادة ضبط وقت الجولة
+            
             const btn = document.getElementById('guess-btn');
+            const timerDisplay = document.getElementById('round-timer');
             
             btn.classList.add('disabled');
-            btn.innerText = `الرجاء الانتظار (${timeLeft}) ثانية`;
+            btn.innerText = `الرجاء الانتظار (${currentRoundTime}) ثانية`;
+            timerDisplay.innerText = currentRoundTime;
 
-            countdownTimer = setInterval(() => {
-                timeLeft--;
-                if (timeLeft > 0) {
-                    btn.innerText = `الرجاء الانتظار (${timeLeft}) ثانية`;
-                } else {
-                    clearInterval(countdownTimer);
-                    isGuessingAllowed = true;
-                    btn.classList.remove('disabled');
-                    btn.innerText = "تخمين الآن";
-                }
-            }, 1000);
-        }
+            // إزالة أي توقيتات سابقة وتصفير الأرقام في البداية 
+            if (roundInterval) clearInterval(roundInterval);
+            updateLiveStats(true); 
 
-        // ==========================================
-        // نظام الجولات وتصاعد اللاعبين
-        // ==========================================
-        
-        function startRoundSystem() {
-            updateLiveStats(true); // تصفير أولي
-            
-            setInterval(() => {
+            // بدء حلقة (Interval) لتناقص الوقت وتصاعد أرقام اللاعبين
+            roundInterval = setInterval(() => {
                 currentRoundTime--;
                 
-                if (currentRoundTime <= 0) {
-                    currentRoundTime = 35; // إعادة ضبط الجولة
-                    updateLiveStats(true); // تصفير الأرقام (بداية جولة جديدة)
+                if (currentRoundTime > 0) {
+                    // الجولة مستمرة: تحديث الوقت، والزر، وتصاعد الأرقام
+                    btn.innerText = `الرجاء الانتظار (${currentRoundTime}) ثانية`;
+                    timerDisplay.innerText = currentRoundTime;
+                    updateLiveStats(false); // (false) تعني الإضافة التراكمية والتصاعدية
                 } else {
-                    updateLiveStats(false); // إضافة تراكمية وتصاعدية
+                    // الجولة انتهت
+                    clearInterval(roundInterval);
+                    timerDisplay.innerText = 0;
+                    btn.classList.remove('disabled');
+                    btn.innerText = "تخمين الآن (بدء جولة جديدة)";
+                    
+                    document.getElementById('result-text').innerText = "انتهت الجولة. الأرقام صفرت، يمكنك بدء جولة جديدة.";
+                    
+                    isGuessingAllowed = true; // السماح بالضغط من جديد
+                    updateLiveStats(true); // (true) تعني تصفير الأرقام بالكامل للصفر
                 }
-                
-                document.getElementById('round-timer').innerText = currentRoundTime;
-            }, 1000); // تحديث العداد كل ثانية
+            }, 1000);
         }
 
         function updateLiveStats(isReset) {
@@ -641,16 +644,16 @@
 
             slots.forEach(slot => {
                 if (isReset) {
-                    slotAmounts[slot.id] = 0; // تصفير المبالغ عند بداية جولة جديدة
+                    slotAmounts[slot.id] = 0; // تصفير المبالغ
                 } else {
-                    // تصاعدي فقط: إضافة مبلغ رهان عشوائي للمبلغ التراكمي في هذه الجولة
+                    // تصاعدي فقط: إضافة مبلغ رهان عشوائي للمبلغ التراكمي
                     let addedBet = Math.floor(Math.random() * 2000) + 100;
                     slotAmounts[slot.id] += addedBet; 
                 }
                 
                 let amount = slotAmounts[slot.id];
                 
-                // تطبيق خوارزمية الحساب الدقيقة
+                // حساب عدد اللاعبين
                 let playersCount = amount > 0 ? (Math.floor(amount / 1200) + 1) : 0;
                 totalPlayersOnSlots += playersCount;
 
@@ -659,7 +662,6 @@
                 if (badge) {
                     badge.innerText = `👥 ${playersCount}`;
                     
-                    // تأثير نبض خفيف عشوائي عند الزيادة لإعطاء واقعية
                     if (!isReset && Math.random() > 0.4) {
                         badge.style.transform = 'translate(-50%, -50%) scale(1.15)';
                         setTimeout(() => {
@@ -669,20 +671,20 @@
                 }
             });
 
-            // حساب الإجمالي وعرضه
-            let grandTotalOnline = 0;
+            // تحديث الإجمالي والمتصلين
             if (isReset) {
-                grandTotalOnline = 0;
+                // تصفير جميع العدادات السفلية
+                document.getElementById('online-count').innerText = 0;
+                document.getElementById('bots-count').innerText = 0;
             } else {
-                let lobbyObservers = Math.floor(Math.random() * 150) + 30; // زوار في اللوبي
-                grandTotalOnline = totalPlayersOnSlots + lobbyObservers;
-            }
+                let lobbyObservers = Math.floor(Math.random() * 150) + 30; // زوار اللوبي
+                let grandTotalOnline = totalPlayersOnSlots + lobbyObservers;
 
-            document.getElementById('online-count').innerText = grandTotalOnline;
-            
-            // حساب البوتات
-            let botsMultiplier = 3 + (Math.random() * 1.5);
-            document.getElementById('bots-count').innerText = Math.floor(grandTotalOnline * botsMultiplier);
+                document.getElementById('online-count').innerText = grandTotalOnline;
+                
+                let botsMultiplier = 3 + (Math.random() * 1.5);
+                document.getElementById('bots-count').innerText = Math.floor(grandTotalOnline * botsMultiplier);
+            }
         }
     </script>
 </body>
