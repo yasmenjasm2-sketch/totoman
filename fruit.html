@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fruit Party Guesser - VIP Edition</title>
+    <title>Fruit Party Guesser - VIP Purple Edition</title>
     
     <!-- Firebase SDK (Version 8) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -11,13 +11,14 @@
 
     <style>
         :root {
-            --primary: #FFD700; /* لون ذهبي ملكي */
-            --secondary: #FF8C00; /* برتقالي عميق */
-            --bg-dark: #090a0f; /* خلفية داكنة احترافية */
-            --bg-card: rgba(20, 24, 34, 0.75);
+            --primary: #dcb0ff; /* بنفسجي فاتح مضيء */
+            --secondary: #9d4edd; /* بنفسجي عميق */
+            --gold: #FFD700; /* ذهبي VIP */
+            --bg-dark: #0f0518; /* خلفية داكنة جداً */
+            --bg-card: rgba(40, 15, 65, 0.5); /* زجاج بنفسجي */
             --text-main: #f8f9fa;
-            --text-muted: #b0bac3;
-            --success: #4CAF50;
+            --text-muted: #c8b6d9;
+            --success: #00ff88;
             --error: #ff4757;
         }
 
@@ -29,7 +30,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(circle at 50% 0%, #1c202a 0%, var(--bg-dark) 100%);
+            background: radial-gradient(circle at 50% 0%, #2a1147 0%, var(--bg-dark) 100%);
             color: var(--text-main);
             text-align: center;
             min-height: 100vh;
@@ -38,16 +39,38 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* الخط المتحرك الشفاف والخفيف على الأجهزة */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(to bottom, transparent, rgba(157, 78, 221, 0.05) 50%, transparent);
+            transform: rotate(45deg);
+            animation: moveLightLine 8s linear infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes moveLightLine {
+            0% { transform: translateY(-30%) rotate(45deg); }
+            100% { transform: translateY(30%) rotate(45deg); }
         }
 
         h2 {
             font-size: 30px;
             font-weight: 900;
             margin-bottom: 30px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--gold), var(--primary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0px 4px 20px rgba(255, 215, 0, 0.2);
+            text-shadow: 0px 4px 15px rgba(157, 78, 221, 0.4);
             letter-spacing: 1.5px;
         }
 
@@ -57,10 +80,12 @@
             flex-direction: column;
             align-items: center;
             background: var(--bg-card);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             padding: 45px 35px;
             border-radius: 24px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 215, 0, 0.15);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             width: 100%;
             max-width: 400px;
         }
@@ -70,8 +95,8 @@
             padding: 16px;
             margin-bottom: 20px;
             border-radius: 12px;
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(157, 78, 221, 0.4);
+            background: rgba(10, 5, 20, 0.6);
             color: white;
             font-size: 16px;
             text-align: center;
@@ -82,8 +107,8 @@
 
         .login-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
-            background: rgba(0, 0, 0, 0.6);
+            box-shadow: 0 0 15px rgba(157, 78, 221, 0.4);
+            background: rgba(10, 5, 20, 0.8);
         }
 
         .login-msg {
@@ -109,24 +134,19 @@
             width: 100%;
             max-width: 450px;
             border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1.5px rgba(255, 215, 0, 0.15);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(157, 78, 221, 0.3);
             background: var(--bg-card);
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             padding: 14px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .game-container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 0 1.5px rgba(255, 215, 0, 0.3);
+            transition: transform 0.3s ease;
         }
 
         .image-wrapper {
             position: relative;
             border-radius: 14px;
             overflow: hidden;
-            box-shadow: inset 0 0 25px rgba(0,0,0,0.7);
-            background-color: #12141a;
+            background-color: #0b0512;
         }
 
         .game-image {
@@ -135,23 +155,35 @@
             height: auto;
             border-radius: 14px;
             opacity: 0.95;
-            transition: opacity 0.3s ease;
         }
 
-        .game-container:hover .game-image {
-            opacity: 1;
-        }
-
-        /* تعديل حجم علامة الصح لتكون أصغر وأكثر احترافية */
         .marker {
             position: absolute;
-            font-size: 26px; /* الحجم الجديد المصغر */
+            font-size: 26px;
             transform: translate(-50%, -50%);
             display: none;
-            filter: drop-shadow(0px 3px 8px rgba(0, 0, 0, 0.9));
+            filter: drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.8));
             z-index: 10;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-shadow: 0 0 15px rgba(76, 175, 80, 0.9);
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.9);
+        }
+
+        /* شارات عدد اللاعبين الزجاجية الأنيقة */
+        .slot-players-badge {
+            position: absolute;
+            background: rgba(20, 10, 40, 0.75);
+            border: 1px solid rgba(157, 78, 221, 0.4);
+            backdrop-filter: blur(4px);
+            color: var(--primary);
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            z-index: 5;
+            font-weight: bold;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s ease, color 0.3s ease;
+            direction: ltr;
         }
 
         .btn {
@@ -159,12 +191,12 @@
             padding: 18px 65px;
             font-size: 20px;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: #000;
+            background: linear-gradient(135deg, var(--gold), var(--secondary));
+            color: #11051c;
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 10px 30px rgba(255, 140, 0, 0.3);
+            box-shadow: 0 10px 25px rgba(157, 78, 221, 0.3);
             transition: all 0.3s ease;
             letter-spacing: 1px;
             text-transform: uppercase;
@@ -172,51 +204,42 @@
             max-width: 320px;
         }
 
-        .btn:hover:not(.disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(255, 140, 0, 0.5);
-        }
-
         .btn:active:not(.disabled) {
             transform: translateY(2px) scale(0.97);
-            box-shadow: 0 5px 15px rgba(255, 140, 0, 0.4);
         }
 
         .btn.disabled {
-            background: linear-gradient(135deg, #444, #333);
-            color: #888;
+            background: linear-gradient(135deg, #2a1b3d, #1a0f2e);
+            color: #6d5b85;
             cursor: not-allowed;
-            box-shadow: inset 0 3px 10px rgba(0,0,0,0.5);
-            transform: none;
-            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: none;
+            border: 1px solid rgba(157, 78, 221, 0.2);
         }
 
         .result-text {
             margin-top: 25px;
-            font-size: 19px;
+            font-size: 18px;
             color: var(--text-muted);
             font-weight: 600;
             min-height: 30px;
             line-height: 1.5;
             padding: 12px 25px;
             border-radius: 12px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(157, 78, 221, 0.05);
+            border: 1px solid rgba(157, 78, 221, 0.1);
             transition: all 0.4s ease;
-            letter-spacing: 0.5px;
         }
 
         .result-text.active {
             color: var(--success);
-            background: rgba(76, 175, 80, 0.1);
-            border-color: rgba(76, 175, 80, 0.25);
-            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.15);
+            background: rgba(0, 255, 136, 0.1);
+            border-color: rgba(0, 255, 136, 0.3);
             transform: scale(1.05);
         }
         
         .loader {
             display: none;
-            border: 3px solid rgba(255,255,255,0.05);
+            border: 3px solid rgba(157, 78, 221, 0.1);
             border-top: 3px solid var(--primary);
             border-radius: 50%;
             width: 28px;
@@ -225,12 +248,11 @@
             margin: 15px auto;
         }
 
-        /* ستايل عداد اللاعبين المتصلين */
         .online-stats {
             margin-top: 35px;
             padding: 10px 22px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 215, 0, 0.15);
+            background: rgba(15, 5, 25, 0.6);
+            border: 1px solid rgba(157, 78, 221, 0.3);
             border-radius: 30px;
             display: flex;
             align-items: center;
@@ -239,7 +261,6 @@
             font-size: 15px;
             font-weight: 600;
             color: var(--text-muted);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         }
 
         .pulse-dot {
@@ -252,21 +273,20 @@
         }
 
         .online-numbers {
-            direction: ltr; /* لضمان ظهور الأرقام بشكل صحيح */
+            direction: ltr;
             display: inline-block;
         }
 
         .current-players {
-            color: var(--primary);
+            color: var(--gold);
             font-weight: 800;
-            text-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
-            transition: color 0.3s;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
         }
 
         @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(76, 175, 80, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+            0% { transform: scale(0.95); opacity: 1; }
+            70% { transform: scale(1.2); opacity: 0.4; }
+            100% { transform: scale(0.95); opacity: 1; }
         }
 
         @keyframes spin {
@@ -291,13 +311,15 @@
         <h2>تخمين اللعبة الفائزة VIP</h2>
 
         <div class="game-container">
-            <div class="image-wrapper">
+            <div class="image-wrapper" id="img-wrap">
                 <img src="vipvip.jpg" alt="Fruit Party" class="game-image">
                 
                 <div id="marker-1" class="marker">✅</div>
                 <div id="marker-2" class="marker">✅</div>
                 <div id="marker-3" class="marker">✅</div>
                 <div id="marker-4" class="marker">✅</div>
+                
+                <!-- سيتم حقن شارات العدادات هنا برمجياً لعدم تكديس الـ HTML -->
             </div>
         </div>
 
@@ -327,15 +349,38 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // الأكواد المسموحة
         const allowedCodes = ["hamzagmail34567", "nbras.vip23"];
 
-        // التحقق من حالة تسجيل الدخول عند تحميل الصفحة
+        // مواقع الفواكه (المربعات)
+        const slots = [
+            { id: 1, top: '17%', left: '17%' },
+            { id: 2, top: '17%', left: '50%' },
+            { id: 3, top: '17%', left: '83%' },
+            { id: 4, top: '50%', left: '17%' },
+            { id: 5, top: '50%', left: '83%' },
+            { id: 6, top: '83%', left: '17%' },
+            { id: 7, top: '83%', left: '50%' },
+            { id: 8, top: '83%', left: '83%' }
+        ];
+
         window.onload = function() {
+            // إنشاء شارات العدادات ديناميكياً أسفل كل فاكهة
+            const wrapper = document.getElementById('img-wrap');
+            slots.forEach(slot => {
+                let badge = document.createElement('div');
+                badge.id = 'slot-badge-' + slot.id;
+                badge.className = 'slot-players-badge';
+                // إزاحة الشارة لأسفل منتصف الفاكهة بقليل
+                badge.style.top = `calc(${slot.top} + 11%)`; 
+                badge.style.left = slot.left;
+                badge.innerText = '👥 0';
+                wrapper.appendChild(badge);
+            });
+
             if (localStorage.getItem('is_vip_logged_in') === 'true') {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('game-screen').style.display = 'flex';
-                startOnlinePlayersSimulator();
+                startAlgorithmSimulator();
             }
         };
 
@@ -348,9 +393,7 @@
             return id;
         }
 
-        function encryptCode(code) {
-            return btoa(code); 
-        }
+        function encryptCode(code) { return btoa(code); }
 
         function login() {
             const codeInput = document.getElementById('sub-code').value.trim();
@@ -358,16 +401,8 @@
             const loader = document.getElementById('login-loader');
             
             msgBox.innerText = "";
-            
-            if (!codeInput) {
-                msgBox.innerText = "الرجاء إدخال كود الاشتراك.";
-                return;
-            }
-
-            if (!allowedCodes.includes(codeInput)) {
-                msgBox.innerText = "كود الاشتراك غير صالح أو منتهي الصلاحية.";
-                return;
-            }
+            if (!codeInput) { msgBox.innerText = "الرجاء إدخال كود الاشتراك."; return; }
+            if (!allowedCodes.includes(codeInput)) { msgBox.innerText = "كود الاشتراك غير صالح أو منتهي الصلاحية."; return; }
 
             loader.style.display = "block";
             const deviceId = getDeviceId();
@@ -376,13 +411,12 @@
 
             dbRef.once('value').then((snapshot) => {
                 const data = snapshot.val();
-                
                 if (data && data.deviceId) {
                     if (data.deviceId === deviceId) {
                         startGameScreen();
                     } else {
                         loader.style.display = "none";
-                        msgBox.innerText = "❌ هذا الكود مرتبط بجهاز آخر بالفعل، لا يمكن استخدامه هنا.";
+                        msgBox.innerText = "❌ هذا الكود مرتبط بجهاز آخر بالفعل.";
                     }
                 } else {
                     dbRef.set({
@@ -403,24 +437,11 @@
         }
 
         function startGameScreen() {
-            localStorage.setItem('is_vip_logged_in', 'true'); // إضافة حفظ حالة الدخول
+            localStorage.setItem('is_vip_logged_in', 'true');
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'flex';
-            startOnlinePlayersSimulator(); // بدء المحاكي الوهمي بعد الدخول
+            startAlgorithmSimulator(); 
         }
-
-        // ----------------- منطق اللعبة ----------------- //
-
-        const slots = [
-            { id: 1, top: '17%', left: '17%' },
-            { id: 2, top: '17%', left: '50%' },
-            { id: 3, top: '17%', left: '83%' },
-            { id: 4, top: '50%', left: '17%' },
-            { id: 5, top: '50%', left: '83%' },
-            { id: 6, top: '83%', left: '17%' },
-            { id: 7, top: '83%', left: '50%' },
-            { id: 8, top: '83%', left: '83%' }
-        ];
 
         let previousSelection = [];
         let isGuessingAllowed = true;
@@ -437,7 +458,6 @@
 
         function makeGuess() {
             if (!isGuessingAllowed) return;
-
             let selectedSlots = [];
 
             if (previousSelection.length === 0) {
@@ -469,19 +489,15 @@
 
             const resultBox = document.getElementById('result-text');
             resultBox.innerText = "🎯 تم تحديد المواقع المتوقعة بنجاح!";
-            
             resultBox.classList.remove('active');
-            setTimeout(() => {
-                resultBox.classList.add('active');
-            }, 50);
+            setTimeout(() => { resultBox.classList.add('active'); }, 50);
 
-            // تشغيل عداد الـ 35 ثانية
             startCooldown();
         }
 
         function startCooldown() {
             isGuessingAllowed = false;
-            let timeLeft = 35; // تم التعديل إلى 35 ثانية
+            let timeLeft = 35;
             const btn = document.getElementById('guess-btn');
             
             btn.classList.add('disabled');
@@ -500,44 +516,49 @@
             }, 1000);
         }
 
-        // محاكي المتصلين الوهمي الاحترافي
-        function startOnlinePlayersSimulator() {
-            let currentPlayers = 0;
-            let totalBots = 0;
-            const counterElement = document.getElementById('online-count');
-            const botsElement = document.getElementById('bots-count');
-            
-            // Initial animation to climb up to a baseline
-            let initialInterval = setInterval(() => {
-                currentPlayers += Math.floor(Math.random() * 50) + 20;
-                totalBots = Math.floor(currentPlayers * 3.7); // Roughly 3-5 times
-                
-                if (currentPlayers >= 1432) {
-                    clearInterval(initialInterval);
-                    // Start normal fast fluctuation
-                    startFastFluctuation(currentPlayers, totalBots);
-                }
-                counterElement.innerText = currentPlayers;
-                botsElement.innerText = totalBots;
-            }, 100);
-            
-            function startFastFluctuation(basePlayers, baseBots) {
-                 setInterval(() => {
-                    const fluctuation = Math.floor(Math.random() * 15) - 7;
-                    basePlayers += fluctuation;
-                    
-                    if (basePlayers < 1350) basePlayers += 25;
-                    if (basePlayers > 1580) basePlayers -= 25;
-                    
-                    // Total bots should be around 3 to 5 times the base players
-                    const multiplier = 3 + (Math.random() * 2); // random between 3 and 5
-                    baseBots = Math.floor(basePlayers * multiplier);
+        // ==========================================
+        // خوارزمية حساب الأشخاص المتطابقة مع الكود السابق
+        // ==========================================
+        function updateLiveStats() {
+            let totalPlayersOnSlots = 0;
 
-                    counterElement.innerText = basePlayers;
-                    botsElement.innerText = baseBots;
+            slots.forEach(slot => {
+                // توليد رهان وهمي عشوائي لكل فاكهة بين 500 و 25,000
+                let simulatedBet = Math.floor(Math.random() * 24500) + 500;
+                
+                // تطبيق نفس الخوارزمية بالضبط: Math.floor(amount / 1200) + 1
+                let playersCount = Math.floor(simulatedBet / 1200) + 1;
+                totalPlayersOnSlots += playersCount;
+
+                // تحديث العداد الزجاجي الخاص بالفاكهة
+                let badge = document.getElementById('slot-badge-' + slot.id);
+                if (badge) {
+                    badge.innerText = `👥 ${playersCount}`;
                     
-                }, 1000); // تحديث كل ثانية
-            }
+                    // تأثير نبض خفيف عند التحديث
+                    badge.style.transform = 'translate(-50%, -50%) scale(1.1)';
+                    setTimeout(() => {
+                        badge.style.transform = 'translate(-50%, -50%) scale(1)';
+                    }, 200);
+                }
+            });
+
+            // حساب الإجمالي: مجموع الأشخاص على الفواكه + زوار في اللوبي (عشوائي)
+            let lobbyObservers = Math.floor(Math.random() * 150) + 30;
+            let grandTotalOnline = totalPlayersOnSlots + lobbyObservers;
+
+            // تحديث عدادات المتصلين الإجمالية
+            document.getElementById('online-count').innerText = grandTotalOnline;
+            
+            // حساب البوتات كنسبة من العدد الإجمالي
+            let botsMultiplier = 3 + (Math.random() * 1.5); // بين 3 و 4.5 أضعاف
+            document.getElementById('bots-count').innerText = Math.floor(grandTotalOnline * botsMultiplier);
+        }
+
+        let statsInterval;
+        function startAlgorithmSimulator() {
+            updateLiveStats(); // تشغيل فوري أول مرة
+            statsInterval = setInterval(updateLiveStats, 3000); // تحديث الأرقام كل 3 ثواني باحترافية
         }
     </script>
 </body>
