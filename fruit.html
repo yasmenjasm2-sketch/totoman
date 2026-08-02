@@ -9,6 +9,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
+    <!-- استدعاء العقل الرئيسي (الخوارزمية) من الملف المستقل -->
+    <script src="fruitsystm.js"></script>
+
     <style>
         :root {
             --primary: #dcb0ff;
@@ -73,6 +76,7 @@
             letter-spacing: 1.5px;
         }
 
+        /* ----- قسم المبرمج ----- */
         #dev-logo {
             position: absolute;
             top: 20px;
@@ -130,6 +134,8 @@
             font-weight: bold;
         }
 
+        /* ---------------------- */
+
         #login-screen {
             display: flex;
             flex-direction: column;
@@ -182,6 +188,7 @@
             width: 100%;
         }
 
+        /* عداد الجولة العلوي */
         .round-timer-box {
             font-size: 16px;
             font-weight: bold;
@@ -308,22 +315,7 @@
             border-color: rgba(0, 255, 136, 0.3);
             transform: scale(1.05);
         }
-
-        .result-text.error {
-            color: var(--error);
-            background: rgba(255, 71, 87, 0.1);
-            border-color: rgba(255, 71, 87, 0.3);
-            animation: shake 0.4s;
-        }
         
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
-        }
-
         .loader {
             display: none;
             border: 3px solid rgba(157, 78, 221, 0.1);
@@ -462,9 +454,10 @@
         ];
 
         let slotAmounts = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
-        let currentRoundTime = 35;
+        let currentRoundTime = 35; 
         let roundInterval;
         let isGuessingAllowed = true;
+        let previousSelection = [];
 
         window.onload = function() {
             const wrapper = document.getElementById('img-wrap');
@@ -546,22 +539,27 @@
 
         function makeGuess() {
             if (!isGuessingAllowed) return;
-
+            
             const resultBox = document.getElementById('result-text');
-            resultBox.classList.remove('active', 'error');
 
-            // جلب البيانات من ملف الخوارزمية المستقل (العقل الرئيسي)
-            let systemData = localStorage.getItem('fruitsystem_data');
+            // جلب التخمين من الملف المستقل (fruitsystm.js)
+            let selectedSlots = generatePrediction(slots, previousSelection);
 
-            if (!systemData) {
-                // إذا لم يتم توليد التخمين من ملف fruitsystm.html يظهر خطأ
-                resultBox.innerText = "❌ خطأ بالنظام: يرجى توليد التخمين من العقل الرئيسي أولاً!";
-                resultBox.classList.add('error');
-                return; // إيقاف العملية
+            // في حال فشلت الخوارزمية ولم تقم بتخمين ناجح
+            if (!selectedSlots || selectedSlots.length === 0) {
+                resultBox.innerText = "❌ خطأ في النظام: لم يتمكن الخادم المستقل من التخمين. يرجى المحاولة مرة أخرى.";
+                resultBox.style.color = "var(--error)";
+                resultBox.style.background = "rgba(255, 71, 87, 0.1)";
+                resultBox.style.borderColor = "rgba(255, 71, 87, 0.3)";
+                return; // إيقاف العملية وعدم استمرار الجولة
             }
 
-            // في حال وجود تخمين (نجاح الخوارزمية)
-            let selectedSlots = JSON.parse(systemData);
+            // في حال نجحت الخوارزمية تستمر بشكل طبيعي
+            resultBox.style.color = "var(--text-muted)";
+            resultBox.style.background = "rgba(157, 78, 221, 0.05)";
+            resultBox.style.borderColor = "rgba(157, 78, 221, 0.1)";
+            
+            previousSelection = selectedSlots.map(s => s.id);
 
             selectedSlots.forEach((slot, index) => {
                 let marker = document.getElementById('marker-' + (index + 1));
@@ -576,10 +574,8 @@
             });
 
             resultBox.innerText = "🎯 تم تحديد المواقع المتوقعة بنجاح! الجولة بدأت.";
+            resultBox.classList.remove('active');
             setTimeout(() => { resultBox.classList.add('active'); }, 50);
-
-            // مسح التخمين الحالي لكي يضطر لتشغيل العقل الرئيسي في الجولة القادمة
-            localStorage.removeItem('fruitsystem_data');
 
             startActiveRound();
         }
