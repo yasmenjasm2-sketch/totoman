@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Brain - خوارزمية التخمين</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #11051c;
+            color: #00ff88;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: rgba(40, 15, 65, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid #9d4edd;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(157, 78, 221, 0.4);
+        }
+        h1 {
+            color: #FFD700;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #FFD700, #9d4edd);
+            color: #11051c;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>عقل النظام المركزي 🧠</h1>
+        <p>اضغط لتوليد التخمين وإرساله للمستخدم عبر التخزين المشترك</p>
+        <button onclick="runAlgorithm()">تشغيل الخوارزمية وإرسال التخمين</button>
+        <div id="status" class="status"></div>
+    </div>
+
+    <script>
+        const slots = [
+            { id: 1, top: '17%', left: '17%' },
+            { id: 2, top: '17%', left: '50%' },
+            { id: 3, top: '17%', left: '83%' },
+            { id: 4, top: '50%', left: '17%' },
+            { id: 5, top: '50%', left: '83%' },
+            { id: 6, top: '83%', left: '17%' },
+            { id: 7, top: '83%', left: '50%' },
+            { id: 8, top: '83%', left: '83%' }
+        ];
+
+        function shuffleArray(array) {
+            let newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function runAlgorithm() {
+            // جلب الاختيار السابق لمعالجته في الخوارزمية
+            let previousSelection = JSON.parse(localStorage.getItem('sys_prev_selection')) || [];
+            let selectedSlots = [];
+
+            if (previousSelection.length === 0) {
+                selectedSlots = shuffleArray(slots).slice(0, 4);
+            } else {
+                let notPickedLastTime = slots.filter(s => !previousSelection.includes(s.id));
+                let pickedLastTime = slots.filter(s => previousSelection.includes(s.id));
+                
+                notPickedLastTime = shuffleArray(notPickedLastTime);
+                pickedLastTime = shuffleArray(pickedLastTime);
+                
+                selectedSlots = notPickedLastTime.slice(0, 3).concat(pickedLastTime.slice(0, 1));
+                selectedSlots = shuffleArray(selectedSlots);
+            }
+
+            let newPrevSelection = selectedSlots.map(s => s.id);
+            localStorage.setItem('sys_prev_selection', JSON.stringify(newPrevSelection));
+
+            // إرسال البيانات (التخمين) إلى واجهة المستخدم
+            localStorage.setItem('fruitsystem_data', JSON.stringify(selectedSlots));
+
+            const status = document.getElementById('status');
+            status.style.color = '#00ff88';
+            status.innerText = "✅ تمت العملية بنجاح! التخمين جاهز الآن في الواجهة.";
+            
+            setTimeout(() => {
+                status.innerText = "";
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
