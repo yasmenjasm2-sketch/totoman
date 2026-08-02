@@ -73,11 +73,10 @@
             letter-spacing: 1.5px;
         }
 
-        /* ----- قسم المبرمج ----- */
         #dev-logo {
             position: absolute;
             top: 20px;
-            left: 20px; /* الزاوية العلوية اليسرى */
+            left: 20px;
             width: 45px;
             height: 45px;
             border-radius: 50%;
@@ -131,8 +130,6 @@
             font-weight: bold;
         }
 
-        /* ---------------------- */
-
         #login-screen {
             display: flex;
             flex-direction: column;
@@ -185,7 +182,6 @@
             width: 100%;
         }
 
-        /* عداد الجولة العلوي */
         .round-timer-box {
             font-size: 16px;
             font-weight: bold;
@@ -312,7 +308,22 @@
             border-color: rgba(0, 255, 136, 0.3);
             transform: scale(1.05);
         }
+
+        .result-text.error {
+            color: var(--error);
+            background: rgba(255, 71, 87, 0.1);
+            border-color: rgba(255, 71, 87, 0.3);
+            animation: shake 0.4s;
+        }
         
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
         .loader {
             display: none;
             border: 3px solid rgba(157, 78, 221, 0.1);
@@ -373,14 +384,12 @@
 </head>
 <body>
 
-    <!-- أيقونة المبرمج -->
     <img src="hamza.jpg" id="dev-logo" alt="Developer" onclick="showDevInfo()">
     <div id="dev-info">
         <div class="dev-name">hamza elhumada</div>
         <div class="dev-sub">nbras</div>
     </div>
 
-    <!-- شاشة تسجيل الدخول -->
     <div id="login-screen">
         <h2>تسجيل الدخول VIP</h2>
         <input type="text" id="sub-code" class="login-input" placeholder="أدخل كود الاشتراك هنا">
@@ -389,11 +398,9 @@
         <p id="login-msg" class="login-msg"></p>
     </div>
 
-    <!-- شاشة اللعبة -->
     <div id="game-screen">
         <h2>تخمين اللعبة الفائزة VIP</h2>
 
-        <!-- عداد الجولة -->
         <div class="round-timer-box">
             وقت الجولة المتبقي: <span id="round-timer">0</span> ثانية
         </div>
@@ -406,15 +413,12 @@
                 <div id="marker-2" class="marker">✅</div>
                 <div id="marker-3" class="marker">✅</div>
                 <div id="marker-4" class="marker">✅</div>
-                
-                <!-- سيتم حقن شارات العدادات هنا برمجياً لعدم تكديس الـ HTML -->
             </div>
         </div>
 
         <button id="guess-btn" class="btn" onclick="makeGuess()">تخمين الآن (بدء الجولة)</button>
         <div class="result-text" id="result-text">اضغط على الزر لبدء الجولة والتخمين</div>
 
-        <!-- عداد اللاعبين المتصلين -->
         <div class="online-stats">
             <div class="pulse-dot"></div>
             <span>المتصلين الآن:</span>
@@ -425,16 +429,14 @@
     </div>
 
     <script>
-        // دالة إظهار معلومات المبرمج
         function showDevInfo() {
             const infoBox = document.getElementById('dev-info');
             infoBox.classList.add('show');
             setTimeout(() => {
                 infoBox.classList.remove('show');
-            }, 3000); // تختفي تلقائياً بعد 3 ثواني
+            }, 3000); 
         }
 
-        // إعدادات Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAo4IaLd5SfVYHAAp_noJD7ZXBbhdVx9-0",
             databaseURL: "https://fawakihyallalive-default-rtdb.firebaseio.com",
@@ -448,7 +450,6 @@
 
         const allowedCodes = ["hamzagmail34567", "nbras.vip23"];
 
-        // مواقع الفواكه (المربعات)
         const slots = [
             { id: 1, top: '17%', left: '17%' },
             { id: 2, top: '17%', left: '50%' },
@@ -460,12 +461,10 @@
             { id: 8, top: '83%', left: '83%' }
         ];
 
-        // مبالغ الرهان التراكمية لكل مربع
         let slotAmounts = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
-        let currentRoundTime = 35; // مدة الجولة بالثواني
+        let currentRoundTime = 35;
         let roundInterval;
         let isGuessingAllowed = true;
-        let previousSelection = [];
 
         window.onload = function() {
             const wrapper = document.getElementById('img-wrap');
@@ -482,7 +481,6 @@
             if (localStorage.getItem('is_vip_logged_in') === 'true') {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('game-screen').style.display = 'flex';
-                // التأكد من أن كل الأرقام صفر عند التحميل
                 updateLiveStats(true); 
             }
         };
@@ -543,39 +541,28 @@
             localStorage.setItem('is_vip_logged_in', 'true');
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'flex';
-            updateLiveStats(true); // التأكد أن كل الأرقام صفر عند الدخول الأول
-        }
-
-        function shuffleArray(array) {
-            let newArray = [...array];
-            for (let i = newArray.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-            }
-            return newArray;
+            updateLiveStats(true); 
         }
 
         function makeGuess() {
             if (!isGuessingAllowed) return;
-            let selectedSlots = [];
 
-            // خوارزمية اختيار الفواكه العشوائية
-            if (previousSelection.length === 0) {
-                selectedSlots = shuffleArray(slots).slice(0, 4);
-            } else {
-                let notPickedLastTime = slots.filter(s => !previousSelection.includes(s.id));
-                let pickedLastTime = slots.filter(s => previousSelection.includes(s.id));
-                
-                notPickedLastTime = shuffleArray(notPickedLastTime);
-                pickedLastTime = shuffleArray(pickedLastTime);
-                
-                selectedSlots = notPickedLastTime.slice(0, 3).concat(pickedLastTime.slice(0, 1));
-                selectedSlots = shuffleArray(selectedSlots);
+            const resultBox = document.getElementById('result-text');
+            resultBox.classList.remove('active', 'error');
+
+            // جلب البيانات من ملف الخوارزمية المستقل (العقل الرئيسي)
+            let systemData = localStorage.getItem('fruitsystem_data');
+
+            if (!systemData) {
+                // إذا لم يتم توليد التخمين من ملف fruitsystm.html يظهر خطأ
+                resultBox.innerText = "❌ خطأ بالنظام: يرجى توليد التخمين من العقل الرئيسي أولاً!";
+                resultBox.classList.add('error');
+                return; // إيقاف العملية
             }
 
-            previousSelection = selectedSlots.map(s => s.id);
+            // في حال وجود تخمين (نجاح الخوارزمية)
+            let selectedSlots = JSON.parse(systemData);
 
-            // وضع علامات (✅) على الفواكه المختارة
             selectedSlots.forEach((slot, index) => {
                 let marker = document.getElementById('marker-' + (index + 1));
                 marker.style.top = slot.top;
@@ -588,21 +575,18 @@
                 }, 250);
             });
 
-            const resultBox = document.getElementById('result-text');
             resultBox.innerText = "🎯 تم تحديد المواقع المتوقعة بنجاح! الجولة بدأت.";
-            resultBox.classList.remove('active');
             setTimeout(() => { resultBox.classList.add('active'); }, 50);
 
-            // بدء الجولة والعدادات
+            // مسح التخمين الحالي لكي يضطر لتشغيل العقل الرئيسي في الجولة القادمة
+            localStorage.removeItem('fruitsystem_data');
+
             startActiveRound();
         }
 
-        // ==========================================
-        // بدء الجولة، تصاعد اللاعبين، ثم التصفير عند النهاية
-        // ==========================================
         function startActiveRound() {
-            isGuessingAllowed = false; // تعطيل زر التخمين
-            currentRoundTime = 35; // إعادة ضبط وقت الجولة
+            isGuessingAllowed = false; 
+            currentRoundTime = 35; 
             
             const btn = document.getElementById('guess-btn');
             const timerDisplay = document.getElementById('round-timer');
@@ -611,21 +595,17 @@
             btn.innerText = `الرجاء الانتظار (${currentRoundTime}) ثانية`;
             timerDisplay.innerText = currentRoundTime;
 
-            // إزالة أي توقيتات سابقة وتصفير الأرقام في البداية 
             if (roundInterval) clearInterval(roundInterval);
             updateLiveStats(true); 
 
-            // بدء حلقة (Interval) لتناقص الوقت وتصاعد أرقام اللاعبين
             roundInterval = setInterval(() => {
                 currentRoundTime--;
                 
                 if (currentRoundTime > 0) {
-                    // الجولة مستمرة: تحديث الوقت، والزر، وتصاعد الأرقام
                     btn.innerText = `الرجاء الانتظار (${currentRoundTime}) ثانية`;
                     timerDisplay.innerText = currentRoundTime;
-                    updateLiveStats(false); // (false) تعني الإضافة التراكمية والتصاعدية
+                    updateLiveStats(false); 
                 } else {
-                    // الجولة انتهت
                     clearInterval(roundInterval);
                     timerDisplay.innerText = 0;
                     btn.classList.remove('disabled');
@@ -633,8 +613,8 @@
                     
                     document.getElementById('result-text').innerText = "انتهت الجولة. الأرقام صفرت، يمكنك بدء جولة جديدة.";
                     
-                    isGuessingAllowed = true; // السماح بالضغط من جديد
-                    updateLiveStats(true); // (true) تعني تصفير الأرقام بالكامل للصفر
+                    isGuessingAllowed = true; 
+                    updateLiveStats(true); 
                 }
             }, 1000);
         }
@@ -644,20 +624,16 @@
 
             slots.forEach(slot => {
                 if (isReset) {
-                    slotAmounts[slot.id] = 0; // تصفير المبالغ
+                    slotAmounts[slot.id] = 0; 
                 } else {
-                    // تصاعدي فقط: إضافة مبلغ رهان عشوائي للمبلغ التراكمي
                     let addedBet = Math.floor(Math.random() * 2000) + 100;
                     slotAmounts[slot.id] += addedBet; 
                 }
                 
                 let amount = slotAmounts[slot.id];
-                
-                // حساب عدد اللاعبين
                 let playersCount = amount > 0 ? (Math.floor(amount / 1200) + 1) : 0;
                 totalPlayersOnSlots += playersCount;
 
-                // تحديث العداد الزجاجي الخاص بالفاكهة
                 let badge = document.getElementById('slot-badge-' + slot.id);
                 if (badge) {
                     badge.innerText = `👥 ${playersCount}`;
@@ -671,13 +647,11 @@
                 }
             });
 
-            // تحديث الإجمالي والمتصلين
             if (isReset) {
-                // تصفير جميع العدادات السفلية
                 document.getElementById('online-count').innerText = 0;
                 document.getElementById('bots-count').innerText = 0;
             } else {
-                let lobbyObservers = Math.floor(Math.random() * 150) + 30; // زوار اللوبي
+                let lobbyObservers = Math.floor(Math.random() * 150) + 30; 
                 let grandTotalOnline = totalPlayersOnSlots + lobbyObservers;
 
                 document.getElementById('online-count').innerText = grandTotalOnline;
