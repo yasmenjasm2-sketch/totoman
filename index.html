@@ -155,6 +155,18 @@
     ::-webkit-scrollbar-track { background: var(--bg2); }
     ::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 3px; }
 
+    /* ===== SVG ICONS ===== */
+    .stroke-icon {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .btn-icon {
+      width: 18px; height: 18px; display: inline-block; vertical-align: middle; margin-left: 8px;
+    }
+
     /* ===== NAV ===== */
     nav {
       position: fixed; top: 0; right: 0; left: 0; z-index: 100;
@@ -186,6 +198,7 @@
       background: linear-gradient(135deg, var(--orange), var(--gold));
       color: #000 !important; padding: 8px 22px; border-radius: 50px;
       font-weight: 900 !important; font-size: 0.88rem !important;
+      display: inline-flex; align-items: center;
     }
 
     /* ===== HERO ===== */
@@ -272,6 +285,7 @@
       color: var(--text); padding: 14px 32px; border-radius: 50px;
       font-size: 1rem; font-weight: 700; text-decoration: none;
       transition: border-color 0.2s, color 0.2s;
+      display: inline-flex; align-items: center;
       cursor: pointer;
     }
     .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
@@ -347,7 +361,10 @@
     .pill {
       background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.2);
       color: var(--gold); padding: 4px 14px; border-radius: 50px;
-      font-size: 0.78rem; font-weight: 700;
+      font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center;
+    }
+    .pill svg {
+      width: 14px; height: 14px; margin-left: 6px; stroke-width: 2.5; stroke: currentColor;
     }
 
     /* ===== FEATURES ===== */
@@ -377,7 +394,10 @@
       background: radial-gradient(circle, rgba(255,107,53,0.06) 0%, transparent 70%);
     }
     .feature-icon {
-      font-size: 2.2rem; margin-bottom: 14px; display: block;
+      margin-bottom: 14px; display: block;
+    }
+    .feature-icon svg {
+      width: 38px; height: 38px; stroke: var(--orange);
     }
     .feature-card h3 { font-size: 1.05rem; font-weight: 800; margin-bottom: 8px; }
     .feature-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
@@ -415,7 +435,8 @@
       transition: transform 0.2s, border-color 0.2s;
     }
     .payment-card:hover { transform: translateY(-4px); border-color: var(--orange); }
-    .payment-icon { font-size: 3rem; margin-bottom: 16px; display: block; }
+    .payment-icon { margin-bottom: 16px; display: block; }
+    .payment-icon svg { width: 56px; height: 56px; stroke: var(--gold); }
     .payment-card h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 10px; }
     .payment-card p { color: var(--muted); font-size: 0.92rem; }
 
@@ -429,6 +450,7 @@
       font-size: 1rem; font-weight: 800; margin-bottom: 12px;
       color: var(--gold); display: flex; align-items: center; gap: 8px;
     }
+    .policy-card h3 svg { width: 22px; height: 22px; stroke: var(--gold); flex-shrink: 0; }
     .policy-card ul {
       list-style: none; display: flex; flex-direction: column; gap: 8px;
     }
@@ -481,6 +503,29 @@
     .feedback-date { font-size: 0.8rem; color: var(--muted); }
     .feedback-text { font-size: 0.95rem; line-height: 1.6; color: var(--text); }
     
+    /* ===== GOOGLE LOGIN BUTTON (GLASSMORPHISM) ===== */
+    .google-login-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 12px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ffffff; padding: 12px 32px; border-radius: 50px;
+      font-size: 1.1rem; font-weight: 700; cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+      font-family: inherit;
+    }
+    .google-login-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.4), 0 0 20px rgba(66, 133, 244, 0.3);
+    }
+    .google-login-btn svg {
+      width: 24px; height: 24px; flex-shrink: 0;
+    }
+
     /* ===== SUPPORT ===== */
     .support-box {
       background: linear-gradient(135deg, rgba(255,107,53,0.1), rgba(123,79,255,0.08));
@@ -488,7 +533,11 @@
       border-radius: 24px; padding: 48px 40px;
       text-align: center;
     }
-    .support-box h2 { font-size: 2rem; font-weight: 900; margin-bottom: 12px; }
+    .support-box h2 { 
+      font-size: 2rem; font-weight: 900; margin-bottom: 12px;
+      display: flex; justify-content: center; align-items: center; gap: 12px;
+    }
+    .support-box h2 svg { width: 36px; height: 36px; stroke: var(--gold); }
     .support-box p { color: var(--muted); margin-bottom: 32px; }
     .support-features {
       display: flex; gap: 32px; justify-content: center; flex-wrap: wrap;
@@ -497,7 +546,8 @@
     .support-feat {
       display: flex; flex-direction: column; align-items: center; gap: 8px;
     }
-    .support-feat .sf-icon { font-size: 2rem; }
+    .support-feat .sf-icon { display: block; }
+    .support-feat .sf-icon svg { width: 32px; height: 32px; stroke: var(--orange); }
     .support-feat span { font-size: 0.85rem; color: var(--muted); }
 
     /* ===== FOOTER ===== */
@@ -559,7 +609,12 @@
     <li><a href="#payment">الدفع</a></li>
     <li><a href="#policy">سياسة الاستخدام</a></li>
     <li><a href="#feedback">آراء المستخدمين</a></li>
-    <li><a href="https://yasmenjasm2-sketch.github.io/fawakihAI2/" target="_blank" class="nav-cta">⬇ تحميل التطبيق</a></li>
+    <li>
+      <a href="https://yasmenjasm2-sketch.github.io/fawakihAI2/" target="_blank" class="nav-cta">
+        <svg class="stroke-icon btn-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+        تحميل التطبيق
+      </a>
+    </li>
   </ul>
 </nav>
 
@@ -572,7 +627,7 @@
 
   <h1>
     أقوى تطبيق لـ<br/>
-    <span class="gradient-text">تخمين الفواكه 🍇</span><br/>
+    <span class="gradient-text">تخمين الفواكه</span><br/>
     بالذكاء الاصطناعي
   </h1>
 
@@ -583,7 +638,8 @@
 
   <div class="hero-actions">
     <a href="https://yasmenjasm2-sketch.github.io/fawakihAI2/" target="_blank" class="btn-primary">
-      ⬇ تحميل فواكه AI الآن
+      <svg class="stroke-icon btn-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+      تحميل فواكه AI الآن
     </a>
     <a href="#about" class="btn-secondary">اعرف أكثر ›</a>
   </div>
@@ -636,10 +692,22 @@
       <div class="app-name-big">فواكه AI</div>
       <div class="app-version">يلا لايف × Gemini AI</div>
       <div class="tech-pills">
-        <span class="pill">🤖 Gemini AI</span>
-        <span class="pill">🎙 يلا لايف</span>
-        <span class="pill">⚡ فوري</span>
-        <span class="pill">🎯 دقيق</span>
+        <span class="pill">
+          <svg class="stroke-icon" viewBox="0 0 24 24"><rect width="14" height="10" x="5" y="9" rx="2"/><path d="M12 5v4"/><path d="M8 5h8"/><path d="M9 14v.01"/><path d="M15 14v.01"/></svg>
+          Gemini AI
+        </span>
+        <span class="pill">
+          <svg class="stroke-icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+          يلا لايف
+        </span>
+        <span class="pill">
+          <svg class="stroke-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          فوري
+        </span>
+        <span class="pill">
+          <svg class="stroke-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          دقيق
+        </span>
       </div>
     </div>
   </div>
@@ -655,55 +723,73 @@
   <div class="features-grid">
 
     <div class="feature-card">
-      <span class="feature-icon">🤖</span>
+      <span class="feature-icon">
+        <svg class="stroke-icon" viewBox="0 0 24 24"><rect width="14" height="10" x="5" y="9" rx="2"/><path d="M12 5v4"/><path d="M8 5h8"/><path d="M9 14v.01"/><path d="M15 14v.01"/></svg>
+      </span>
       <h3>ذكاء اصطناعي Gemini</h3>
       <p>مدعوم بتقنية Gemini AI من Google، يحلل الأنماط ويقدم تخمينات دقيقة تفوق القدرة البشرية.</p>
     </div>
 
     <div class="feature-card">
-      <span class="feature-icon">⚡</span>
+      <span class="feature-icon">
+        <svg class="stroke-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </span>
       <h3>استجابة فورية</h3>
       <p>يعمل في الوقت الفعلي داخل غرف يلا لايف دون تأخير، مما يمنحك أفضلية واضحة.</p>
     </div>
 
     <div class="feature-card">
-      <span class="feature-icon">🎯</span>
+      <span class="feature-icon">
+        <svg class="stroke-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      </span>
       <h3>دقة عالية في التخمين</h3>
       <p>خوارزميات متطورة تزيد باستمرار من دقة التخمينات مع كل جلسة استخدام.</p>
     </div>
 
     <div class="feature-card">
-      <span class="feature-icon">🎙</span>
+      <span class="feature-icon">
+        <svg class="stroke-icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+      </span>
       <h3>هل تطبيق له ربط في يلا لايف؟ </h3>
       <p>التطبيق مستقل على منصه يلا لايف ليس مربوط  بدومين اوAPI رسمي في يلا لايف ابدأ تطبيق وحده يعمل .</p>
     </div>
 
     <div class="feature-card">
-      <span class="feature-icon">🖥</span>
+      <span class="feature-icon">
+        <svg class="stroke-icon" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+      </span>
       <h3>واجهة سهلة الاستخدام</h3>
       <p>تصميم بسيط وواضح يجعل استخدام التطبيق أمراً سهلاً حتى للمبتدئين.</p>
     </div>
 
     <div class="feature-card">
-      <span class="feature-icon">🛡</span>
+      <span class="feature-icon">
+        <svg class="stroke-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </span>
       <h3>دعم فني متكامل</h3>
       <p>فريق دعم فني متاح على مدار الساعة للإجابة على جميع استفساراتك وحل المشكلات.</p>
     </div>
 
     <div class="feature-card">
-      <span class="feature-icon">💳</span>
+      <span class="feature-icon">
+        <svg class="stroke-icon" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+      </span>
       <h3>بوابات دفع متعددة</h3>
       <p>ادفع بالطريقة التي تناسبك: PayPal أو العملات الرقمية المشفرة بأمان تام.</p>
     </div>
 
     <div class="feature-card">
-      <span class="feature-icon">🔐</span>
+      <span class="feature-icon">
+        <svg class="stroke-icon" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </span>
       <h3>آمن وموثوق</h3>
       <p>بيانات المستخدمين محمية بالكامل مع تشفير كامل لجميع عمليات الدفع والبيانات.</p>
     </div>
 
     <div class="feature-card">
-      <span class="feature-icon">🌐</span>
+      <span class="feature-icon">
+        <svg class="stroke-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      </span>
       <h3>تحديثات مستمرة</h3>
       <p>يتلقى التطبيق تحديثات دورية تضيف ميزات جديدة وتحسن الأداء باستمرار.</p>
     </div>
@@ -788,7 +874,9 @@
 
   <div class="payment-grid">
     <div class="payment-card">
-      <span class="payment-icon">💳</span>
+      <span class="payment-icon">
+        <svg class="stroke-icon" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+      </span>
       <h3>PayPal</h3>
       <p>
         ادفع بأمان وسرعة عبر حسابك في PayPal. من أكثر وسائل الدفع الإلكتروني
@@ -797,7 +885,9 @@
     </div>
 
     <div class="payment-card">
-      <span class="payment-icon">₿</span>
+      <span class="payment-icon">
+        <svg class="stroke-icon" viewBox="0 0 24 24"><path d="M11 2v4M15 2v4M11 22v-4M15 22v-4"/><path d="M5 6h10a4 4 0 0 1 0 8H5Z"/><path d="M9 14h6a4 4 0 0 1 0 8H9Z"/></svg>
+      </span>
       <h3>العملات الرقمية المشفرة</h3>
       <p>
         ندعم الدفع بعدة عملات رقمية مشفرة للمستخدمين الذين يفضلون الدفع اللامركزي
@@ -815,7 +905,10 @@
 
   <div class="policy-grid">
     <div class="policy-card">
-      <h3>⚖️ حقوق الملكية الفكرية</h3>
+      <h3>
+        <svg class="stroke-icon" viewBox="0 0 24 24"><path d="M12 2v20"/><path d="m3 14 4-8 4 8"/><path d="m13 14 4-8 4 8"/><line x1="7" x2="7" y1="14" y2="17"/><line x1="17" x2="17" y1="14" y2="17"/><path d="M3 17h8"/><path d="M13 17h8"/><line x1="12" x2="12" y1="2" y2="5"/><line x1="7" x2="17" y1="5" y2="5"/></svg>
+        حقوق الملكية الفكرية
+      </h3>
       <ul>
         <li>جميع حقوق تطبيق فواكه AI محفوظة لمطوره</li>
         <li>يُحظر نسخ أو توزيع التطبيق دون إذن</li>
@@ -826,7 +919,10 @@
     </div>
 
     <div class="policy-card">
-      <h3>✅ الاستخدام المسموح</h3>
+      <h3>
+        <svg class="stroke-icon" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+        الاستخدام المسموح
+      </h3>
       <ul>
         <li>استخدام التطبيق لحساب شخصي واحد</li>
         <li>الاستخدام في غرف فواكه يلا لايف المسموح بها</li>
@@ -836,7 +932,10 @@
     </div>
 
     <div class="policy-card">
-      <h3>🔒 سياسة الخصوصية</h3>
+      <h3>
+        <svg class="stroke-icon" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        سياسة الخصوصية
+      </h3>
       <ul>
         <li>لا نجمع بيانات شخصية غير ضرورية</li>
         <li>بيانات الدفع مشفرة بالكامل</li>
@@ -847,7 +946,10 @@
     </div>
 
     <div class="policy-card">
-      <h3>💰 سياسة الاسترداد</h3>
+      <h3>
+        <svg class="stroke-icon" viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M22 12H18"/><path d="M18 10v4"/></svg>
+        سياسة الاسترداد
+      </h3>
       <ul>
         <li>الاشتراك مدفوع قابل للاسترداد</li>
         <li>في حالات الأعطال التقنية يتم النظر في الطلبات</li>
@@ -871,8 +973,14 @@
     
     <!-- منطقة تسجيل الدخول -->
     <div id="auth-section" style="text-align: center; padding: 40px 20px;">
-      <h3 style="margin-bottom: 20px;">شاركنا رأيك حول التطبيق</h3>
-      <button id="login-google-btn" class="btn-primary" style="background: linear-gradient(135deg, #4285F4, #34A853);">
+      <h3 style="margin-bottom: 24px;">شاركنا رأيك حول التطبيق</h3>
+      <button id="login-google-btn" class="google-login-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
         تسجيل الدخول باستخدام Google
       </button>
     </div>
@@ -892,7 +1000,10 @@
       
       <div class="feedback-input-area">
         <textarea id="feedback-text" placeholder="اكتب ملاحظاتك، تقييمك أو اقتراحاتك هنا..."></textarea>
-        <button id="submit-feedback-btn" class="btn-primary" style="width: 100%; justify-content: center;">نشر الملاحظة 🚀</button>
+        <button id="submit-feedback-btn" class="btn-primary" style="width: 100%; justify-content: center;">
+          نشر الملاحظة
+          <svg class="stroke-icon btn-icon" viewBox="0 0 24 24"><line x1="22" x2="11" y1="2" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
       </div>
     </div>
 
@@ -945,31 +1056,43 @@
 <!-- ===== SUPPORT ===== -->
 <section id="support">
   <div class="support-box">
-    <h2>🎧 دعم فني متكامل على مدار الساعة</h2>
+    <h2>
+      <svg class="stroke-icon" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+      دعم فني متكامل على مدار الساعة
+    </h2>
     <p>
       فريقنا المتخصص جاهز دائماً لمساعدتك في أي استفسار أو مشكلة تقنية
       تواجهها أثناء استخدام تطبيق فواكه AI.
     </p>
     <div class="support-features">
       <div class="support-feat">
-        <span class="sf-icon">⚡</span>
+        <span class="sf-icon">
+          <svg class="stroke-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </span>
         <span>استجابة سريعة</span>
       </div>
       <div class="support-feat">
-        <span class="sf-icon">🕐</span>
+        <span class="sf-icon">
+          <svg class="stroke-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </span>
         <span>متاح 24/7</span>
       </div>
       <div class="support-feat">
-        <span class="sf-icon">🛠</span>
+        <span class="sf-icon">
+          <svg class="stroke-icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </span>
         <span>دعم تقني متخصص</span>
       </div>
       <div class="support-feat">
-        <span class="sf-icon">🌍</span>
+        <span class="sf-icon">
+          <svg class="stroke-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </span>
         <span>عربي وإنجليزي</span>
       </div>
     </div>
     <a href="https://yasmenjasm2-sketch.github.io/fawakihAI2/" target="_blank" class="btn-primary">
-      ⬇ حمّل التطبيق الآن
+      <svg class="stroke-icon btn-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+      حمّل التطبيق الآن
     </a>
   </div>
 </section>
@@ -1000,7 +1123,8 @@
 
 <!-- ===== FLOATING FRUITS SCRIPT ===== -->
 <script>
-  const fruits = ['🍉','🍇','🍓','🍒','🍑','🥭','🍒','🍓','🍋','🍊','','🍎','🍋','🍎'];
+  // الفواكه المتحركة للخلفية (بدون تكرار للفراولة والمانجو وفقاً لطلبك السابق)
+  const fruits = ['🍉','🍇','🍓','🍒','🍑','🥭','🍋','🍊','🍎'];
   const container = document.querySelector('.hero-fruits');
   for (let i = 0; i < 18; i++) {
     const el = document.createElement('span');
@@ -1075,7 +1199,7 @@
 
   // دالة فلترة الكلمات البذيئة (حماية)
   function filterProfanity(text) {
-    // قائمة الكلمات البذيئة الشائعة (يمكنك الإضافة عليها لاحقاً)
+    // قائمة الكلمات البذيئة الشائعة
     const badWords = ['شتم', 'بذيء', 'حمار', 'كلب', 'غبي', 'زق', 'قحبه', 'قحبة', 'شرموط', 'شرموطة', 'منيوك', 'كس', 'زب', 'يلعن'];
     let filteredText = text;
     
@@ -1116,13 +1240,16 @@
     signOut(auth);
   });
 
+  // محتوى زر النشر مع أيقونة الـ SVG
+  const submitBtnHTML = `نشر الملاحظة <svg class="stroke-icon btn-icon" viewBox="0 0 24 24"><line x1="22" x2="11" y1="2" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+
   // إرسال الملاحظة
   submitBtn.addEventListener('click', () => {
     const text = feedbackInput.value.trim();
     if (text === "") return alert("يرجى كتابة ملاحظة قبل الإرسال!");
     if (!currentUser) return alert("يرجى تسجيل الدخول أولاً!");
 
-    submitBtn.textContent = "جاري التشفير والإرسال...";
+    submitBtn.innerHTML = "جاري التشفير والإرسال...";
     submitBtn.disabled = true;
 
     // 1. الفلترة
@@ -1139,11 +1266,11 @@
       timestamp: serverTimestamp()
     }).then(() => {
       feedbackInput.value = "";
-      submitBtn.textContent = "نشر الملاحظة 🚀";
+      submitBtn.innerHTML = submitBtnHTML;
       submitBtn.disabled = false;
     }).catch((error) => {
       console.error("Error saving data: ", error);
-      submitBtn.textContent = "نشر الملاحظة 🚀";
+      submitBtn.innerHTML = submitBtnHTML;
       submitBtn.disabled = false;
       alert("حدث خطأ أثناء إرسال الملاحظة.");
     });
