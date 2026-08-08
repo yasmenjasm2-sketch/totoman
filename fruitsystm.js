@@ -21,7 +21,11 @@ function generatePrediction(slots, previousSelection) {
             throw new Error("بيانات الفواكه مفقودة أو غير صالحة.");
         }
 
-        // ----------------- التعديل الجديد (نظام الأقلية) -----------------
+        // ----------------- التعديل الحاسم (إعدام نهائي) -----------------
+        // حذف الكرز (4) والبطيخ (6) بشكل قطعي من أي سحب قادم ولن يظهرا أبداً
+        let availableSlots = slots.filter(s => s.id !== 4 && s.id !== 6);
+
+        // ----------------- نظام الأقلية -----------------
         // دالة مساعدة لدعم الفواكه التي يضغط عليها "أقل عدد من الأشخاص" (الأقلية)
         const applyMinorityLogic = (array) => {
             let shuffled = shuffleArray(array); // نبدأ بخلط عشوائي
@@ -34,10 +38,10 @@ function generatePrediction(slots, previousSelection) {
                     let amountA = (typeof slotAmounts !== 'undefined' && slotAmounts[a.id]) ? slotAmounts[a.id] : 0;
                     let amountB = (typeof slotAmounts !== 'undefined' && slotAmounts[b.id]) ? slotAmounts[b.id] : 0;
                     
-                    // (إجراء احتياطي): إذا لم يتم العثور على المتغير، نقلل الكرز(4) والبطيخ(6) كوزن عالي افتراضي
+                    // (إجراء احتياطي): إذا لم يتم العثور على المتغير
                     if (typeof slotAmounts === 'undefined') {
-                        amountA = (a.id === 4 || a.id === 6) ? 999999 : 0;
-                        amountB = (b.id === 4 || b.id === 6) ? 999999 : 0;
+                        amountA = 0;
+                        amountB = 0;
                     }
 
                     // إضافة عامل عشوائي بسيط جداً (±15%) للقيم حتى تظل هناك حيوية إذا تساوت الأرقام
@@ -54,14 +58,14 @@ function generatePrediction(slots, previousSelection) {
 
         let selectedSlots = [];
 
-        // خوارزمية اختيار الفواكه العشوائية
+        // خوارزمية اختيار الفواكه العشوائية (باستخدام الفواكه المتاحة فقط)
         if (!previousSelection || previousSelection.length === 0) {
             // التخمين الأول (استخدام دالة الأقلية)
-            selectedSlots = applyMinorityLogic(slots).slice(0, 4);
+            selectedSlots = applyMinorityLogic(availableSlots).slice(0, 4);
         } else {
             // التخمينات المعتمدة على الجولات السابقة
-            let notPickedLastTime = slots.filter(s => !previousSelection.includes(s.id));
-            let pickedLastTime = slots.filter(s => previousSelection.includes(s.id));
+            let notPickedLastTime = availableSlots.filter(s => !previousSelection.includes(s.id));
+            let pickedLastTime = availableSlots.filter(s => previousSelection.includes(s.id));
             
             // تطبيق خوارزمية تقليل الظهور (الأقلية) على المجموعتين
             notPickedLastTime = applyMinorityLogic(notPickedLastTime);
@@ -70,6 +74,14 @@ function generatePrediction(slots, previousSelection) {
             // اختيار 3 من الفواكه التي لم تظهر المرة السابقة، وواحدة ظهرت
             selectedSlots = notPickedLastTime.slice(0, 3).concat(pickedLastTime.slice(0, 1));
             
+            // --- معالجة نقص العدد ---
+            // نظراً لأننا أعدمنا فاكهتين، قد ينقص العدد عن 4 في بعض الجولات المستعصية، لذلك نكمل النقص آلياً
+            if (selectedSlots.length < 4) {
+                let needed = 4 - selectedSlots.length;
+                let remainingToPick = pickedLastTime.filter(s => !selectedSlots.includes(s));
+                selectedSlots = selectedSlots.concat(remainingToPick.slice(0, needed));
+            }
+
             // خلط النتيجة النهائية حتى لا تكون الفاكهة المكررة دائماً في نفس الترتيب
             selectedSlots = shuffleArray(selectedSlots);
         }
