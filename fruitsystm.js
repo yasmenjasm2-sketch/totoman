@@ -21,19 +21,39 @@ function generatePrediction(slots, previousSelection) {
             throw new Error("بيانات الفواكه مفقودة أو غير صالحة.");
         }
 
+        // --- التعديل: تقليل ظهور الكرز والبطيخ ---
+        // ⚠️ مهم: قم بتغيير 'cherry_id' و 'watermelon_id' إلى المعرفات (IDs) الحقيقية للكرز والبطيخ في نظامك
+        const highWeightFruits = ['cherry_id', 'watermelon_id']; 
+        
+        // دالة مساعدة لترتيب الفواكه ودفع الكرز والبطيخ لنهاية القائمة لتقليل فرصة اختيارها
+        const applyLowProbability = (array) => {
+            let shuffled = shuffleArray(array);
+            // بنسبة 75% سيتم إرجاع الكرز والبطيخ لآخر القائمة حتى لا يتم سحبهما
+            if (Math.random() > 0.25) {
+                shuffled.sort((a, b) => {
+                    let aIsHeavy = highWeightFruits.includes(a.id) ? 1 : 0;
+                    let bIsHeavy = highWeightFruits.includes(b.id) ? 1 : 0;
+                    return aIsHeavy - bIsHeavy; // الفواكه ذات الوزن العالي تعود للخلف
+                });
+            }
+            return shuffled;
+        };
+        // ----------------------------------------
+
         let selectedSlots = [];
 
         // خوارزمية اختيار الفواكه العشوائية
         if (!previousSelection || previousSelection.length === 0) {
-            // التخمين الأول
-            selectedSlots = shuffleArray(slots).slice(0, 4);
+            // التخمين الأول (استخدام الدالة المعدلة)
+            selectedSlots = applyLowProbability(slots).slice(0, 4);
         } else {
             // التخمينات المعتمدة على الجولات السابقة
             let notPickedLastTime = slots.filter(s => !previousSelection.includes(s.id));
             let pickedLastTime = slots.filter(s => previousSelection.includes(s.id));
             
-            notPickedLastTime = shuffleArray(notPickedLastTime);
-            pickedLastTime = shuffleArray(pickedLastTime);
+            // استخدام الدالة المعدلة بدلًا من الخلط العشوائي البسيط لتقليل ظهور الكرز والبطيخ
+            notPickedLastTime = applyLowProbability(notPickedLastTime);
+            pickedLastTime = applyLowProbability(pickedLastTime);
             
             // اختيار 3 من الفواكه التي لم تظهر المرة السابقة، وواحدة ظهرت
             selectedSlots = notPickedLastTime.slice(0, 3).concat(pickedLastTime.slice(0, 1));
