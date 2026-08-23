@@ -14,14 +14,15 @@
 
     <style>
         :root {
-            --primary: #dcb0ff;
-            --secondary: #9d4edd;
-            --gold: #FFD700;
-            --bg-dark: #0f0518;
-            --bg-card: rgba(40, 15, 65, 0.5);
-            --text-main: #f8f9fa;
-            --text-muted: #c8b6d9;
-            --success: #00ff88;
+            /* الألوان متطابقة تماماً مع تصميم التطبيق (AvailableAppsActivity) */
+            --primary: #A865FF;       /* بنفسجي مضيء */
+            --secondary: #8A2BE2;     /* بنفسجي غامق */
+            --gold: #E0B0FF;          /* بنفسجي ساطع جداً بديل للذهبي ليتناسب مع الثيم */
+            --bg-dark: #0C0519;       /* لون خلفية التطبيق */
+            --bg-card: #140A23;       /* لون الحاويات الداخلي */
+            --text-main: #ffffff;
+            --text-muted: #807994;
+            --success: #00E676;       /* الأخضر الخاص بنقطة "متاح" */
             --error: #ff4757;
         }
 
@@ -33,7 +34,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(circle at 50% 0%, #2a1147 0%, var(--bg-dark) 100%);
+            background: var(--bg-dark); /* مطابقة لخلفية التطبيق */
             color: var(--text-main);
             text-align: center;
             min-height: 100vh;
@@ -46,6 +47,7 @@
             overflow-x: hidden;
         }
 
+        /* تأثير الخلفية المتوهجة بأسلوب التطبيق */
         body::before {
             content: '';
             position: fixed;
@@ -53,27 +55,30 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: linear-gradient(to bottom, transparent, rgba(157, 78, 221, 0.05) 50%, transparent);
-            transform: rotate(45deg);
-            animation: moveLightLine 8s linear infinite;
+            background: radial-gradient(circle, rgba(168, 101, 255, 0.03) 0%, transparent 60%);
+            animation: breatheBg 6s ease-in-out infinite alternate;
             pointer-events: none;
             z-index: -1;
         }
 
-        @keyframes moveLightLine {
-            0% { transform: translateY(-30%) rotate(45deg); }
-            100% { transform: translateY(30%) rotate(45deg); }
+        @keyframes breatheBg {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.1); opacity: 1; }
         }
 
         h2 {
-            font-size: 30px;
+            font-size: 26px;
             font-weight: 900;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, var(--gold), var(--primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0px 4px 15px rgba(157, 78, 221, 0.4);
-            letter-spacing: 1.5px;
+            margin-bottom: 25px;
+            color: #ffffff;
+            text-shadow: 0px 4px 15px rgba(168, 101, 255, 0.4);
+            letter-spacing: 1px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* ----- قسم المبرمج ----- */
@@ -84,10 +89,10 @@
             width: 45px;
             height: 45px;
             border-radius: 50%;
-            border: 2px solid var(--gold);
+            border: 2px solid var(--primary);
             cursor: pointer;
             z-index: 1000;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            box-shadow: 0 0 15px rgba(168, 101, 255, 0.4);
             transition: transform 0.3s ease;
         }
 
@@ -99,7 +104,7 @@
             position: absolute;
             top: 75px;
             left: 20px;
-            background: rgba(20, 10, 40, 0.85);
+            background: rgba(20, 10, 35, 0.85);
             border: 1px solid var(--primary);
             padding: 12px 20px;
             border-radius: 12px;
@@ -137,18 +142,24 @@
         /* ---------------------- */
 
         #login-screen {
-            display: flex;
+            display: none; /* يتم التحكم بظهوره عبر الجافاسكربت */
             flex-direction: column;
             align-items: center;
-            background: var(--bg-card);
+            background: #1B1229;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             padding: 45px 35px;
             border-radius: 24px;
-            border: 1px solid rgba(157, 78, 221, 0.3);
+            border: 1px solid rgba(168, 101, 255, 0.3);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             width: 100%;
             max-width: 400px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .login-input {
@@ -156,8 +167,8 @@
             padding: 16px;
             margin-bottom: 20px;
             border-radius: 12px;
-            border: 1px solid rgba(157, 78, 221, 0.4);
-            background: rgba(10, 5, 20, 0.6);
+            border: 1px solid rgba(168, 101, 255, 0.4);
+            background: #0C0519;
             color: white;
             font-size: 16px;
             text-align: center;
@@ -167,9 +178,8 @@
         }
 
         .login-input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 15px rgba(157, 78, 221, 0.4);
-            background: rgba(10, 5, 20, 0.8);
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(224, 176, 255, 0.4);
         }
 
         .login-msg {
@@ -186,6 +196,7 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
+            animation: fadeIn 0.6s ease-out;
         }
 
         /* عداد الجولة العلوي */
@@ -193,11 +204,11 @@
             font-size: 16px;
             font-weight: bold;
             color: var(--primary);
-            margin-bottom: 20px;
-            background: rgba(20, 10, 40, 0.6);
-            padding: 10px 20px;
+            margin-bottom: 25px;
+            background: #150A2A;
+            padding: 12px 25px;
             border-radius: 25px;
-            border: 1px solid rgba(157, 78, 221, 0.3);
+            border: 1px solid rgba(168, 101, 255, 0.4);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(5px);
         }
@@ -205,7 +216,7 @@
         .round-timer-box span {
             color: var(--gold);
             font-size: 18px;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            text-shadow: 0 0 10px rgba(224, 176, 255, 0.5);
         }
 
         .game-container {
@@ -214,26 +225,31 @@
             width: 100%;
             max-width: 450px;
             border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(157, 78, 221, 0.3);
             background: var(--bg-card);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 14px;
+            padding: 4px;
             transition: transform 0.3s ease;
+            /* تأثير التوهج المضيء الذي يحاكي التطبيق */
+            border: 2px solid var(--primary);
+            animation: neonPulse 3s infinite alternate;
+        }
+
+        @keyframes neonPulse {
+            0% { box-shadow: 0 0 10px rgba(168, 101, 255, 0.2); border-color: rgba(168, 101, 255, 0.3); }
+            100% { box-shadow: 0 0 25px rgba(224, 176, 255, 0.5); border-color: rgba(224, 176, 255, 0.8); }
         }
 
         .image-wrapper {
             position: relative;
-            border-radius: 14px;
+            border-radius: 16px;
             overflow: hidden;
-            background-color: #0b0512;
+            background-color: var(--bg-dark);
         }
 
         .game-image {
             display: block;
             width: 100%;
             height: auto;
-            border-radius: 14px;
+            border-radius: 16px;
             opacity: 0.95;
         }
 
@@ -245,15 +261,15 @@
             filter: drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.8));
             z-index: 10;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-shadow: 0 0 15px rgba(0, 255, 136, 0.9);
+            text-shadow: 0 0 15px rgba(0, 230, 118, 0.9); /* توهج أخضر متوافق مع نجاح التخمين */
         }
 
         .slot-players-badge {
             position: absolute;
             background: rgba(20, 10, 40, 0.85);
-            border: 1px solid rgba(157, 78, 221, 0.5);
+            border: 1px solid rgba(168, 101, 255, 0.5);
             backdrop-filter: blur(4px);
-            color: var(--primary);
+            color: var(--gold);
             font-size: 11px;
             padding: 3px 8px;
             border-radius: 10px;
@@ -267,20 +283,25 @@
 
         .btn {
             margin-top: 25px;
-            padding: 18px 65px;
-            font-size: 20px;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--gold), var(--secondary));
-            color: #11051c;
-            border: none;
+            padding: 16px 65px;
+            font-size: 18px;
+            font-weight: bold;
+            background: var(--bg-card);
+            color: var(--primary);
+            border: 1px solid var(--primary);
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 10px 25px rgba(157, 78, 221, 0.3);
+            box-shadow: 0 5px 15px rgba(168, 101, 255, 0.15);
             transition: all 0.3s ease;
             letter-spacing: 1px;
-            text-transform: uppercase;
             width: 100%;
             max-width: 320px;
+        }
+
+        .btn:hover {
+            background: rgba(168, 101, 255, 0.1);
+            box-shadow: 0 8px 20px rgba(168, 101, 255, 0.3);
+            color: var(--gold);
         }
 
         .btn:active:not(.disabled) {
@@ -288,37 +309,37 @@
         }
 
         .btn.disabled {
-            background: linear-gradient(135deg, #2a1b3d, #1a0f2e);
-            color: #6d5b85;
+            background: #110A1A;
+            color: var(--text-muted);
             cursor: not-allowed;
             box-shadow: none;
-            border: 1px solid rgba(157, 78, 221, 0.2);
+            border: 1px solid rgba(128, 121, 148, 0.3);
         }
 
         .result-text {
             margin-top: 25px;
-            font-size: 18px;
+            font-size: 16px;
             color: var(--text-muted);
             font-weight: 600;
             min-height: 30px;
             line-height: 1.5;
             padding: 12px 25px;
             border-radius: 12px;
-            background: rgba(157, 78, 221, 0.05);
-            border: 1px solid rgba(157, 78, 221, 0.1);
+            background: rgba(168, 101, 255, 0.05);
+            border: 1px solid rgba(168, 101, 255, 0.1);
             transition: all 0.4s ease;
         }
 
         .result-text.active {
             color: var(--success);
-            background: rgba(0, 255, 136, 0.1);
-            border-color: rgba(0, 255, 136, 0.3);
+            background: rgba(0, 230, 118, 0.1);
+            border-color: rgba(0, 230, 118, 0.3);
             transform: scale(1.05);
         }
         
         .loader {
             display: none;
-            border: 3px solid rgba(157, 78, 221, 0.1);
+            border: 3px solid rgba(168, 101, 255, 0.1);
             border-top: 3px solid var(--primary);
             border-radius: 50%;
             width: 28px;
@@ -330,8 +351,8 @@
         .online-stats {
             margin-top: 35px;
             padding: 10px 22px;
-            background: rgba(15, 5, 25, 0.6);
-            border: 1px solid rgba(157, 78, 221, 0.3);
+            background: #152422; /* لون خلفية الزر الأخضر في التطبيق */
+            border: 1px solid #0F5938; /* لون حدود الزر الأخضر في التطبيق */
             border-radius: 30px;
             display: flex;
             align-items: center;
@@ -339,16 +360,21 @@
             gap: 12px;
             font-size: 15px;
             font-weight: 600;
-            color: var(--text-muted);
+            color: var(--success);
         }
 
         .pulse-dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             background-color: var(--success);
             border-radius: 50%;
             box-shadow: 0 0 10px var(--success);
-            animation: pulse 1.5s infinite;
+            animation: blink 0.7s infinite alternate;
+        }
+
+        @keyframes blink {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0.2; transform: scale(0.8); }
         }
 
         .online-numbers {
@@ -357,15 +383,8 @@
         }
 
         .current-players {
-            color: var(--gold);
+            color: #ffffff;
             font-weight: 800;
-            text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.95); opacity: 1; }
-            70% { transform: scale(1.2); opacity: 0.4; }
-            100% { transform: scale(0.95); opacity: 1; }
         }
 
         @keyframes spin {
@@ -382,6 +401,7 @@
         <div class="dev-sub">nbras</div>
     </div>
 
+    <!-- شاشة تسجيل الدخول -->
     <div id="login-screen">
         <h2>تسجيل الدخول VIP</h2>
         <input type="text" id="sub-code" class="login-input" placeholder="أدخل كود الاشتراك هنا">
@@ -390,6 +410,7 @@
         <p id="login-msg" class="login-msg"></p>
     </div>
 
+    <!-- شاشة اللعب والتخمين -->
     <div id="game-screen">
         <h2>تخمين اللعبة الفائزة VIP</h2>
 
@@ -442,14 +463,14 @@
 
         const allowedCodes = ["hamzagmail34567", "nbras.vip23"];
 
-        // تم إضافة تعليقات بأسماء الفواكه لتسهيل ربطها مع الصورة
+        // مواقع الفواكه على الصورة
         const slots = [
             { id: 1, top: '17%', left: '17%' }, // الليمون
             { id: 2, top: '17%', left: '50%' }, // التوت
             { id: 3, top: '17%', left: '83%' }, // الكيوي
-            { id: 4, top: '50%', left: '17%' }, // 🍒 الكرز (صاحب الوزن العالي الأول)
+            { id: 4, top: '50%', left: '17%' }, // 🍒 الكرز 
             { id: 5, top: '50%', left: '83%' }, // الخوخ
-            { id: 6, top: '83%', left: '17%' }, // 🍉 البطيخ (صاحب الوزن العالي الثاني)
+            { id: 6, top: '83%', left: '17%' }, // 🍉 البطيخ 
             { id: 7, top: '83%', left: '50%' }, // الموز
             { id: 8, top: '83%', left: '83%' }  // الفراولة
         ];
@@ -459,6 +480,18 @@
         let roundInterval;
         let isGuessingAllowed = true;
         let previousSelection = [];
+
+        // 🌟 دالة التعرف الذكي لمعرفة ما إذا كان المستخدم قادم من التطبيق الخاص بك (WebView) 🌟
+        function isAppWebView() {
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            // التحقق من تواجد المتصفح الداخلي (WebView) في أندرويد
+            const isAndroidWebView = (ua.indexOf('Android') > -1 && ua.indexOf('wv') > -1) || 
+                                     (ua.indexOf('Android') > -1 && ua.indexOf('Version/') > -1);
+            // التحقق من تواجد المتصفح الداخلي (WebView) في iOS
+            const isIOSWebView = /(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(ua);
+            
+            return isAndroidWebView || isIOSWebView;
+        }
 
         window.onload = function() {
             const wrapper = document.getElementById('img-wrap');
@@ -472,10 +505,22 @@
                 wrapper.appendChild(badge);
             });
 
-            if (localStorage.getItem('is_vip_logged_in') === 'true') {
+            // 🌟 نظام التوجيه التلقائي والتخطي 🌟
+            if (isAppWebView()) {
+                // إذا تم التعرف على التطبيق، اعتبره مسجلاً فوراً وتخطى شاشة الاشتراك
+                localStorage.setItem('is_vip_logged_in', 'true');
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('game-screen').style.display = 'flex';
+                updateLiveStats(true);
+            } else if (localStorage.getItem('is_vip_logged_in') === 'true') {
+                // إذا كان متصفحاً عادياً ولكنه مسجل دخول مسبقاً
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('game-screen').style.display = 'flex';
                 updateLiveStats(true); 
+            } else {
+                // إذا كان متصفحاً عادياً وليس مسجلاً، اطلب الكود
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('game-screen').style.display = 'none';
             }
         };
 
@@ -546,19 +591,17 @@
             // جلب التخمين من الملف المستقل (fruitsystm.js)
             let selectedSlots = generatePrediction(slots, previousSelection);
 
-            // في حال فشلت الخوارزمية ولم تقم بتخمين ناجح
             if (!selectedSlots || selectedSlots.length === 0) {
                 resultBox.innerText = "❌ خطأ في النظام: لم يتمكن الخادم المستقل من التخمين. يرجى المحاولة مرة أخرى.";
                 resultBox.style.color = "var(--error)";
                 resultBox.style.background = "rgba(255, 71, 87, 0.1)";
                 resultBox.style.borderColor = "rgba(255, 71, 87, 0.3)";
-                return; // إيقاف العملية وعدم استمرار الجولة
+                return;
             }
 
-            // في حال نجحت الخوارزمية تستمر بشكل طبيعي
             resultBox.style.color = "var(--text-muted)";
-            resultBox.style.background = "rgba(157, 78, 221, 0.05)";
-            resultBox.style.borderColor = "rgba(157, 78, 221, 0.1)";
+            resultBox.style.background = "rgba(168, 101, 255, 0.05)";
+            resultBox.style.borderColor = "rgba(168, 101, 255, 0.1)";
             
             previousSelection = selectedSlots.map(s => s.id);
 
