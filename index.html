@@ -162,6 +162,7 @@
       stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
+      transition: all 0.3s ease;
     }
     .btn-icon {
       width: 18px; height: 18px; display: inline-block; vertical-align: middle; margin-left: 8px;
@@ -191,14 +192,20 @@
     .nav-links { display: flex; gap: 28px; list-style: none; }
     .nav-links a {
       color: var(--muted); text-decoration: none; font-size: 0.92rem; font-weight: 600;
-      transition: color 0.2s;
+      transition: color 0.3s ease, transform 0.3s ease;
+      display: inline-block;
     }
-    .nav-links a:hover { color: var(--gold); }
+    .nav-links a:hover { color: var(--gold); transform: translateY(-2px); }
     .nav-cta {
       background: linear-gradient(135deg, var(--orange), var(--gold));
       color: #000 !important; padding: 8px 22px; border-radius: 50px;
       font-weight: 900 !important; font-size: 0.88rem !important;
       display: inline-flex; align-items: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .nav-cta:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
     }
 
     /* ===== HERO ===== */
@@ -274,26 +281,134 @@
       color: #000; padding: 14px 36px; border-radius: 50px;
       font-size: 1rem; font-weight: 900; text-decoration: none;
       box-shadow: 0 8px 30px rgba(255,107,53,0.4);
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       display: inline-flex; align-items: center; gap: 8px;
       cursor: pointer;
       border: none;
     }
-    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(255,107,53,0.5); }
+    .btn-primary:hover { 
+      transform: translateY(-5px) scale(1.03); 
+      box-shadow: 0 15px 40px rgba(255,107,53,0.6); 
+    }
     .btn-secondary {
       background: transparent; border: 1.5px solid var(--border);
       color: var(--text); padding: 14px 32px; border-radius: 50px;
       font-size: 1rem; font-weight: 700; text-decoration: none;
-      transition: border-color 0.2s, color 0.2s;
+      transition: all 0.3s ease;
       display: inline-flex; align-items: center;
       cursor: pointer;
     }
-    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-secondary:hover { 
+      border-color: var(--gold); 
+      color: var(--gold); 
+      transform: translateY(-3px);
+      box-shadow: 0 5px 20px rgba(255, 215, 0, 0.15);
+    }
+
+    /* ===== الإضافات الجديدة (السعر والتطبيقات المدعومة) ===== */
+    .price-box {
+      margin-top: 25px;
+      position: relative;
+      z-index: 1;
+      animation: fadeDown 0.7s ease 0.35s both;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 10px 28px;
+      border-radius: 50px;
+      backdrop-filter: blur(10px);
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+    }
+    .price-box:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(0, 255, 127, 0.3);
+      transform: translateY(-2px);
+    }
+    .price-amount {
+      color: #00FF7F; /* لون أخضر فاتح مشع ومميز للسعر */
+      font-weight: 900;
+      font-size: 1.45rem;
+      text-shadow: 0 0 15px rgba(0, 255, 127, 0.5);
+      letter-spacing: 1px;
+    }
+
+    .supported-apps {
+      margin-top: 40px;
+      position: relative;
+      z-index: 1;
+      animation: fadeDown 0.7s ease 0.4s both;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+    .supported-apps-title {
+      font-size: 0.95rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 700;
+      position: relative;
+    }
+    .supported-apps-title::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 2px;
+    }
+    .apps-row {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .app-icon-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .app-icon-item:hover {
+      transform: translateY(-8px) scale(1.1);
+    }
+    .app-icon-item img {
+      width: 65px;
+      height: 65px;
+      border-radius: 22px;
+      object-fit: cover;
+      border: 2px solid rgba(255,255,255,0.1);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+    .app-icon-item:hover img {
+      border-color: var(--gold);
+      box-shadow: 0 15px 30px rgba(255, 215, 0, 0.35);
+    }
+    .app-icon-item span {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--text);
+      transition: color 0.3s ease;
+    }
+    .app-icon-item:hover span {
+      color: var(--gold);
+    }
 
     .hero-stats {
       display: flex; gap: 48px; justify-content: center; flex-wrap: wrap;
       margin-top: 60px; position: relative; z-index: 1;
-      animation: fadeDown 0.7s ease 0.4s both;
+      animation: fadeDown 0.7s ease 0.5s both;
     }
     .stat-item { text-align: center; }
     .stat-num {
@@ -338,6 +453,11 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    .what-visual:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(255,107,53,0.15);
     }
     .what-visual::before {
       content: '';
@@ -347,6 +467,10 @@
     .app-icon-big {
       width: 96px; height: 96px; border-radius: 24px; margin-bottom: 16px;
       object-fit: cover; box-shadow: 0 8px 20px rgba(255,107,53,0.3);
+      transition: transform 0.3s ease;
+    }
+    .what-visual:hover .app-icon-big {
+      transform: scale(1.05) rotate(3deg);
     }
     .app-name-big {
       font-size: 1.6rem; font-weight: 900;
@@ -362,6 +486,11 @@
       background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.2);
       color: var(--gold); padding: 4px 14px; border-radius: 50px;
       font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center;
+      transition: all 0.3s ease;
+    }
+    .pill:hover {
+      background: rgba(255,215,0,0.15);
+      transform: translateY(-2px);
     }
     .pill svg {
       width: 14px; height: 14px; margin-left: 6px; stroke-width: 2.5; stroke: currentColor;
@@ -379,12 +508,12 @@
     .feature-card {
       background: var(--card); border: 1px solid var(--border);
       border-radius: 20px; padding: 28px 24px;
-      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s, box-shadow 0.4s;
       position: relative; overflow: hidden;
     }
     .feature-card:hover {
-      transform: translateY(-6px);
-      border-color: rgba(255,107,53,0.4);
+      transform: translateY(-10px);
+      border-color: rgba(255,107,53,0.5);
       box-shadow: var(--glow);
     }
     .feature-card::after {
@@ -392,9 +521,17 @@
       position: absolute; top: 0; right: 0;
       width: 80px; height: 80px;
       background: radial-gradient(circle, rgba(255,107,53,0.06) 0%, transparent 70%);
+      transition: opacity 0.3s ease;
+    }
+    .feature-card:hover::after {
+      opacity: 0.8;
     }
     .feature-icon {
       margin-bottom: 14px; display: block;
+      transition: transform 0.3s ease;
+    }
+    .feature-card:hover .feature-icon {
+      transform: scale(1.1);
     }
     .feature-icon svg {
       width: 38px; height: 38px; stroke: var(--orange);
@@ -408,6 +545,13 @@
       display: flex; gap: 32px; align-items: flex-start;
       padding: 32px 0;
       border-bottom: 1px solid var(--border);
+      transition: background 0.3s ease;
+      border-radius: 12px;
+    }
+    .step:hover {
+      background: rgba(255,255,255,0.02);
+      padding-right: 15px;
+      padding-left: 15px;
     }
     .step:last-child { border-bottom: none; }
     .step-num {
@@ -417,12 +561,17 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 1.3rem; font-weight: 900; color: #000;
       flex-shrink: 0;
+      transition: transform 0.3s ease;
+    }
+    .step:hover .step-num {
+      transform: scale(1.1) rotate(-5deg);
     }
     .step-content h3 { font-size: 1.15rem; font-weight: 800; margin-bottom: 8px; }
     .step-content p { color: var(--muted); font-size: 0.98rem; }
     .step-content a {
       color: var(--orange); text-decoration: none; font-weight: 700;
       border-bottom: 1px dashed var(--orange);
+      transition: color 0.3s, border-color 0.3s;
     }
     .step-content a:hover { color: var(--gold); border-color: var(--gold); }
 
@@ -432,10 +581,15 @@
       background: var(--card); border: 1px solid var(--border);
       border-radius: 20px; padding: 32px 28px;
       text-align: center;
-      transition: transform 0.2s, border-color 0.2s;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .payment-card:hover { transform: translateY(-4px); border-color: var(--orange); }
-    .payment-icon { margin-bottom: 16px; display: block; }
+    .payment-card:hover { 
+      transform: translateY(-8px); 
+      border-color: var(--orange); 
+      box-shadow: 0 10px 30px rgba(255,107,53,0.15);
+    }
+    .payment-icon { margin-bottom: 16px; display: block; transition: transform 0.3s ease; }
+    .payment-card:hover .payment-icon { transform: scale(1.15); }
     .payment-icon svg { width: 56px; height: 56px; stroke: var(--gold); }
     .payment-card h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 10px; }
     .payment-card p { color: var(--muted); font-size: 0.92rem; }
@@ -445,6 +599,11 @@
     .policy-card {
       background: var(--card); border: 1px solid var(--border);
       border-radius: 16px; padding: 28px 24px;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+    .policy-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--gold);
     }
     .policy-card h3 {
       font-size: 1rem; font-weight: 800; margin-bottom: 12px;
@@ -457,6 +616,10 @@
     .policy-card li {
       color: var(--muted); font-size: 0.9rem;
       padding-right: 16px; position: relative;
+      transition: color 0.3s ease;
+    }
+    .policy-card:hover li {
+      color: var(--text);
     }
     .policy-card li::before {
       content: '›'; position: absolute; right: 0;
@@ -489,6 +652,11 @@
       background: var(--card); border: 1px solid rgba(255,255,255,0.05);
       border-radius: 16px; padding: 16px 20px;
       display: flex; flex-direction: column; gap: 8px;
+      transition: transform 0.2s ease;
+    }
+    .feedback-item:hover {
+      transform: translateX(-5px);
+      border-color: rgba(255,215,0,0.2);
     }
     .feedback-header {
       display: flex; justify-content: space-between; align-items: center;
@@ -532,6 +700,11 @@
       border: 1px solid rgba(255,107,53,0.25);
       border-radius: 24px; padding: 48px 40px;
       text-align: center;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    .support-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(123,79,255,0.15);
     }
     .support-box h2 { 
       font-size: 2rem; font-weight: 900; margin-bottom: 12px;
@@ -545,7 +718,9 @@
     }
     .support-feat {
       display: flex; flex-direction: column; align-items: center; gap: 8px;
+      transition: transform 0.3s ease;
     }
+    .support-feat:hover { transform: translateY(-5px); }
     .support-feat .sf-icon { display: block; }
     .support-feat .sf-icon svg { width: 32px; height: 32px; stroke: var(--orange); }
     .support-feat span { font-size: 0.85rem; color: var(--muted); }
@@ -571,8 +746,8 @@
     }
     .footer-desc { color: var(--muted); font-size: 0.9rem; max-width: 500px; margin: 0 auto 28px; }
     .footer-links { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
-    .footer-links a { color: var(--muted); text-decoration: none; font-size: 0.88rem; }
-    .footer-links a:hover { color: var(--gold); }
+    .footer-links a { color: var(--muted); text-decoration: none; font-size: 0.88rem; transition: color 0.3s, transform 0.3s; display: inline-block; }
+    .footer-links a:hover { color: var(--gold); transform: translateY(-2px); }
     .footer-bottom { color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--border); padding-top: 20px; margin-top: 20px; }
     .footer-bottom strong { color: var(--orange); }
 
@@ -587,6 +762,7 @@
       section { padding: 60px 16px; }
       .features-grid { padding: 0 16px; }
       .step { flex-direction: column; gap: 16px; }
+      .apps-row { flex-wrap: wrap; }
     }
     @media (max-width: 480px) {
       .features-grid { grid-template-columns: 1fr; }
@@ -649,6 +825,31 @@
       <svg class="stroke-icon btn-icon" style="margin-right: 0; margin-left: 8px;" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
       آراء وتقييمات المستخدمين
     </a>
+  </div>
+
+  <!-- السعر -->
+  <div class="price-box">
+    سعر الاشتراك: 
+    <span class="price-amount">35 دولار امريكي</span>
+  </div>
+
+  <!-- التطبيقات المدعومة -->
+  <div class="supported-apps">
+    <div class="supported-apps-title">التطبيقات المدعومة للتخمين</div>
+    <div class="apps-row">
+      <div class="app-icon-item">
+        <img src="hamzadd.jpg" alt="يلا لايف" />
+        <span>يلا لايف</span>
+      </div>
+      <div class="app-icon-item">
+        <img src="masa.jpg" alt="ماسا" />
+        <span>ماسا</span>
+      </div>
+      <div class="app-icon-item">
+        <img src="yooy.jpg" alt="يووي" />
+        <span>يووي</span>
+      </div>
+    </div>
   </div>
 
   <div class="hero-stats">
@@ -1112,7 +1313,7 @@
     FawakihAI
   </div>
   <p class="footer-desc">
-    تطبيق تخمين الفواكه الأذكى لمنصة يلا لايف، مدعوم بتقنية Gemini AI.
+    تطبيق تخمين الفواكه الأذكى، مدعوم بتقنية Gemini AI.
     جميع الحقوق محفوظة.
   </p>
   <div class="footer-links">
@@ -1121,209 +1322,11 @@
     <a href="#how">طريقة التحميل</a>
     <a href="#payment">الدفع</a>
     <a href="#policy">سياسة الاستخدام</a>
-    <a href="https://yasmenjasm2-sketch.github.io/fawakihAI2/" target="_blank">الموقع الرسمي</a>
   </div>
   <div class="footer-bottom">
-    © 2026 <strong>فواكه AI</strong> —hamza elhumada  جميع الحقوق محفوظة |
-مطور بـحمزة الحماده لمجتمع fawakihAI
+    &copy; 2026 <strong>فواكه AI</strong>. جميع الحقوق محفوظة.
   </div>
 </footer>
-
-<!-- ===== FLOATING FRUITS SCRIPT ===== -->
-<script>
-  // الفواكه المتحركة للخلفية (بدون تكرار للفراولة والمانجو وفقاً لطلبك السابق)
-  const fruits = ['🍉','🍇','🍓','🍒','🍑','🥭','🍋','🍊','🍎'];
-  const container = document.querySelector('.hero-fruits');
-  for (let i = 0; i < 18; i++) {
-    const el = document.createElement('span');
-    el.className = 'fruit-float';
-    el.textContent = fruits[Math.floor(Math.random() * fruits.length)];
-    el.style.cssText = `
-      left: ${Math.random() * 100}%;
-      animation-duration: ${8 + Math.random() * 14}s;
-      animation-delay: ${Math.random() * 12}s;
-      font-size: ${1.5 + Math.random() * 2}rem;
-    `;
-    container.appendChild(el);
-  }
-</script>
-
-<!-- ===== FIREBASE & CHAT LOGIC SCRIPT ===== -->
-<script type="module">
-  // إستيراد مكتبات فايربيس
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { getDatabase, ref, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-  // إعدادات فايربيس بناءً على الملف المرفق
-  const firebaseConfig = {
-    apiKey: "AIzaSyAo4IaLd5SfVYHAAp_noJD7ZXBbhdVx9-0",
-    authDomain: "fawakihyallalive.firebaseapp.com",
-    databaseURL: "https://fawakihyallalive-default-rtdb.firebaseio.com",
-    projectId: "fawakihyallalive",
-    storageBucket: "fawakihyallalive.firebasestorage.app",
-    messagingSenderId: "917478913649",
-    appId: "1:917478913649:android:fee5d42aca81c8a2e3cdd0"
-  };
-
-  // تهيئة فايربيس
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getDatabase(app);
-  const provider = new GoogleAuthProvider();
-
-  // متغيرات الواجهة
-  const authSection = document.getElementById('auth-section');
-  const inputContainer = document.getElementById('feedback-input-container');
-  const loginBtn = document.getElementById('login-google-btn');
-  const logoutBtn = document.getElementById('logout-btn');
-  const submitBtn = document.getElementById('submit-feedback-btn');
-  const feedbackInput = document.getElementById('feedback-text');
-  const feedbacksList = document.getElementById('feedbacks-list');
-  
-  const userNameDisplay = document.getElementById('user-display-name');
-  const userEmailDisplay = document.getElementById('user-email-address');
-  const userProfilePic = document.getElementById('user-profile-pic');
-
-  let currentUser = null;
-
-  // مفتاح التشفير (تشفير احترافي للبيانات بالخلفية)
-  const SECRET_KEY = "FawakihAI_Secure_Key_2026";
-
-  // دالة التشفير
-  function encryptData(text) {
-    return CryptoJS.AES.encrypt(text, SECRET_KEY).toString();
-  }
-
-  // دالة فك التشفير
-  function decryptData(cipherText) {
-    try {
-      const bytes = CryptoJS.AES.decrypt(cipherText, SECRET_KEY);
-      return bytes.toString(CryptoJS.enc.Utf8);
-    } catch(e) {
-      return "رسالة مشفرة غير مقروءة";
-    }
-  }
-
-  // دالة فلترة الكلمات البذيئة (حماية)
-  function filterProfanity(text) {
-    // قائمة الكلمات البذيئة الشائعة
-    const badWords = ['شتم', 'بذيء', 'حمار', 'كلب', 'غبي', 'زق', 'قحبه', 'قحبة', 'شرموط', 'شرموطة', 'منيوك', 'كس', 'زب', 'يلعن'];
-    let filteredText = text;
-    
-    badWords.forEach(word => {
-      // إنشاء تعبير نمطي يتجاهل حالة الأحرف للكلمة
-      const regex = new RegExp(word, 'gi');
-      filteredText = filteredText.replace(regex, '***');
-    });
-    return filteredText;
-  }
-
-  // مراقبة حالة تسجيل الدخول
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      currentUser = user;
-      authSection.style.display = 'none';
-      inputContainer.style.display = 'block';
-      userNameDisplay.textContent = user.displayName;
-      userEmailDisplay.textContent = user.email;
-      userProfilePic.src = user.photoURL || 'hamza.jpg';
-    } else {
-      currentUser = null;
-      authSection.style.display = 'block';
-      inputContainer.style.display = 'none';
-    }
-  });
-
-  // تسجيل الدخول
-  loginBtn.addEventListener('click', () => {
-    signInWithPopup(auth, provider).catch((error) => {
-      console.error("خطأ في تسجيل الدخول:", error);
-      alert("حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.");
-    });
-  });
-
-  // تسجيل الخروج
-  logoutBtn.addEventListener('click', () => {
-    signOut(auth);
-  });
-
-  // محتوى زر النشر مع أيقونة الـ SVG
-  const submitBtnHTML = `نشر الملاحظة <svg class="stroke-icon btn-icon" viewBox="0 0 24 24"><line x1="22" x2="11" y1="2" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
-
-  // إرسال الملاحظة
-  submitBtn.addEventListener('click', () => {
-    const text = feedbackInput.value.trim();
-    if (text === "") return alert("يرجى كتابة ملاحظة قبل الإرسال!");
-    if (!currentUser) return alert("يرجى تسجيل الدخول أولاً!");
-
-    submitBtn.innerHTML = "جاري التشفير والإرسال...";
-    submitBtn.disabled = true;
-
-    // 1. الفلترة
-    const cleanText = filterProfanity(text);
-    // 2. التشفير
-    const encryptedText = encryptData(cleanText);
-
-    // 3. الإرسال لقاعدة البيانات
-    push(ref(db, 'feedbacks'), {
-      userId: currentUser.uid,
-      userName: currentUser.displayName,
-      userPhoto: currentUser.photoURL,
-      encryptedMessage: encryptedText,
-      timestamp: serverTimestamp()
-    }).then(() => {
-      feedbackInput.value = "";
-      submitBtn.innerHTML = submitBtnHTML;
-      submitBtn.disabled = false;
-    }).catch((error) => {
-      console.error("Error saving data: ", error);
-      submitBtn.innerHTML = submitBtnHTML;
-      submitBtn.disabled = false;
-      alert("حدث خطأ أثناء إرسال الملاحظة.");
-    });
-  });
-
-  // جلب الآراء وعرضها
-  const feedbacksRef = ref(db, 'feedbacks');
-  onValue(feedbacksRef, (snapshot) => {
-    feedbacksList.innerHTML = ""; // مسح القائمة الحالية
-    const data = snapshot.val();
-    
-    if (data) {
-      // تحويل البيانات لمصفوفة لفرزها من الأحدث للأقدم
-      const feedbacksArray = Object.values(data).sort((a, b) => b.timestamp - a.timestamp);
-      
-      feedbacksArray.forEach((feedback) => {
-        // فك التشفير قبل العرض
-        const decryptedMessage = decryptData(feedback.encryptedMessage);
-        
-        // تنسيق التاريخ
-        let dateString = "الآن";
-        if (feedback.timestamp) {
-          const dateObj = new Date(feedback.timestamp);
-          dateString = dateObj.toLocaleDateString('ar-EG') + " " + dateObj.toLocaleTimeString('ar-EG');
-        }
-
-        const fbItem = document.createElement('div');
-        fbItem.className = 'feedback-item';
-        fbItem.innerHTML = `
-          <div class="feedback-header">
-            <div class="feedback-user-info">
-              <img src="${feedback.userPhoto || 'hamza.jpg'}" alt="user" onerror="this.src='hamza.jpg'"/>
-              <span class="feedback-user-name">${feedback.userName || 'مستخدم'}</span>
-            </div>
-            <div class="feedback-date">${dateString}</div>
-          </div>
-          <div class="feedback-text">${decryptedMessage.replace(/\n/g, '<br>')}</div>
-        `;
-        feedbacksList.appendChild(fbItem);
-      });
-    } else {
-      feedbacksList.innerHTML = "<div style='text-align: center; color: var(--muted); padding: 20px;'>لا توجد آراء حتى الآن. كن أول من يشاركنا رأيه!</div>";
-    }
-  });
-</script>
 
 </body>
 </html>
