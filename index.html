@@ -626,23 +626,11 @@
       color: var(--orange); font-weight: 900;
     }
 
-    /* ===== FEEDBACK / CHAT SYSTEM CSS ===== */
+    /* ===== FEEDBACK SYSTEM CSS ===== */
     .feedback-wrap {
       background: var(--bg2); border: 1px solid var(--border);
       border-radius: 20px; padding: 32px;
       margin-top: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-    .feedback-input-area {
-      display: flex; flex-direction: column; gap: 16px; margin-bottom: 30px;
-    }
-    .feedback-input-area textarea {
-      width: 100%; min-height: 120px; background: var(--bg3);
-      border: 1px solid var(--border); border-radius: 12px;
-      padding: 16px; color: var(--text); font-family: 'Cairo', sans-serif;
-      font-size: 1rem; resize: vertical; transition: border 0.3s;
-    }
-    .feedback-input-area textarea:focus {
-      outline: none; border-color: var(--orange);
     }
     .feedbacks-list {
       display: flex; flex-direction: column; gap: 16px; max-height: 500px;
@@ -663,36 +651,9 @@
       border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;
     }
     .feedback-user-info { display: flex; align-items: center; gap: 12px; }
-    .feedback-user-info img {
-      width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
-      border: 1px solid var(--orange);
-    }
     .feedback-user-name { font-weight: 700; color: var(--gold); }
     .feedback-date { font-size: 0.8rem; color: var(--muted); }
     .feedback-text { font-size: 0.95rem; line-height: 1.6; color: var(--text); }
-    
-    /* ===== GOOGLE LOGIN BUTTON (GLASSMORPHISM) ===== */
-    .google-login-btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      gap: 12px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #ffffff; padding: 12px 32px; border-radius: 50px;
-      font-size: 1.1rem; font-weight: 700; cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-      backdrop-filter: blur(10px);
-      font-family: inherit;
-    }
-    .google-login-btn:hover {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
-      border-color: rgba(255, 255, 255, 0.3);
-      transform: translateY(-3px);
-      box-shadow: 0 12px 28px rgba(0,0,0,0.4), 0 0 20px rgba(66, 133, 244, 0.3);
-    }
-    .google-login-btn svg {
-      width: 24px; height: 24px; flex-shrink: 0;
-    }
 
     /* ===== SUPPORT ===== */
     .support-box {
@@ -1168,56 +1129,16 @@
   </div>
 </section>
 
-<!-- ===== USER FEEDBACK & CHAT SYSTEM (Firebase Powered) ===== -->
+<!-- ===== USER FEEDBACK ===== -->
 <section id="feedback">
   <div class="section-label">مجتمع فواكه AI</div>
   <h2 class="section-title">آراء وملاحظات المستخدمين</h2>
   <div class="divider"></div>
-  <p class="section-desc">
-    يتم سحب اسم المستخدم تلقائياً عبر حساب Google لضمان المصداقية. جميع الملاحظات مشفرة بالخلفية وتخضع لفلترة الكلمات المسيئة لضمان بيئة نظيفة.
-  </p>
 
   <div class="feedback-wrap">
     
-    <!-- منطقة تسجيل الدخول -->
-    <div id="auth-section" style="text-align: center; padding: 40px 20px;">
-      <h3 style="margin-bottom: 10px;">شاركنا رأيك حول التطبيق</h3>
-      <p style="color: var(--muted); font-size: 0.95rem; margin-bottom: 24px;">يمكنك قراءة آراء وتقييمات المستخدمين بالأسفل. لمشاركة رأيك، يرجى تسجيل الدخول.</p>
-      <button id="login-google-btn" class="google-login-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-        </svg>
-        تسجيل الدخول باستخدام Google
-      </button>
-    </div>
-
-    <!-- منطقة إضافة الرأي (تظهر فقط للمسجلين) -->
-    <div id="feedback-input-container" style="display: none;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <img id="user-profile-pic" src="" alt="User" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--gold);" />
-          <div>
-            <div style="font-weight: 700; color: var(--gold);" id="user-display-name"></div>
-            <div style="font-size: 0.8rem; color: var(--muted);" id="user-email-address"></div>
-          </div>
-        </div>
-        <button id="logout-btn" class="btn-secondary" style="padding: 6px 16px; font-size: 0.8rem;">تسجيل خروج</button>
-      </div>
-      
-      <div class="feedback-input-area">
-        <textarea id="feedback-text" placeholder="اكتب ملاحظاتك، تقييمك أو اقتراحاتك هنا..."></textarea>
-        <button id="submit-feedback-btn" class="btn-primary" style="width: 100%; justify-content: center;">
-          نشر الملاحظة
-          <svg class="stroke-icon btn-icon" viewBox="0 0 24 24"><line x1="22" x2="11" y1="2" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-        </button>
-      </div>
-    </div>
-
     <!-- قائمة الآراء المثبتة -->
-    <h3 style="margin: 30px 0 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">أحدث الآراء</h3>
+    <h3 style="margin: 10px 0 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">أحدث الآراء</h3>
     <div id="feedbacks-list" class="feedbacks-list">
       <div style="text-align: center; color: var(--muted); padding: 20px;">جاري تحميل الآراء...</div>
     </div>
@@ -1327,6 +1248,43 @@
     &copy; 2026 <strong>فواكه AI</strong>. جميع الحقوق محفوظة.
   </div>
 </footer>
+
+<!-- ===== سكربت استدعاء الآراء المستقلة ===== -->
+<script src="reviews.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const list = document.getElementById('feedbacks-list');
+    
+    // التحقق من وجود المصفوفة داخل ملف reviews.js
+    if (typeof fawakihReviews !== 'undefined' && fawakihReviews.length > 0) {
+      list.innerHTML = ''; // مسح عبارة "جاري التحميل..."
+      
+      fawakihReviews.forEach(review => {
+        const item = document.createElement('div');
+        item.className = 'feedback-item';
+        
+        // تصميم الأفاتار الدائري بالحرف واللون
+        item.innerHTML = `
+          <div class="feedback-header">
+            <div class="feedback-user-info">
+              <div style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.2rem; background-color: ${review.bgColor}; color: ${review.textColor}; border: 1px solid var(--orange);">
+                ${review.initial}
+              </div>
+              <div>
+                <div class="feedback-user-name">${review.name}</div>
+                <div class="feedback-date">${review.date}</div>
+              </div>
+            </div>
+          </div>
+          <div class="feedback-text">${review.text}</div>
+        `;
+        list.appendChild(item);
+      });
+    } else {
+      list.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">لا توجد آراء حالياً.</div>';
+    }
+  });
+</script>
 
 </body>
 </html>
