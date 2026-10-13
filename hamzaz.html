@@ -98,12 +98,59 @@
         .mode-badge.sim { background: #ff9800; color: #fff; }
         .ws-badge { font-size: 16px; font-weight: bold; color: #ffd700; text-shadow: 0 0 8px #ffd70044; }
         .logout-btn { background: #f4433622 !important; color: #f44336 !important; border: 1px solid #f4433644 !important; font-size: 9px; padding: 4px 10px; border-radius: 4px; cursor: pointer; }
+
+        /* ============ شاشة تسجيل الدخول (مضافة) ============ */
+        #loginScreen {
+            position: fixed; inset: 0; z-index: 99999;
+            background: radial-gradient(circle at 50% 18%, #1a0a12 0%, #07070d 70%);
+            display: flex; align-items: center; justify-content: center;
+            padding: 16px; direction: rtl;
+        }
+        #loginScreen.hidden { display: none; }
+        .login-box {
+            width: 100%; max-width: 360px;
+            background: linear-gradient(135deg, #0d0d1a, #140a14);
+            border: 1px solid #ffd70033;
+            border-radius: 16px;
+            padding: 26px 20px 22px;
+            box-shadow: 0 0 40px #ffd70012, inset 0 0 30px #00000066;
+            text-align: center;
+            animation: loginPop .45s ease;
+        }
+        @keyframes loginPop {
+            from { opacity: 0; transform: translateY(18px) scale(.96); }
+            to   { opacity: 1; transform: none; }
+        }
+        .login-logo { font-size: 46px; line-height: 1; filter: drop-shadow(0 0 14px #ffd70066); }
+        .login-title { font-size: 17px; color: #ffd700; margin-top: 8px; text-shadow: 0 0 12px #ffd70044; font-weight: bold; }
+        .login-sub { font-size: 10px; color: #777; margin-top: 4px; margin-bottom: 18px; }
+        .login-field { text-align: right; margin-bottom: 12px; }
+        .login-field label { display: block; font-size: 10px; color: #888; margin-bottom: 5px; }
+        .login-field input {
+            width: 100%; padding: 11px 12px;
+            background: #05050d; border: 1px solid #22223a;
+            border-radius: 9px; color: #e0e0e0; font-size: 13px;
+            direction: ltr; text-align: left; outline: none; transition: all .2s;
+        }
+        .login-field input:focus { border-color: #ffd70088; box-shadow: 0 0 12px #ffd70022; }
+        #loginBtn {
+            width: 100%; padding: 13px; margin-top: 6px;
+            border: none; border-radius: 10px; cursor: pointer;
+            background: linear-gradient(135deg, #ffd700, #ff9800);
+            color: #120800; font-size: 14px; font-weight: bold;
+            transition: all .2s;
+        }
+        #loginBtn:active { transform: scale(.97); }
+        #loginBtn:disabled { opacity: .6; cursor: wait; }
+        .login-msg { font-size: 11px; margin-top: 12px; min-height: 16px; color: #f44336; }
+        .login-msg.ok { color: #4caf50; }
+        .login-foot { font-size: 9px; color: #444; margin-top: 16px; }
     </style>
-    
+
     <script>
         const activeCode = localStorage.getItem('yalla_fruit_active_code');
         const expiryTime = localStorage.getItem('yalla_fruit_expiry');
-        
+
         // في الإنتاج يتم تفعيل هذا
         // if (!activeCode || !expiryTime || Date.now() > parseInt(expiryTime)) {
         //     localStorage.removeItem('yalla_fruit_active_code');
@@ -113,8 +160,33 @@
     </script>
 </head>
 <body>
-<div class="container">
-    
+
+<!-- ================= شاشة تسجيل الدخول ================= -->
+<div id="loginScreen">
+    <div class="login-box">
+        <div class="login-logo">🍒</div>
+        <div class="login-title">YALLA FRUIT HACK v6.4</div>
+        <div class="login-sub">HYBRID ENGINE · KLM NETWORK · تسجيل الدخول</div>
+
+        <div class="login-field">
+            <label>البريد الإلكتروني / المستخدم</label>
+            <input type="text" id="loginUser" placeholder="example@mail.com" autocomplete="off" spellcheck="false">
+        </div>
+
+        <div class="login-field">
+            <label>كلمة المرور</label>
+            <input type="password" id="loginPass" placeholder="••••••••" autocomplete="off" spellcheck="false">
+        </div>
+
+        <button id="loginBtn" onclick="doLogin()">🔐 دخول</button>
+        <div id="loginMsg" class="login-msg"></div>
+        <div class="login-foot">🔒 محمي بتشفير داخلي · غير مصرح بالدخول لغير المصرح لهم</div>
+    </div>
+</div>
+<!-- ====================================================== -->
+
+<div class="container" id="appContainer" style="display:none;">
+
     <div class="header">
         <h1>🍒 YALLA FRUIT v6.4 <span class="mode-badge hybrid">KLM-BURST</span></h1>
         <div class="sub">HYBRID ENGINE · KLM NETWORK · استراتيجية الأقلية المتقدمة</div>
@@ -125,17 +197,17 @@
             <span>📊: <span id="historyCount">0</span></span>
         </div>
     </div>
-    
+
     <button id="connectBtn" class="connect-btn disconnected" onclick="toggleConnection()">
         🔗 تشغيل المحرك الهجين KLM
     </button>
-    
+
     <div style="display:flex;gap:4px;margin-bottom:8px;">
         <button class="bot-btn primary" style="flex:1;" onclick="setMode('hybrid')">🔮 هجين KLM (موصى به)</button>
         <button class="bot-btn" style="flex:1;" onclick="setMode('realtime')">📡 مباشر</button>
         <button class="bot-btn" style="flex:1;" onclick="setMode('pcap')">📁 PCAP</button>
     </div>
-    
+
     <div class="card" id="liveMonitorCard" style="border-color:#e040fb44;background:linear-gradient(135deg,#0d0d1a,#1a0025);display:none;">
         <div class="card-title" style="color:#e040fb;">🧠 المحرك الهجين KLM <span class="badge" id="modeLabel">نشط</span></div>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 2px;">
@@ -151,14 +223,14 @@
             <span style="font-size:8px;color:#555;">🎯 <span id="accuracyLabel">0%</span></span>
         </div>
     </div>
-    
+
     <div class="card">
         <div class="card-title">🎯 التوقعات <span class="badge badge-gold">CODEX v6.4 KLM</span></div>
-        
+
         <div id="warningPanel">
             <div class="warning-bar"><span class="warn-icon">⏳</span> <span class="warn-text">اضغط "تشغيل المحرك الهجين KLM" لبدء التحليل...</span></div>
         </div>
-        
+
         <div class="prediction-grid">
             <div class="pred-option" id="optSmall1" onclick="selectOption('small1')">
                 <div class="pred-type">🟢 SMALL 1</div>
@@ -190,7 +262,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="card">
         <div class="card-title">🍇 الفواكه — الرهانات الحية <span class="badge" id="playersBadge">0</span></div>
         <div id="fruitBoard" class="fruit-grid"></div>
@@ -200,7 +272,7 @@
             <span id="roundTimerText">الحالة: انتظار...</span>
         </div>
     </div>
-    
+
     <div class="bot-panel">
         <div class="bot-header">
             <span class="bot-title">🤖 BOT v4 - تلقائي بالكامل</span>
@@ -219,7 +291,7 @@
             <span id="botProfit" style="color:#4caf50;">الربح: +0</span>
         </div>
     </div>
-    
+
     <div class="card">
         <div class="card-title">📊 إحصائيات CODEX <span class="badge" id="accuracyBadge">0%</span></div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;">
@@ -241,19 +313,19 @@
             </div>
         </div>
     </div>
-    
+
     <div class="card">
         <div class="card-title">📡 بيانات التحليل <span class="badge">مباشر</span></div>
         <div class="raw-section" id="rawData">اضغط "تشغيل" للبدء...</div>
     </div>
-    
+
     <div class="card">
         <div class="card-title">🏆 آخر النتائج <span class="badge" id="recentCount">0</span></div>
         <div class="history-strip" id="historyStrip">
             <span style="color:#666;font-size:10px;padding:5px;">لا توجد نتائج بعد</span>
         </div>
     </div>
-    
+
     <div class="card">
         <div class="card-title">📋 سجل النظام</div>
         <div class="log-panel" id="logPanel">
@@ -261,7 +333,7 @@
             <div class="log-entry system">[نظام] اضغط زر التشغيل للبدء</div>
         </div>
     </div>
-    
+
     <div class="card">
         <div class="card-title">⚙️ الإعدادات</div>
         <div class="setting-row">
@@ -347,7 +419,7 @@ class CodexEngine {
         this.lastAnalysis = null;
         this.patterns = {};
         this.roundTimes = [];
-        
+
         FRUIT_KEYS.forEach(k => {
             this.fruitStats[k] = {
                 appearances: 0, wins: 0, winRate: 0, avgBets: 0,
@@ -356,23 +428,23 @@ class CodexEngine {
             };
         });
     }
-    
+
     analyze(bets) {
         this.currentRound++;
         const results = [];
         const totalBets = Object.values(bets).reduce((a, b) => a + b, 0);
         const n = Object.keys(bets).length;
-        
+
         if (totalBets === 0 || n < 4) return null;
-        
+
         const sorted = Object.entries(bets).sort((a, b) => a[1] - b[1]);
-        
+
         sorted.forEach(([fruit, amount]) => {
             const f = FRUITS[fruit];
             const pct = totalBets > 0 ? (amount / totalBets) * 100 : 0;
             const rank = sorted.findIndex(x => x[0] === fruit) + 1;
             const fStat = this.fruitStats[fruit];
-            
+
             const rankBonus = (n - rank + 1) / n;
             let historyBonus = 1.0;
             if (fStat.lastSeenRound > 0) {
@@ -382,24 +454,24 @@ class CodexEngine {
                 else if (roundsAgo > 1) historyBonus = 1.1;
                 else historyBonus = 0.85;
             }
-            
+
             const recentWins = this.history.slice(-4).filter(h => h === fruit).length;
             if (recentWins >= 2) historyBonus *= 0.6;
             if (recentWins >= 3) historyBonus *= 0.3;
-            
+
             if (fStat.streak > 0) historyBonus *= (1 + fStat.streak * 0.1);
-            
+
             let winRateBonus = 1.0;
             if (fStat.appearances > 5) {
                 const wr = fStat.winRate / 100;
                 winRateBonus = 1 + (wr - 0.2) * 0.5;
             }
-            
+
             const riskFactor = pct / 100;
             const ev = (f.mult - 1) * (1 - riskFactor) - 1 * riskFactor;
             const score = (f.mult * 100) / (pct + 3) * rankBonus * historyBonus * winRateBonus;
             const confidence = Math.min(99, Math.round((score / 150) * 100));
-            
+
             results.push({
                 fruit, amount, pct: Math.round(pct * 10) / 10,
                 rank, score: Math.round(score * 10) / 10,
@@ -409,17 +481,17 @@ class CodexEngine {
                 note: this.getNote(fruit, rank, pct, confidence)
             });
         });
-        
+
         results.sort((a, b) => b.score - a.score);
-        
+
         const smalls = results.filter(r => r.group === "small");
         const bigs = results.filter(r => r.group === "big");
-        
+
         this.targetFruit = results.length > 0 ? results[0].fruit : null;
         this.lastAnalysis = results;
-        
+
         const bestConfidence = results.length > 0 ? results[0].confidence : 0;
-        
+
         return {
             round: this.currentRound,
             total: totalBets, numFruits: n,
@@ -437,11 +509,11 @@ class CodexEngine {
             } : null
         };
     }
-    
+
     recordResult(winner) {
         this.history.push(winner);
         this.stats.total++;
-        
+
         if (this.fruitStats[winner]) {
             const fs = this.fruitStats[winner];
             fs.appearances++;
@@ -449,15 +521,15 @@ class CodexEngine {
             fs.streak = (fs.streak || 0) + 1;
             fs.maxStreak = Math.max(fs.maxStreak, fs.streak);
         }
-        
+
         FRUIT_KEYS.forEach(k => {
             if (k !== winner) {
                 this.fruitStats[k].streak = 0;
             }
         });
-        
+
         const wasCorrect = this.targetFruit === winner;
-        
+
         if (wasCorrect) {
             this.stats.wins++;
             this.confidence = Math.min(99, this.confidence + 3);
@@ -471,22 +543,22 @@ class CodexEngine {
             this.confidence = Math.max(10, this.confidence - 2);
             this.stats.profit -= 1;
         }
-        
+
         const total = this.stats.wins + this.stats.losses;
         this.stats.winRate = total > 0 ? Math.round((this.stats.wins / total) * 1000) / 10 : 0;
-        
+
         FRUIT_KEYS.forEach(k => {
             const fs = this.fruitStats[k];
             if (fs.appearances > 0) {
                 fs.winRate = Math.round((fs.wins / fs.appearances) * 1000) / 10;
             }
         });
-        
+
         if (this.history.length > 200) this.history.shift();
         updateStatsUI(this.stats);
         return wasCorrect;
     }
-    
+
     getNote(fruit, rank, pct, confidence) {
         if (rank === 1) return `🎯 الهدف الرئيسي - ثقة ${confidence}%`;
         if (rank === 2) return `🎯 ثاني أفضل خيار`;
@@ -525,7 +597,7 @@ const State = {
 function initUI() {
     const board = document.getElementById('fruitBoard');
     board.innerHTML = '';
-    
+
     FRUIT_KEYS.forEach(key => {
         const f = FRUITS[key];
         State.bets[key] = Math.floor(Math.random() * 5000) + 500;
@@ -575,28 +647,28 @@ function updateBetsUI(bets) {
 function updatePredictions(analysis) {
     if (!analysis) return;
     State.recommended = [];
-    
+
     const configs = [
         { id: 'optSmall1', data: analysis.smalls?.[0], idx: 0 },
         { id: 'optSmall2', data: analysis.smalls?.[1], idx: 1 },
         { id: 'optBig1',   data: analysis.bigs?.[0],   idx: 2 },
         { id: 'optBig2',   data: analysis.bigs?.[1],   idx: 3 }
     ];
-    
+
     configs.forEach(cfg => {
         if (cfg.data) {
             const d = cfg.data;
             const scoreColor = d.confidence > 70 ? '#4caf50' : d.confidence > 40 ? '#ff9800' : '#f44336';
-            
+
             document.getElementById(`${cfg.id}Fruit`).textContent = `${d.emoji} ${d.name} x${d.mult}`;
             document.getElementById(`${cfg.id}Score`).textContent = `Score: ${d.score} | ثقة: ${d.confidence}%`;
             document.getElementById(`${cfg.id}Score`).style.color = scoreColor;
             document.getElementById(`${cfg.id}Note`).textContent = `رهان: ${d.amount.toLocaleString()} | ${d.pct}%`;
             document.getElementById(`${cfg.id}Bar`).style.width = `${d.confidence}%`;
             document.getElementById(`${cfg.id}Bar`).style.background = d.confidence > 70 ? '#4caf50' : d.confidence > 40 ? '#ff9800' : '#f44336';
-            
+
             State.recommended.push(d.fruit);
-            
+
             const cell = document.getElementById(`cell-${d.fruit}`);
             if (cell) {
                 cell.classList.add('highlight-recommend');
@@ -611,7 +683,7 @@ function updateWarningPanel(analysis) {
     if (!analysis) return;
     const panel = document.getElementById('warningPanel');
     let html = '';
-    
+
     if (analysis.bigs && analysis.smalls) {
         const bigPct = analysis.bigs.reduce((s, r) => s + r.pct, 0);
         if (bigPct > 45) {
@@ -626,7 +698,7 @@ function updateWarningPanel(analysis) {
             </div>`;
         }
     }
-    
+
     if (analysis.prediction) {
         const p = analysis.prediction;
         const cls = p.confidence > 60 ? 'success' : '';
@@ -637,7 +709,7 @@ function updateWarningPanel(analysis) {
             </span>
         </div>`;
     }
-    
+
     if (!html) {
         html = `<div class="warning-bar success">
             <span class="warn-icon">✅</span>
@@ -654,7 +726,7 @@ function updateStatsUI(stats) {
     document.getElementById('statConfidence').textContent = `${State.codex.confidence}%`;
     document.getElementById('accuracyLabel').textContent = `${stats.winRate || 0}%`;
     document.getElementById('accuracyBadge').textContent = `${stats.winRate || 0}%`;
-    
+
     const accBadge = document.getElementById('accuracyBadge');
     if (stats.winRate > 60) accBadge.style.color = '#4caf50';
     else if (stats.winRate > 40) accBadge.style.color = '#ff9800';
@@ -664,37 +736,37 @@ function updateStatsUI(stats) {
 function handleWinner(winnerKey) {
     if (!winnerKey || !FRUITS[winnerKey]) return;
     const f = FRUITS[winnerKey];
-    
+
     State.history.unshift(winnerKey);
     if (State.history.length > 20) State.history.pop();
-    
+
     document.getElementById('historyCount').textContent = State.history.length;
     document.getElementById('recentCount').textContent = State.history.length;
-    
+
     const hStrip = document.getElementById('historyStrip');
     hStrip.innerHTML = State.history.map(k => {
         const fi = FRUITS[k];
         return `<div class="history-item" style="border-color:${fi.color}">${fi.emoji}<span class="h-mult">x${fi.mult}</span></div>`;
     }).join('');
-    
+
     const cell = document.getElementById(`cell-${winnerKey}`);
     if (cell) {
         cell.classList.add('highlight-winner');
         setTimeout(() => cell.classList.remove('highlight-winner'), 4000);
     }
-    
+
     const wasCorrect = State.codex.recordResult(winnerKey);
-    
+
     document.getElementById('liveServerFruitDisplay').innerHTML = `${f.emoji} ${f.name} (x${f.mult})`;
     document.getElementById('liveServerFruitDisplay').style.color = f.color;
     document.getElementById('liveServerFruitDisplay').style.textShadow = `0 0 12px ${f.color}`;
-    document.getElementById('liveProgressionText').textContent = 
+    document.getElementById('liveProgressionText').textContent =
         `🏆 الفائز: ${f.emoji} ${f.name} | التوقع: ${wasCorrect ? '✅ صحيح' : '❌ خطأ'}`;
-    
+
     addLog(`🏆 ${f.emoji} ${f.name} x${f.mult} ${wasCorrect ? '✅' : '❌'}`, 'winner');
-    
+
     if (State.botActive) processBotResult(winnerKey, wasCorrect);
-    
+
     State.currentRound++;
     document.getElementById('roundDisplay').textContent = State.currentRound;
 }
@@ -750,7 +822,7 @@ function setBotRounds(num) {
 }
 
 function updateBotUI() {
-    document.getElementById('botRounds').textContent = 
+    document.getElementById('botRounds').textContent =
         State.botMaxRounds > 0 ? `${State.botRounds}/${State.botMaxRounds}` : `${State.botRounds}/∞`;
     const total = State.botWins + State.botLosses;
     const rate = total > 0 ? Math.round((State.botWins / total) * 100) : 0;
@@ -774,17 +846,17 @@ function startEngine() {
     State.userId = document.getElementById('inpUser').value.trim();
     State.deviceId = document.getElementById('inpDevice').value.trim();
     State.speed = parseInt(document.getElementById('selSpeed').value) || 2;
-    
+
     const btn = document.getElementById('connectBtn');
     btn.className = 'connect-btn hybrid';
     btn.textContent = '⏹ إيقاف المحرك';
-    
+
     updateStatus('🟣 HYBRID نشط', 'purple');
     addLog('🚀 بدء المحرك الهجين KLM...', 'system');
-    
+
     document.getElementById('liveMonitorCard').style.display = 'block';
     document.getElementById('liveServerFruitDisplay').textContent = '🧠 جاري التحليل...';
-    
+
     tryConnectWS();
     startGameLoop();
 }
@@ -817,30 +889,30 @@ function tryConnectWS() {
         'wss://roomws15.klmburst.com/comet',
         'wss://roomws20.klmburst.com/comet'
     ];
-    
+
     const selectedServer = document.getElementById('selServer').value;
     if (selectedServer !== 'auto') {
         servers.unshift(`wss://${selectedServer}/comet`);
     }
-    
+
     let tried = 0;
-    
+
     function tryNext() {
         if (tried >= servers.length || !State.running) {
             addLog('[نظام] 🟣 وضع HYBRID نشط - تحليل ذكي بدون اتصال مباشر', 'system');
             return;
         }
-        
+
         const url = servers[tried];
         addLog(`🔌 محاولة الاتصال: ${url}`, 'data');
-        
+
         try {
             const ws = new WebSocket(url);
-            
+
             ws.onopen = () => {
                 addLog(`✅ اتصال مباشر KLM تم بنجاح! السيرفر: ${url}`, 'info');
                 State.connector = ws;
-                
+
                 const handshake = [{
                     channel: '/meta/handshake',
                     version: '1.0', minimumVersion: '1.0',
@@ -856,11 +928,11 @@ function tryConnectWS() {
                         }
                     }
                 }];
-                
+
                 ws.send(JSON.stringify(handshake));
                 updateStatus('✅ متصل KLM مباشر', 'green');
                 addLog('🔑 جاري المصادقة مع chatws.klmburst.com...', 'info');
-                
+
                 ws.onmessage = (e) => {
                     try {
                         const msgs = JSON.parse(e.data);
@@ -876,7 +948,7 @@ function tryConnectWS() {
                         });
                     } catch(err) {}
                 };
-                
+
                 ws.onclose = () => {
                     addLog('⚠️ انقطع الاتصال KLM المباشر - جاري تحويل مسار HYBRID', 'warn');
                     State.connector = null;
@@ -884,7 +956,7 @@ function tryConnectWS() {
                     setTimeout(tryNext, 300);
                 };
             };
-            
+
             ws.onerror = () => {
                 tried++;
                 addLog(`❌ فشل الاتصال بـ ${url}`, 'data');
@@ -921,11 +993,11 @@ function sendSubscription(ws, clientId) {
 function processLiveData(msg) {
     const channel = msg.channel || '';
     const data = msg.data || {};
-    
+
     document.getElementById('rawData').textContent = JSON.stringify(msg).substring(0, 180);
-    document.getElementById('msgCountLabel').textContent = 
+    document.getElementById('msgCountLabel').textContent =
         parseInt(document.getElementById('msgCountLabel').textContent) + 1;
-    
+
     if (channel.includes('bets') && typeof data === 'object') {
         const liveBets = {};
         FRUIT_KEYS.forEach(fk => {
@@ -935,7 +1007,7 @@ function processLiveData(msg) {
                 }
             });
         });
-        
+
         if (Object.keys(liveBets).length > 0) {
             FRUIT_KEYS.forEach(k => {
                 if (liveBets[k]) {
@@ -943,7 +1015,7 @@ function processLiveData(msg) {
                 }
             });
             updateBetsUI(State.bets);
-            
+
             const analysis = State.codex.analyze(State.bets);
             if (analysis) {
                 updatePredictions(analysis);
@@ -951,7 +1023,7 @@ function processLiveData(msg) {
             }
         }
     }
-    
+
     if (channel.includes('result') || channel.includes('state')) {
         let winner = null;
         ['fruit', 'winner', 'winning_fruit', 'id', 'result'].forEach(key => {
@@ -963,11 +1035,11 @@ function processLiveData(msg) {
                 });
             }
         });
-        
+
         if (winner && State.gameState !== 2) {
             State.gameState = 2;
             handleWinner(winner);
-            
+
             setTimeout(() => {
                 State.gameState = 1;
                 State.roundTimer = 40;
@@ -982,48 +1054,48 @@ function startGameLoop() {
     State.roundTimer = 40;
     State.gameState = 1;
     generateBets();
-    
+
     const intervalMs = Math.max(300, Math.floor(1000 / State.speed));
-    
+
     State.mainInterval = setInterval(() => {
         if (!State.running) return;
-        
+
         if (State.gameState === 1) {
             State.roundTimer -= 0.5;
-            
+
             if (State.roundTimer <= 0) {
                 State.gameState = 2;
                 State.roundTimer = 0;
                 document.getElementById('roundTimerText').textContent = '🔴 جاري سحب النتيجة...';
                 return;
             }
-            
+
             if (Math.random() < 0.2 && !State.connector) {
                 generateBets();
             }
-            
+
             if (!State.connector) {
                 updateBetsUI(State.bets);
                 const analysis = State.codex.analyze(State.bets);
                 if (analysis) { updatePredictions(analysis); updateWarningPanel(analysis); }
             }
-            
+
             const pct = (State.roundTimer / 40) * 100;
             document.getElementById('timerFill').style.width = `${Math.max(0, pct)}%`;
             document.getElementById('timerText').textContent = `⏱️ ${Math.ceil(State.roundTimer)}s`;
-            
+
             if (State.roundTimer > 5) {
                 document.getElementById('roundTimerText').textContent = '🟢 وقت الرهان مفتوح';
             } else {
                 document.getElementById('roundTimerText').textContent = '🔴 جاري الإغلاق...';
             }
-            
+
             const phrases = [
                 '🧠 تحليل توزيع الرهانات من KLM...', '📊 حساب CODEX Score...',
                 '🎯 تحديد الأقلية في سيرفرات klmburst...', '📡 مسح أنماط السيرفر...', '⚡ تحديث التوقعات...'
             ];
             document.getElementById('liveProgressionText').textContent = phrases[Math.floor(Math.random() * phrases.length)];
-            
+
         } else if (State.gameState === 2) {
             if (!State.connector && Math.random() < 0.1) {
                 const analysis = State.codexAnalysis;
@@ -1038,7 +1110,7 @@ function startGameLoop() {
                 }
                 if (!winner) winner = FRUIT_KEYS[Math.floor(Math.random() * FRUIT_KEYS.length)];
                 handleWinner(winner);
-                
+
                 State.gameState = 1;
                 State.roundTimer = 40 + Math.random() * 10;
                 generateBets();
@@ -1069,7 +1141,7 @@ function logout() {
     localStorage.removeItem('yalla_fruit_active_code');
     localStorage.removeItem('yalla_fruit_expiry');
     addLog('🔐 تم تسجيل الخروج بنجاح.', 'system');
-    setTimeout(() => { window.location.href = "login.html"; }, 500);
+    setTimeout(() => { showLoginScreen(); }, 500);
 }
 
 function downloadLog() {
@@ -1103,5 +1175,103 @@ addLog('[نظام] ✅ قائمة السيرفرات: chatws, chatws1, roomws1-5
 addLog('[نظام] ✅ التوكن والـ deviceID محدثان من الـ Handshake الأصلي', 'info');
 addLog('[نظام] اضغط "تشغيل المحرك الهجين KLM" للبدء', 'system');
 </script>
+
+<!-- ================= سكربت تسجيل الدخول (مضاف) ================= -->
+<script>
+(function () {
+    /* بيانات الدخول مخزنة بشكل مشفّر (Base64 مجزّأ) */
+    var _A1 = "Z21haWwz";        /* الجزء الأول من البريد */
+    var _A2 = "NDU2Nw==";        /* الجزء الثاني من البريد */
+    var _B1 = "aGFtemF6";        /* الجزء الأول من كلمة المرور */
+    var _B2 = "ZWQxMjM=";        /* الجزء الثاني من كلمة المرور */
+
+    function _dec(x) { try { return atob(x); } catch (e) { return ""; } }
+
+    /* التحقق الداخلي */
+    window.__verifyAuth = function (user, pass) {
+        var u = _dec(_A1) + _dec(_A2);
+        var p = _dec(_B1) + _dec(_B2);
+        return (user === u) && (pass === p);
+    };
+})();
+
+function hideLoginScreen() {
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('appContainer').style.display = 'block';
+    try { sessionStorage.setItem('yf_session', '1'); } catch (e) {}
+    addLog('[نظام] ✅ تم تسجيل الدخول بنجاح', 'system');
+}
+
+function showLoginScreen() {
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('appContainer').style.display = 'none';
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginMsg').textContent = '';
+    document.getElementById('loginMsg').className = 'login-msg';
+    document.getElementById('loginBtn').disabled = false;
+    document.getElementById('loginBtn').textContent = '🔐 دخول';
+    try { sessionStorage.removeItem('yf_session'); } catch (e) {}
+}
+
+function doLogin() {
+    var u = document.getElementById('loginUser').value.trim();
+    var p = document.getElementById('loginPass').value;
+    var msg = document.getElementById('loginMsg');
+    var btn = document.getElementById('loginBtn');
+
+    if (!u || !p) {
+        msg.className = 'login-msg';
+        msg.textContent = '⚠️ الرجاء إدخال البريد وكلمة المرور';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ جاري التحقق...';
+    msg.className = 'login-msg';
+    msg.textContent = '';
+
+    setTimeout(function () {
+        if (window.__verifyAuth(u, p)) {
+            msg.className = 'login-msg ok';
+            msg.textContent = '✅ تم التحقق بنجاح، جاري الدخول...';
+            setTimeout(hideLoginScreen, 550);
+        } else {
+            btn.disabled = false;
+            btn.textContent = '🔐 دخول';
+            msg.className = 'login-msg';
+            msg.textContent = '❌ بيانات الدخول غير صحيحة';
+            var box = document.querySelector('.login-box');
+            box.style.animation = 'none';
+            void box.offsetWidth;
+            box.style.animation = 'loginPop .45s ease';
+            document.getElementById('loginPass').value = '';
+            document.getElementById('loginPass').focus();
+        }
+    }, 420);
+}
+
+/* الدخول بزر Enter */
+document.addEventListener('DOMContentLoaded', function () {
+    ['loginUser', 'loginPass'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') { e.preventDefault(); doLogin(); }
+            });
+        }
+    });
+    setTimeout(function () { document.getElementById('loginUser').focus(); }, 250);
+
+    /* إن كان هناك جلسة نشطة في نفس التاب، تخطَّ الشاشة */
+    var ok = false;
+    try { ok = sessionStorage.getItem('yf_session') === '1'; } catch (e) {}
+    if (ok) {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('appContainer').style.display = 'block';
+    }
+});
+</script>
+<!-- ============================================================== -->
+
 </body>
 </html>
