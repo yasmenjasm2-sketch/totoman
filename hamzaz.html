@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🍒 YALLA FRUIT HACK v6.4 - HYBRID ENGINE [KLM]</title>
     <style>
-        /* نفس الـ styles من ملفك الأصلي - محذوفة للاختصار هنا لكن أحتفظ بها كلها في الملف الكامل */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, sans-serif;
@@ -16,7 +15,6 @@
             direction: rtl;
         }
         .container { max-width: 520px; margin: 0 auto; }
-        /* باقي الـ styles مطابقة للأصل */
         .header { background: linear-gradient(135deg, #0d0d1a, #1a0a0a); border: 1px solid #ffd70033; border-radius: 12px; padding: 10px 14px; margin-bottom: 8px; text-align: center; }
         .header h1 { font-size: 18px; color: #ffd700; text-shadow: 0 0 10px #ffd70033; }
         .header .sub { font-size: 10px; color: #888; }
@@ -407,6 +405,9 @@ const FRUIT_KEYS = Object.keys(FRUITS);
 const SMALL_KEYS = FRUIT_KEYS.filter(k => FRUITS[k].group === "small");
 const BIG_KEYS   = FRUIT_KEYS.filter(k => FRUITS[k].group === "big");
 
+/* 🎯 الفواكه النادرة (وزنها مخفّض جداً) */
+const RARE_FRUITS = ['cherry', 'watermelon'];
+
 class CodexEngine {
     constructor() {
         this.history = [];
@@ -467,9 +468,26 @@ class CodexEngine {
                 winRateBonus = 1 + (wr - 0.2) * 0.5;
             }
 
+            /* 🎯 عقوبة الفواكه النادرة (كرز وبطيخ) لتقليل ظهورها */
+            let rareFruitPenalty = 1.0;
+            if (RARE_FRUITS.includes(fruit)) {
+                rareFruitPenalty = 0.18; /* وزن منخفض جداً */
+            }
+
+            /* 🎲 عامل عشوائي كبير جداً (0.3 إلى 3.0) */
+            const randomFactor = 0.3 + Math.random() * 2.7;
+
             const riskFactor = pct / 100;
             const ev = (f.mult - 1) * (1 - riskFactor) - 1 * riskFactor;
-            const score = (f.mult * 100) / (pct + 3) * rankBonus * historyBonus * winRateBonus;
+
+            /* المعادلة الأساسية + العشوائية + عقوبة النوادر */
+            const score = ((f.mult * 100) / (pct + 3))
+                        * rankBonus
+                        * historyBonus
+                        * winRateBonus
+                        * rareFruitPenalty
+                        * randomFactor;
+
             const confidence = Math.min(99, Math.round((score / 150) * 100));
 
             results.push({
@@ -1103,7 +1121,14 @@ function startGameLoop() {
                 if (analysis && analysis.all && analysis.all.length > 0) {
                     const totalBets = analysis.total;
                     const weights = {};
-                    analysis.all.forEach(r => { weights[r.fruit] = Math.max(1, (totalBets - r.amount) / totalBets * 10); });
+                    analysis.all.forEach(r => {
+                        /* 🎯 وزن أقل للكرز والبطيخ في محاكاة الفائز */
+                        let baseWeight = Math.max(1, (totalBets - r.amount) / totalBets * 10);
+                        if (RARE_FRUITS.includes(r.fruit)) {
+                            baseWeight *= 0.15; /* وزن منخفض جداً للفواكه النادرة */
+                        }
+                        weights[r.fruit] = baseWeight;
+                    });
                     const totalW = Object.values(weights).reduce((a, b) => a + b, 0);
                     let r = Math.random() * totalW;
                     for (const [fruit, w] of Object.entries(weights)) { r -= w; if (r <= 0) { winner = fruit; break; } }
@@ -1127,12 +1152,20 @@ function generateBets() {
         const baseWeight = SMALL_KEYS.includes(k) ? 1.5 : 0.8;
         const variance = 0.5 + Math.random();
         const isMajority = Math.random() < 0.3;
-        const weight = isMajority ? baseWeight * 3 : baseWeight * variance;
+        let weight = isMajority ? baseWeight * 3 : baseWeight * variance;
+
+        /* 🎯 تقليل وزن الرهانات للكرز والبطيخ */
+        if (RARE_FRUITS.includes(k)) {
+            weight *= 0.12; /* وزن منخفض جداً */
+        }
+
         State.bets[k] = Math.floor((totalPool / FRUIT_KEYS.length) * weight);
     });
     const minorityCount = 2 + Math.floor(Math.random() * 2);
     const shuffled = [...FRUIT_KEYS].sort(() => Math.random() - 0.5);
     for (let i = 0; i < minorityCount; i++) {
+        /* 🎯 لا نختار الكرز أو البطيخ كأقلية */
+        if (RARE_FRUITS.includes(shuffled[i])) continue;
         State.bets[shuffled[i]] = Math.floor(500 + Math.random() * 2000);
     }
 }
@@ -1179,15 +1212,13 @@ addLog('[نظام] اضغط "تشغيل المحرك الهجين KLM" للبد�
 <!-- ================= سكربت تسجيل الدخول (مضاف) ================= -->
 <script>
 (function () {
-    /* بيانات الدخول مخزنة بشكل مشفّر (Base64 مجزّأ) */
-    var _A1 = "Z21haWwz";        /* الجزء الأول من البريد */
-    var _A2 = "NDU2Nw==";        /* الجزء الثاني من البريد */
-    var _B1 = "aGFtemF6";        /* الجزء الأول من كلمة المرور */
-    var _B2 = "ZWQxMjM=";        /* الجزء الثاني من كلمة المرور */
+    var _A1 = "Z21haWwz";
+    var _A2 = "NDU2Nw==";
+    var _B1 = "aGFtemF6";
+    var _B2 = "ZWQxMjM=";
 
     function _dec(x) { try { return atob(x); } catch (e) { return ""; } }
 
-    /* التحقق الداخلي */
     window.__verifyAuth = function (user, pass) {
         var u = _dec(_A1) + _dec(_A2);
         var p = _dec(_B1) + _dec(_B2);
@@ -1250,7 +1281,6 @@ function doLogin() {
     }, 420);
 }
 
-/* الدخول بزر Enter */
 document.addEventListener('DOMContentLoaded', function () {
     ['loginUser', 'loginPass'].forEach(function (id) {
         var el = document.getElementById(id);
@@ -1262,7 +1292,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     setTimeout(function () { document.getElementById('loginUser').focus(); }, 250);
 
-    /* إن كان هناك جلسة نشطة في نفس التاب، تخطَّ الشاشة */
     var ok = false;
     try { ok = sessionStorage.getItem('yf_session') === '1'; } catch (e) {}
     if (ok) {
