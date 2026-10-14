@@ -425,12 +425,25 @@ const FRUIT_KEYS = Object.keys(FRUITS);
 const SMALL_KEYS = FRUIT_KEYS.filter(k => FRUITS[k].group === "small");
 const BIG_KEYS   = FRUIT_KEYS.filter(k => FRUITS[k].group === "big");
 
-/* 🎯 الفواكه النادرة (وزنها مخفّض جداً) - الكرز + البطيخ + المانجو */
-const RARE_FRUITS = ['cherry', 'watermelon', 'mango'];
+/* 🎯 تصنيف الفواكه حسب درجة ندرتها */
+const VERY_RARE_FRUITS = ['cherry', 'watermelon'];   /* نادرة جداً - شبه معدومة */
+const SEMI_RARE_FRUITS = ['mango'];                   /* نادرة نسبياً */
+
+/* دالة موحدة لحساب عقوبة النُدرة */
+function getRarePenalty(fruit) {
+    if (VERY_RARE_FRUITS.includes(fruit)) return 0.03;  /* عقوبة قوية جداً */
+    if (SEMI_RARE_FRUITS.includes(fruit)) return 0.35;
+    return 1.0;
+}
+
+/* متوافق مع الكود القديم */
+const RARE_FRUITS = [...VERY_RARE_FRUITS, ...SEMI_RARE_FRUITS];
 
 /* 🔒 مجموعتا الفواكه للوحة الخمس خانات */
 const SMALL_BOARD_POOL = ['orange', 'lemon', 'grape', 'apple'];
 const BIG_BOARD_POOL   = ['strawberry', 'mango', 'watermelon', 'cherry'];
+/* ترتيب المجموعة الكبيرة حسب الأولوية (نستبعد النوادر جداً) */
+const BIG_BOARD_PRIORITY = ['strawberry', 'mango'];
 
 /* ⏱️ مدة الجولة (35 ثانية) */
 const ROUND_DURATION = 35;
@@ -498,11 +511,8 @@ class CodexEngine {
                 winRateBonus = 1 + (wr - 0.2) * 0.5;
             }
 
-            /* 🎯 عقوبة الفواكه النادرة (كرز، بطيخ، مانجو) لتقليل ظهورها */
-            let rareFruitPenalty = 1.0;
-            if (RARE_FRUITS.includes(fruit)) {
-                rareFruitPenalty = 0.18;
-            }
+            /* 🎯 عقوبة النُدرة (كرز وبطيخ: 0.03 / مانجو: 0.35) */
+            const rareFruitPenalty = getRarePenalty(fruit);
 
             /* 🎲 عامل عشوائي كبير جداً (0.3 إلى 3.0) */
             const randomFactor = 0.3 + Math.random() * 2.7;
@@ -686,16 +696,36 @@ function updateBoardFromAnalysis(analysis) {
         }
     }
 
-    /* 🔴 المرحلة 2: اختر أفضل 2 فواكه كبيرة */
+    /* 🔴 المرحلة 2: اختر أفضل فاكهتين كبيرتين — مع استبعاد النوادر جداً */
     const bigPicked = [];
-    for (const r of sorted) {
+
+    /* أولاً: أفضل 2 من الفواكه غير النادرة جداً (فراولة + مانجو فقط) */
+    const prioritySorted = sorted.filter(r => BIG_BOARD_PRIORITY.includes(r.fruit));
+    for (const r of prioritySorted) {
         if (bigPicked.length >= 2) break;
-        if (BIG_BOARD_POOL.includes(r.fruit) && !bigPicked.includes(r.fruit)) {
+        if (!bigPicked.includes(r.fruit)) {
             bigPicked.push(r.fruit);
         }
     }
+
+    /* إن لم تكتمل 2 من الأولوية، أكمل من باقي المجموعة الكبيرة */
     if (bigPicked.length < 2) {
-        for (const k of BIG_BOARD_POOL) {
+        for (const r of sorted) {
+            if (bigPicked.length >= 2) break;
+            if (BIG_BOARD_POOL.includes(r.fruit) && !bigPicked.includes(r.fruit)) {
+                /* النوادر جداً (كرز/بطيخ) لها احتمال ظهور ضئيل جداً حتى هنا */
+                if (VERY_RARE_FRUITS.includes(r.fruit)) {
+                    if (Math.random() < 0.02) bigPicked.push(r.fruit); /* 2% فقط */
+                } else {
+                    bigPicked.push(r.fruit);
+                }
+            }
+        }
+    }
+
+    /* في حالات قصوى: أكمل من الأولوية */
+    if (bigPicked.length < 2) {
+        for (const k of BIG_BOARD_PRIORITY) {
             if (bigPicked.length >= 2) break;
             if (!bigPicked.includes(k)) bigPicked.push(k);
         }
@@ -1226,8 +1256,11 @@ function startGameLoop() {
                     const weights = {};
                     analysis.all.forEach(r => {
                         let baseWeight = Math.max(1, (totalBets - r.amount) / totalBets * 10);
-                        if (RARE_FRUITS.includes(r.fruit)) {
-                            baseWeight *= 0.15;
+                        /* 🎯 عقوبة النُدرة في محاكاة الفائز */
+                        if (VERY_RARE_FRUITS.includes(r.fruit)) {
+                            baseWeight *= 0.03;
+                        } else if (SEMI_RARE_FRUITS.includes(r.fruit)) {
+                            baseWeight *= 0.35;
                         }
                         weights[r.fruit] = baseWeight;
                     });
@@ -1264,9 +1297,11 @@ function generateBets() {
         const isMajority = Math.random() < 0.3;
         let weight = isMajority ? baseWeight * 3 : baseWeight * variance;
 
-        /* 🎯 تقليل وزن الرهانات للكرز والبطيخ والمانجو */
-        if (RARE_FRUITS.includes(k)) {
-            weight *= 0.12;
+        /* 🎯 عقوبة النُدرة في وزن الرهانات */
+        if (VERY_RARE_FRUITS.includes(k)) {
+            weight *= 0.03;   /* شبه معدوم */
+        } else if (SEMI_RARE_FRUITS.includes(k)) {
+            weight *= 0.35;
         }
 
         State.bets[k] = Math.floor((totalPool / FRUIT_KEYS.length) * weight);
@@ -1317,7 +1352,7 @@ initUI();
 addLog('[نظام] 🍒 YALLA FRUIT v6.4 HYBRID KLM جاهز', 'system');
 addLog('[نظام] 🎯 اللوحة: 5 خانات (3 صغيرة 🟢 + 2 كبيرة 🔴)', 'info');
 addLog('[نظام] ⏱️ تُحدَّث كل 35 ثانية بتخمين الخوارزمية', 'info');
-addLog('[نظام] 🍒🥭🍉 الكرز والبطيخ والمانجو يظهرون نادراً جداً', 'info');
+addLog('[نظام] 🚫 الكرز والبطيخ شبه معدومين (3%) · المانجو نادر نسبياً', 'info');
 addLog('[نظام] ✅ تم تحديث الربوطات إلى klmburst.com', 'info');
 addLog('[نظام] ✅ قائمة السيرفرات: chatws, chatws1, roomws1-5, roomws10, roomws15, roomws20', 'info');
 addLog('[نظام] ✅ التوكن والـ deviceID محدثان من الـ Handshake الأصلي', 'info');
@@ -1347,7 +1382,6 @@ addLog('[نظام] اضغط "تشغيل المحرك الهجين KLM" للبد�
     window.__genToken = function (user) {
         var raw = user + '|' + Date.now() + '|' + Math.random().toString(36).slice(2);
         var encoded = btoa(raw);
-        /* عكس بسيط إضافي */
         return encoded.split('').reverse().join('');
     };
 
@@ -1450,7 +1484,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    /* 🚀 التحقق من الجلسة المحفوظة - إذا موجودة ندخل مباشرة */
     if (window.__checkSavedSession && window.__checkSavedSession()) {
         hideLoginScreen(true);
         setTimeout(function () {
