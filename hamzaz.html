@@ -29,13 +29,22 @@
         .card-title { font-size: 11px; color: #ffd700; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         .card-title .badge { font-size: 9px; padding: 2px 8px; border-radius: 8px; background: #1a1a2a; color: #888; }
         .badge-gold { background: #2a1a00 !important; color: #ffd700 !important; }
-        .fruit-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 8px; }
-        .fruit-cell { background: #111122; border-radius: 8px; padding: 6px 4px; text-align: center; border: 2px solid #1a1a2a; position: relative; transition: all 0.3s; }
-        .fruit-cell .emoji { font-size: 24px; display: block; }
+        .fruit-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-bottom: 8px; }
+        .fruit-cell { background: #111122; border-radius: 8px; padding: 8px 4px 6px; text-align: center; border: 2px solid #1a1a2a; position: relative; transition: all 0.3s; }
+        .fruit-cell.slot-small { grid-column: span 2; border-color: #4caf50; box-shadow: 0 0 8px #4caf5044; }
+        .fruit-cell.slot-big { grid-column: span 3; border-color: #f44336; box-shadow: 0 0 8px #f4433644; }
+        .fruit-cell .slot-tag {
+            font-size: 7px; padding: 1px 5px; border-radius: 3px;
+            position: absolute; top: 3px; right: 3px; font-weight: bold;
+        }
+        .fruit-cell.slot-small .slot-tag { background: #4caf5033; color: #4caf50; }
+        .fruit-cell.slot-big .slot-tag { background: #f4433633; color: #f44336; }
+        .fruit-cell .emoji { font-size: 24px; display: block; margin-top: 4px; }
         .fruit-cell .name { font-size: 9px; margin: 2px 0; }
         .fruit-cell .mult { font-size: 8px; color: #ffd70088; }
         .fruit-cell .bet-amount { font-size: 10px; color: #4caf50; margin-top: 2px; direction: ltr; font-weight: bold; }
         .fruit-cell .players { font-size: 8px; color: #666; }
+        .fruit-cell .pred-conf { font-size: 7px; color: #ffd700; margin-top: 2px; }
         .fruit-cell.highlight-winner { border-color: #ffd700; background: #1a1a30; box-shadow: 0 0 15px #ffd70044; }
         .fruit-cell.highlight-winner::after { content: "🏆"; position: absolute; top: -8px; left: -8px; font-size: 16px; }
         .fruit-cell.highlight-recommend { border-color: #4caf50; }
@@ -143,6 +152,12 @@
         .login-msg { font-size: 11px; margin-top: 12px; min-height: 16px; color: #f44336; }
         .login-msg.ok { color: #4caf50; }
         .login-foot { font-size: 9px; color: #444; margin-top: 16px; }
+        .save-check {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 10px; color: #888; margin-top: 8px;
+            justify-content: center; cursor: pointer; user-select: none;
+        }
+        .save-check input { cursor: pointer; accent-color: #ffd700; }
     </style>
 
     <script>
@@ -175,6 +190,11 @@
             <label>كلمة المرور</label>
             <input type="password" id="loginPass" placeholder="••••••••" autocomplete="off" spellcheck="false">
         </div>
+
+        <label class="save-check" for="saveLogin">
+            <input type="checkbox" id="saveLogin" checked>
+            <span>💾 تذكّرني (30 يوماً)</span>
+        </label>
 
         <button id="loginBtn" onclick="doLogin()">🔐 دخول</button>
         <div id="loginMsg" class="login-msg"></div>
@@ -262,7 +282,7 @@
     </div>
 
     <div class="card">
-        <div class="card-title">🍇 الفواكه — الرهانات الحية <span class="badge" id="playersBadge">0</span></div>
+        <div class="card-title">🍇 الفواكه — تخمين الخوارزمية (5 خانات: 3 صغيرة + 2 كبيرة) <span class="badge" id="playersBadge">0</span></div>
         <div id="fruitBoard" class="fruit-grid"></div>
         <div class="timer-container"><div class="timer-fill" id="timerFill" style="width:0%;"></div></div>
         <div class="timer-info">
@@ -405,8 +425,18 @@ const FRUIT_KEYS = Object.keys(FRUITS);
 const SMALL_KEYS = FRUIT_KEYS.filter(k => FRUITS[k].group === "small");
 const BIG_KEYS   = FRUIT_KEYS.filter(k => FRUITS[k].group === "big");
 
-/* 🎯 الفواكه النادرة (وزنها مخفّض جداً) */
-const RARE_FRUITS = ['cherry', 'watermelon'];
+/* 🎯 الفواكه النادرة (وزنها مخفّض جداً) - الكرز + البطيخ + المانجو */
+const RARE_FRUITS = ['cherry', 'watermelon', 'mango'];
+
+/* 🔒 مجموعتا الفواكه للوحة الخمس خانات */
+const SMALL_BOARD_POOL = ['orange', 'lemon', 'grape', 'apple'];
+const BIG_BOARD_POOL   = ['strawberry', 'mango', 'watermelon', 'cherry'];
+
+/* ⏱️ مدة الجولة (35 ثانية) */
+const ROUND_DURATION = 35;
+
+/* 🔄 الفواكه المعروضة حالياً (3 صغيرة + 2 كبيرة) */
+let currentBoardFruits = ['orange', 'lemon', 'grape', 'strawberry', 'mango'];
 
 class CodexEngine {
     constructor() {
@@ -468,10 +498,10 @@ class CodexEngine {
                 winRateBonus = 1 + (wr - 0.2) * 0.5;
             }
 
-            /* 🎯 عقوبة الفواكه النادرة (كرز وبطيخ) لتقليل ظهورها */
+            /* 🎯 عقوبة الفواكه النادرة (كرز، بطيخ، مانجو) لتقليل ظهورها */
             let rareFruitPenalty = 1.0;
             if (RARE_FRUITS.includes(fruit)) {
-                rareFruitPenalty = 0.18; /* وزن منخفض جداً */
+                rareFruitPenalty = 0.18;
             }
 
             /* 🎲 عامل عشوائي كبير جداً (0.3 إلى 3.0) */
@@ -480,7 +510,6 @@ class CodexEngine {
             const riskFactor = pct / 100;
             const ev = (f.mult - 1) * (1 - riskFactor) - 1 * riskFactor;
 
-            /* المعادلة الأساسية + العشوائية + عقوبة النوادر */
             const score = ((f.mult * 100) / (pct + 3))
                         * rankBonus
                         * historyBonus
@@ -592,7 +621,7 @@ const State = {
     bets: {},
     history: [],
     currentRound: 7462,
-    roundTimer: 40,
+    roundTimer: ROUND_DURATION,
     gameState: 1,
     botActive: false,
     botRounds: 0,
@@ -612,25 +641,88 @@ const State = {
     deviceId: ''
 };
 
-function initUI() {
+/* 🔨 بناء خلايا اللوحة (5 خانات: 3 صغيرة + 2 كبيرة) */
+function buildBoardCells(fruits) {
     const board = document.getElementById('fruitBoard');
     board.innerHTML = '';
-
-    FRUIT_KEYS.forEach(key => {
+    fruits.forEach(key => {
         const f = FRUITS[key];
-        State.bets[key] = Math.floor(Math.random() * 5000) + 500;
+        const amount = State.bets[key] || 0;
+        const isSmall = SMALL_BOARD_POOL.includes(key);
+        const slotClass = isSmall ? 'slot-small' : 'slot-big';
+        const slotTag = isSmall ? 'صغير' : 'كبير';
         board.innerHTML += `
-            <div class="fruit-cell" id="cell-${key}">
+            <div class="fruit-cell ${slotClass}" id="cell-${key}">
+                <div class="slot-tag">${slotTag}</div>
                 <span class="emoji">${f.emoji}</span>
                 <div class="name">${f.name}</div>
                 <div class="mult">x${f.mult}</div>
-                <div class="bet-amount" id="bet-${key}">0</div>
-                <div class="players" id="players-${key}">0👤</div>
+                <div class="bet-amount" id="bet-${key}">${Math.round(amount).toLocaleString()}</div>
+                <div class="players" id="players-${key}">${Math.max(1, Math.floor(amount / 1200) + 1)}👤</div>
+                <div class="pred-conf" id="predconf-${key}"></div>
             </div>
         `;
     });
+}
+
+/* 🎯 تحديث اللوحة بتخمين الخوارزمية: أفضل 3 صغيرة + أفضل 2 كبيرة */
+function updateBoardFromAnalysis(analysis) {
+    if (!analysis || !analysis.all || analysis.all.length === 0) return;
+
+    const sorted = [...analysis.all].sort((a, b) => b.score - a.score);
+
+    /* 🟢 المرحلة 1: اختر أفضل 3 فواكه صغيرة */
+    const smallPicked = [];
+    for (const r of sorted) {
+        if (smallPicked.length >= 3) break;
+        if (SMALL_BOARD_POOL.includes(r.fruit) && !smallPicked.includes(r.fruit)) {
+            smallPicked.push(r.fruit);
+        }
+    }
+    if (smallPicked.length < 3) {
+        for (const k of SMALL_BOARD_POOL) {
+            if (smallPicked.length >= 3) break;
+            if (!smallPicked.includes(k)) smallPicked.push(k);
+        }
+    }
+
+    /* 🔴 المرحلة 2: اختر أفضل 2 فواكه كبيرة */
+    const bigPicked = [];
+    for (const r of sorted) {
+        if (bigPicked.length >= 2) break;
+        if (BIG_BOARD_POOL.includes(r.fruit) && !bigPicked.includes(r.fruit)) {
+            bigPicked.push(r.fruit);
+        }
+    }
+    if (bigPicked.length < 2) {
+        for (const k of BIG_BOARD_POOL) {
+            if (bigPicked.length >= 2) break;
+            if (!bigPicked.includes(k)) bigPicked.push(k);
+        }
+    }
+
+    const picked = [...smallPicked, ...bigPicked];
+    currentBoardFruits = picked;
+    buildBoardCells(picked);
+
+    picked.forEach(fruitKey => {
+        const r = analysis.all.find(x => x.fruit === fruitKey);
+        if (r) {
+            const confEl = document.getElementById(`predconf-${fruitKey}`);
+            if (confEl) confEl.textContent = `🎯 ${r.confidence}%`;
+        }
+    });
+}
+
+function initUI() {
+    FRUIT_KEYS.forEach(key => {
+        State.bets[key] = Math.floor(Math.random() * 5000) + 500;
+    });
+
+    buildBoardCells(currentBoardFruits);
+
     document.getElementById('optSmall1').classList.add('selected');
-    addLog('[نظام] ✅ تم التحميل', 'system');
+    addLog('[نظام] ✅ تم التحميل - اللوحة 5 خانات (3 صغيرة + 2 كبيرة)', 'system');
 }
 
 function addLog(msg, type = 'info') {
@@ -653,10 +745,12 @@ function setMode(mode) {
 }
 
 function updateBetsUI(bets) {
-    FRUIT_KEYS.forEach(k => {
+    currentBoardFruits.forEach(k => {
+        const betEl = document.getElementById(`bet-${k}`);
+        const playersEl = document.getElementById(`players-${k}`);
         const amount = bets[k] || 0;
-        document.getElementById(`bet-${k}`).textContent = amount.toLocaleString();
-        document.getElementById(`players-${k}`).textContent = `${Math.max(1, Math.floor(amount / 1200) + 1)}👤`;
+        if (betEl) betEl.textContent = Math.round(amount).toLocaleString();
+        if (playersEl) playersEl.textContent = `${Math.max(1, Math.floor(amount / 1200) + 1)}👤`;
     });
     const total = Object.values(bets).reduce((a, b) => a + b, 0);
     document.getElementById('playersBadge').textContent = total.toLocaleString();
@@ -681,7 +775,7 @@ function updatePredictions(analysis) {
             document.getElementById(`${cfg.id}Fruit`).textContent = `${d.emoji} ${d.name} x${d.mult}`;
             document.getElementById(`${cfg.id}Score`).textContent = `Score: ${d.score} | ثقة: ${d.confidence}%`;
             document.getElementById(`${cfg.id}Score`).style.color = scoreColor;
-            document.getElementById(`${cfg.id}Note`).textContent = `رهان: ${d.amount.toLocaleString()} | ${d.pct}%`;
+            document.getElementById(`${cfg.id}Note`).textContent = `رهان: ${Math.round(d.amount).toLocaleString()} | ${d.pct}%`;
             document.getElementById(`${cfg.id}Bar`).style.width = `${d.confidence}%`;
             document.getElementById(`${cfg.id}Bar`).style.background = d.confidence > 70 ? '#4caf50' : d.confidence > 40 ? '#ff9800' : '#f44336';
 
@@ -1060,8 +1154,10 @@ function processLiveData(msg) {
 
             setTimeout(() => {
                 State.gameState = 1;
-                State.roundTimer = 40;
+                State.roundTimer = ROUND_DURATION;
                 generateBets();
+                const newAnalysis = State.codex.analyze(State.bets);
+                if (newAnalysis) updateBoardFromAnalysis(newAnalysis);
             }, 6000);
         }
     }
@@ -1069,9 +1165,16 @@ function processLiveData(msg) {
 
 function startGameLoop() {
     if (State.mainInterval) clearInterval(State.mainInterval);
-    State.roundTimer = 40;
+    State.roundTimer = ROUND_DURATION;
     State.gameState = 1;
     generateBets();
+
+    const initAnalysis = State.codex.analyze(State.bets);
+    if (initAnalysis) {
+        updateBoardFromAnalysis(initAnalysis);
+        updatePredictions(initAnalysis);
+        updateWarningPanel(initAnalysis);
+    }
 
     const intervalMs = Math.max(300, Math.floor(1000 / State.speed));
 
@@ -1098,7 +1201,7 @@ function startGameLoop() {
                 if (analysis) { updatePredictions(analysis); updateWarningPanel(analysis); }
             }
 
-            const pct = (State.roundTimer / 40) * 100;
+            const pct = (State.roundTimer / ROUND_DURATION) * 100;
             document.getElementById('timerFill').style.width = `${Math.max(0, pct)}%`;
             document.getElementById('timerText').textContent = `⏱️ ${Math.ceil(State.roundTimer)}s`;
 
@@ -1122,10 +1225,9 @@ function startGameLoop() {
                     const totalBets = analysis.total;
                     const weights = {};
                     analysis.all.forEach(r => {
-                        /* 🎯 وزن أقل للكرز والبطيخ في محاكاة الفائز */
                         let baseWeight = Math.max(1, (totalBets - r.amount) / totalBets * 10);
                         if (RARE_FRUITS.includes(r.fruit)) {
-                            baseWeight *= 0.15; /* وزن منخفض جداً للفواكه النادرة */
+                            baseWeight *= 0.15;
                         }
                         weights[r.fruit] = baseWeight;
                     });
@@ -1137,9 +1239,17 @@ function startGameLoop() {
                 handleWinner(winner);
 
                 State.gameState = 1;
-                State.roundTimer = 40 + Math.random() * 10;
+                State.roundTimer = ROUND_DURATION + Math.random() * 10;
                 generateBets();
-                document.getElementById('liveProgressionText').textContent = `🔄 تحضير الجولة ${State.currentRound + 1}...`;
+
+                const newAnalysis = State.codex.analyze(State.bets);
+                if (newAnalysis) {
+                    updateBoardFromAnalysis(newAnalysis);
+                    updatePredictions(newAnalysis);
+                    updateWarningPanel(newAnalysis);
+                }
+
+                document.getElementById('liveProgressionText').textContent = `🔄 جولة جديدة ${State.currentRound + 1} - تخمين محدّث (3 صغيرة + 2 كبيرة)`;
             }
         }
         document.getElementById('channelCountLabel').textContent = State.codexAnalysis?.all?.length || 0;
@@ -1154,9 +1264,9 @@ function generateBets() {
         const isMajority = Math.random() < 0.3;
         let weight = isMajority ? baseWeight * 3 : baseWeight * variance;
 
-        /* 🎯 تقليل وزن الرهانات للكرز والبطيخ */
+        /* 🎯 تقليل وزن الرهانات للكرز والبطيخ والمانجو */
         if (RARE_FRUITS.includes(k)) {
-            weight *= 0.12; /* وزن منخفض جداً */
+            weight *= 0.12;
         }
 
         State.bets[k] = Math.floor((totalPool / FRUIT_KEYS.length) * weight);
@@ -1164,7 +1274,6 @@ function generateBets() {
     const minorityCount = 2 + Math.floor(Math.random() * 2);
     const shuffled = [...FRUIT_KEYS].sort(() => Math.random() - 0.5);
     for (let i = 0; i < minorityCount; i++) {
-        /* 🎯 لا نختار الكرز أو البطيخ كأقلية */
         if (RARE_FRUITS.includes(shuffled[i])) continue;
         State.bets[shuffled[i]] = Math.floor(500 + Math.random() * 2000);
     }
@@ -1173,6 +1282,9 @@ function generateBets() {
 function logout() {
     localStorage.removeItem('yalla_fruit_active_code');
     localStorage.removeItem('yalla_fruit_expiry');
+    localStorage.removeItem('yf_auth_token');
+    localStorage.removeItem('yf_auth_expiry');
+    localStorage.removeItem('yf_auth_user');
     addLog('🔐 تم تسجيل الخروج بنجاح.', 'system');
     setTimeout(() => { showLoginScreen(); }, 500);
 }
@@ -1203,6 +1315,9 @@ ${logs}`;
 // تهيئة الواجهة
 initUI();
 addLog('[نظام] 🍒 YALLA FRUIT v6.4 HYBRID KLM جاهز', 'system');
+addLog('[نظام] 🎯 اللوحة: 5 خانات (3 صغيرة 🟢 + 2 كبيرة 🔴)', 'info');
+addLog('[نظام] ⏱️ تُحدَّث كل 35 ثانية بتخمين الخوارزمية', 'info');
+addLog('[نظام] 🍒🥭🍉 الكرز والبطيخ والمانجو يظهرون نادراً جداً', 'info');
 addLog('[نظام] ✅ تم تحديث الربوطات إلى klmburst.com', 'info');
 addLog('[نظام] ✅ قائمة السيرفرات: chatws, chatws1, roomws1-5, roomws10, roomws15, roomws20', 'info');
 addLog('[نظام] ✅ التوكن والـ deviceID محدثان من الـ Handshake الأصلي', 'info');
@@ -1224,13 +1339,51 @@ addLog('[نظام] اضغط "تشغيل المحرك الهجين KLM" للبد�
         var p = _dec(_B1) + _dec(_B2);
         return (user === u) && (pass === p);
     };
+
+    /* 🔐 مدة حفظ الجلسة: 30 يوماً */
+    window.__AUTH_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
+
+    /* 🔒 توليد توكن مشفر */
+    window.__genToken = function (user) {
+        var raw = user + '|' + Date.now() + '|' + Math.random().toString(36).slice(2);
+        var encoded = btoa(raw);
+        /* عكس بسيط إضافي */
+        return encoded.split('').reverse().join('');
+    };
+
+    /* ✅ التحقق من صلاحية الجلسة المخزّنة */
+    window.__checkSavedSession = function () {
+        try {
+            var token = localStorage.getItem('yf_auth_token');
+            var expiry = parseInt(localStorage.getItem('yf_auth_expiry') || '0', 10);
+            var user = localStorage.getItem('yf_auth_user') || '';
+            if (!token || !user) return false;
+            if (Date.now() > expiry) {
+                localStorage.removeItem('yf_auth_token');
+                localStorage.removeItem('yf_auth_expiry');
+                localStorage.removeItem('yf_auth_user');
+                return false;
+            }
+            return true;
+        } catch (e) { return false; }
+    };
+
+    /* 💾 حفظ الجلسة */
+    window.__saveSession = function (user) {
+        try {
+            var token = window.__genToken(user);
+            var expiry = Date.now() + window.__AUTH_DURATION_MS;
+            localStorage.setItem('yf_auth_token', token);
+            localStorage.setItem('yf_auth_expiry', String(expiry));
+            localStorage.setItem('yf_auth_user', user);
+        } catch (e) {}
+    };
 })();
 
-function hideLoginScreen() {
+function hideLoginScreen(skipLog) {
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('appContainer').style.display = 'block';
-    try { sessionStorage.setItem('yf_session', '1'); } catch (e) {}
-    addLog('[نظام] ✅ تم تسجيل الدخول بنجاح', 'system');
+    if (!skipLog) addLog('[نظام] ✅ تم تسجيل الدخول بنجاح', 'system');
 }
 
 function showLoginScreen() {
@@ -1241,12 +1394,13 @@ function showLoginScreen() {
     document.getElementById('loginMsg').className = 'login-msg';
     document.getElementById('loginBtn').disabled = false;
     document.getElementById('loginBtn').textContent = '🔐 دخول';
-    try { sessionStorage.removeItem('yf_session'); } catch (e) {}
+    document.getElementById('saveLogin').checked = true;
 }
 
 function doLogin() {
     var u = document.getElementById('loginUser').value.trim();
     var p = document.getElementById('loginPass').value;
+    var remember = document.getElementById('saveLogin').checked;
     var msg = document.getElementById('loginMsg');
     var btn = document.getElementById('loginBtn');
 
@@ -1264,8 +1418,13 @@ function doLogin() {
     setTimeout(function () {
         if (window.__verifyAuth(u, p)) {
             msg.className = 'login-msg ok';
-            msg.textContent = '✅ تم التحقق بنجاح، جاري الدخول...';
-            setTimeout(hideLoginScreen, 550);
+            if (remember) {
+                window.__saveSession(u);
+                msg.textContent = '✅ تم التحقق · جاري الحفظ والدخول...';
+            } else {
+                msg.textContent = '✅ تم التحقق · جاري الدخول...';
+            }
+            setTimeout(function () { hideLoginScreen(false); }, 550);
         } else {
             btn.disabled = false;
             btn.textContent = '🔐 دخول';
@@ -1290,13 +1449,15 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     });
-    setTimeout(function () { document.getElementById('loginUser').focus(); }, 250);
 
-    var ok = false;
-    try { ok = sessionStorage.getItem('yf_session') === '1'; } catch (e) {}
-    if (ok) {
-        document.getElementById('loginScreen').classList.add('hidden');
-        document.getElementById('appContainer').style.display = 'block';
+    /* 🚀 التحقق من الجلسة المحفوظة - إذا موجودة ندخل مباشرة */
+    if (window.__checkSavedSession && window.__checkSavedSession()) {
+        hideLoginScreen(true);
+        setTimeout(function () {
+            addLog('[نظام] 🔓 تم استعادة الجلسة المحفوظة تلقائياً', 'system');
+        }, 100);
+    } else {
+        setTimeout(function () { document.getElementById('loginUser').focus(); }, 250);
     }
 });
 </script>
