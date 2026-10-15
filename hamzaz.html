@@ -51,7 +51,7 @@
         .fruit-cell.low-bet { border-color: #ff9800aa; }
         .fruit-cell.special { border-color: #e040fb; box-shadow: 0 0 8px #e040fb44; }
         .timer-container { height: 4px; background: #1a1a2a; border-radius: 2px; overflow: hidden; margin: 4px 0; }
-        .timer-fill { height: 100%; border-radius: 2px; transition: width 0.2s linear; background: linear-gradient(90deg, #4caf50, #ff9800, #f44336); }
+        .timer-fill { height: 100%; border-radius: 2px; transition: width 0.15s linear; background: linear-gradient(90deg, #4caf50, #ff9800, #f44336); }
         .timer-info { display: flex; justify-content: space-between; font-size: 9px; color: #666; margin-bottom: 6px; }
         .prediction-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
         .pred-option { background: #0a0a18; border-radius: 8px; padding: 8px; border: 1px solid #1a1a2a; cursor: pointer; transition: all 0.2s; }
@@ -106,7 +106,6 @@
         .ws-badge { font-size: 16px; font-weight: bold; color: #ffd700; text-shadow: 0 0 8px #ffd70044; }
         .logout-btn { background: #f4433622 !important; color: #f44336 !important; border: 1px solid #f4433644 !important; font-size: 9px; padding: 4px 10px; border-radius: 4px; cursor: pointer; }
 
-        /* ============ شاشة تسجيل الدخول ============ */
         #loginScreen {
             position: fixed; inset: 0; z-index: 99999;
             background: radial-gradient(circle at 50% 18%, #1a0a12 0%, #07070d 70%);
@@ -167,7 +166,6 @@
 </head>
 <body>
 
-<!-- ================= شاشة تسجيل الدخول ================= -->
 <div id="loginScreen">
     <div class="login-box">
         <div class="login-logo">🍒</div>
@@ -194,7 +192,6 @@
         <div class="login-foot">🔒 محمي بتشفير داخلي · غير مصرح بالدخول لغير المصرح لهم</div>
     </div>
 </div>
-<!-- ====================================================== -->
 
 <div class="container" id="appContainer" style="display:none;">
 
@@ -279,7 +276,7 @@
         <div id="fruitBoard" class="fruit-grid"></div>
         <div class="timer-container"><div class="timer-fill" id="timerFill" style="width:0%;"></div></div>
         <div class="timer-info">
-            <span id="timerText">⏱️ 0s</span>
+            <span id="timerText">⏱️ 37s</span>
             <span id="roundTimerText">الحالة: انتظار...</span>
         </div>
     </div>
@@ -404,24 +401,7 @@
 
 <script>
 /* ==========================================================================
- *  YALLA FRUIT v6.4 — AI1 (Brain 1) — SMALI-EXACT RANDOMNESS & PREDICTION
- *  ------------------------------------------------------------------------
- *  All weights, randomness, learning, memory, and weighted-lottery logic
- *  is a byte-for-byte port of YallaGameActivity.startNewRound() [smali].
- *
- *  What stayed IDENTICAL to your previous HTML:
- *    • UI, layout, login screen, KLM network, bot panel, statistics
- *    • Cherry/Watermelon mutual exclusion in the lottery
- *    • Board layout (3 small + 2 big)
- *
- *  What changed (ONLY the randomness + prediction core):
- *    • Base weight ranges per fruit (15/20/25/28/30)
- *    • occurrences × SecureRandom(2..4)
- *    • bonus SecureRandom(2..5) or -2
- *    • strawberry/mango exception
- *    • highConfidence when weight ≥ 25
- *    • 3-or-4 selection count decision
- *    • max weight cap 30
+ *  YALLA FRUIT v6.4 — AI1 (Brain 1) — SMALI-EXACT
  * ========================================================================== */
 
 const FRUITS = {
@@ -452,30 +432,22 @@ function getRarePenalty(fruit) {
 const SMALL_BOARD_POOL = ['orange', 'lemon', 'grape', 'apple'];
 const BIG_BOARD_POOL   = ['strawberry', 'mango', 'watermelon', 'cherry'];
 
-/* ✅ تم إصلاح المدة: 37 ثانية بالضبط */
+/* ✅ مدة الجولة بالضبط 37 ثانية حقيقية */
 const ROUND_DURATION = 37;
 
 let currentBoardFruits = ['orange', 'lemon', 'grape', 'strawberry', 'mango'];
 
 /* ==========================================================================
  *  AI1 — BRAIN 1  (SMALI-EXACT IMPLEMENTATION)
- *  --------------------------------------------------------------------------
- *  Base weight ranges (from YallaGameActivity.startNewRound sparse-switch):
- *     cherry     → randInt(0x0F=15) + 1  → 1..15
- *     watermelon → randInt(0x14=20) + 1  → 1..20
- *     mango      → randInt(0x19=25) + 1  → 1..25
- *     strawberry → randInt(0x1C=28) + 1  → 1..28
- *     orange/lemon/grape/apple → randInt(0x1E=30) + 1 → 1..30
  * ========================================================================== */
 const AI1 = {
-    history: [],            // last 7 winners (fruit keys)
-    occurrences: {},        // fruit key → count inside history
+    history: [],
+    occurrences: {},
     MAX: 7,
     WEIGHT_CAP: 30,
     HIGH_CONF: 25,
     STRAWBERRY_MANGO_EXCEPTION: true,
 
-    /* Push a fresh winning fruit into short-term memory (7 slots) */
     push(fruitKey) {
         if (!fruitKey || !FRUITS[fruitKey]) return;
         this.history.push(fruitKey);
@@ -496,62 +468,51 @@ const AI1 = {
     }
 };
 
-/* Base random max per fruit — mirrors the exact constants in the smali */
 function getBaseRange(fruitKey) {
     switch (fruitKey) {
-        case 'cherry':     return 15;   // 0x0F
-        case 'watermelon': return 20;   // 0x14
-        case 'mango':      return 25;   // 0x19
-        case 'strawberry': return 28;   // 0x1C
+        case 'cherry':     return 15;
+        case 'watermelon': return 20;
+        case 'mango':      return 25;
+        case 'strawberry': return 28;
         case 'orange':
         case 'lemon':
         case 'grape':
         case 'apple':
-            return 30;                   // 0x1E
+            return 30;
         default:
-            return 10;                   // 0x0A
+            return 10;
     }
 }
 
-/* ==========================================================================
- *  calculateAI1Weight — EXACT PORT FROM smali (currentAI == 1 branch)
- * ========================================================================== */
 function calculateAI1Weight(fruitKey, lastRoundGuesses) {
     const baseMax = getBaseRange(fruitKey);
     let weight = Math.floor(Math.random() * baseMax) + 1;
 
-    /* Halve cherry / watermelon if they were in last round's guesses */
     if ((fruitKey === 'cherry' || fruitKey === 'watermelon')
         && lastRoundGuesses.includes(fruitKey)) {
         weight = Math.max(1, Math.floor(weight / 2));
     }
 
-    /* Apply AI1 memory boost (occurrences × multiplier + bonus) */
     if (AI1.occurrences[fruitKey] !== undefined) {
         const occ = AI1.occurrences[fruitKey];
-
-        /* multiplier = randInt(3) + 2 → 2..4   (exact smali) */
         const multiplier = Math.floor(Math.random() * 3) + 2;
         const occurrencesBoost = occ * multiplier;
 
-        /* bonus = randInt(4) + 2 → 2..5  OR  -2  (exact smali) */
         let bonus;
         if (!lastRoundGuesses.includes(fruitKey)) {
-            bonus = Math.floor(Math.random() * 4) + 2;   // 2..5
+            bonus = Math.floor(Math.random() * 4) + 2;
         } else {
             bonus = -2;
         }
 
         let newWeight = weight + occurrencesBoost + bonus;
 
-        /* Strawberry / Mango exception: if they were guessed → weight = 0 */
         if (AI1.STRAWBERRY_MANGO_EXCEPTION
             && (fruitKey === 'strawberry' || fruitKey === 'mango')
             && lastRoundGuesses.includes(fruitKey)) {
             newWeight = 0;
         }
 
-        /* Clamp: min(30, weight) then max(0, ...)  (exact smali) */
         newWeight = Math.min(newWeight, AI1.WEIGHT_CAP);
         newWeight = Math.max(0, newWeight);
         weight = newWeight;
@@ -560,7 +521,6 @@ function calculateAI1Weight(fruitKey, lastRoundGuesses) {
     return weight;
 }
 
-/* Compute weights + high-confidence flag + max/total */
 function computeAI1Weights(boardFruits, lastRoundGuesses) {
     const weights = {};
     let total = 0, max = 0, highConfidence = false;
@@ -576,10 +536,6 @@ function computeAI1Weights(boardFruits, lastRoundGuesses) {
     return { weights, total, max, highConfidence };
 }
 
-/* Selection count decision (exact smali):
- *   if (highConfidence && maxPct >= 55) → randInt(100) > 80 ? 4 : 3
- *   else count = 4
- */
 function decideCount(highConfidence, max, total) {
     if (total <= 0) return 4;
     const maxPct = Math.floor((max * 100) / total);
@@ -590,16 +546,13 @@ function decideCount(highConfidence, max, total) {
     return 4;
 }
 
-/* Weighted lottery + unique pick (with cherry/watermelon mutual exclusion) */
 function weightedLottery(pool, weights, count) {
-    /* Build lottery pool: each fruit repeated `weight` times */
     const bag = [];
     pool.forEach(key => {
         const w = Math.max(0, Math.floor(weights[key] || 0));
         for (let i = 0; i < w; i++) bag.push(key);
     });
 
-    /* Secure-like shuffle (Fisher–Yates) */
     for (let i = bag.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [bag[i], bag[j]] = [bag[j], bag[i]];
@@ -608,12 +561,10 @@ function weightedLottery(pool, weights, count) {
     const picked = [];
     const pickedSet = new Set();
 
-    /* Primary pass from the weighted bag */
     for (const key of bag) {
         if (picked.length >= count) break;
         if (pickedSet.has(key)) continue;
 
-        /* 🚫 Cherry & Watermelon mutual exclusion — kept as-is */
         if (key === 'cherry'     && pickedSet.has('watermelon')) continue;
         if (key === 'watermelon' && pickedSet.has('cherry'))     continue;
 
@@ -621,7 +572,6 @@ function weightedLottery(pool, weights, count) {
         pickedSet.add(key);
     }
 
-    /* Fallback: fill from remaining pool (still respecting exclusion) */
     if (picked.length < count) {
         const remaining = pool.filter(k => !pickedSet.has(k));
         for (let i = remaining.length - 1; i > 0; i--) {
@@ -640,27 +590,17 @@ function weightedLottery(pool, weights, count) {
     return picked;
 }
 
-/* ==========================================================================
- *  AI1 GENERATE BOARD  — picks exactly 3 small + 2 big using the smali core
- *  Keeps board layout identical (3 small + 2 big) and cherry/watermelon
- *  exclusion intact.
- * ========================================================================== */
 function ai1GenerateBoard() {
     const lastRoundGuesses = currentBoardFruits.slice();
 
-    /* Compute weights for every fruit (both pools share AI1 memory) */
     const allWeights = {};
     FRUIT_KEYS.forEach(key => {
         allWeights[key] = calculateAI1Weight(key, lastRoundGuesses);
     });
 
-    /* ---- 3 small slots ---- */
     const smalls = weightedLottery(SMALL_BOARD_POOL, allWeights, 3);
-
-    /* ---- 2 big slots (cherry/watermelon exclusion preserved) ---- */
     const bigs = weightedLottery(BIG_BOARD_POOL, allWeights, 2);
 
-    /* Final board: 3 small + 2 big (preserves original ordering) */
     const picked = [...smalls, ...bigs];
 
     return {
@@ -672,9 +612,6 @@ function ai1GenerateBoard() {
     };
 }
 
-/* ==========================================================================
- *  CODEX ENGINE — kept as-is for scoring/display only (not for randomness)
- * ========================================================================== */
 class CodexEngine {
     constructor() {
         this.history = [];
@@ -852,6 +789,7 @@ const State = {
     history: [],
     currentRound: 7462,
     roundTimer: ROUND_DURATION,
+    roundStartTime: null,   // ✅ NEW: طابع بداية الجولة (مصدر الحقيقة للوقت)
     gameState: 1,
     botActive: false,
     botRounds: 0,
@@ -871,7 +809,6 @@ const State = {
     deviceId: ''
 };
 
-/* Build board cells — 3 small + 2 big (unchanged) */
 function buildBoardCells(fruits) {
     const board = document.getElementById('fruitBoard');
     board.innerHTML = '';
@@ -895,16 +832,12 @@ function buildBoardCells(fruits) {
     });
 }
 
-/* ==========================================================================
- *  updateBoardFromAnalysis — NOW USES AI1 (SMALI-EXACT) INSTEAD OF CODEX
- * ========================================================================== */
 function updateBoardFromAnalysis(analysis) {
     const result = ai1GenerateBoard();
     const picked = result.picked;
     currentBoardFruits = picked;
     buildBoardCells(picked);
 
-    /* Show AI1 weight per picked fruit (as % of total) */
     const totalWeight = Object.values(result.weights).reduce((a, b) => a + b, 0) || 1;
     picked.forEach(fruitKey => {
         const el = document.getElementById(`predconf-${fruitKey}`);
@@ -1071,7 +1004,6 @@ function handleWinner(winnerKey) {
         setTimeout(() => cell.classList.remove('highlight-winner'), 4000);
     }
 
-    /* Push winner into AI1 short-term memory */
     AI1.push(winnerKey);
     addLog(`🧠 AI1 memory updated: +${winnerKey} (size=${AI1.history.length}/${AI1.MAX})`, 'data');
 
@@ -1363,6 +1295,8 @@ function processLiveData(msg) {
 
             setTimeout(() => {
                 State.gameState = 1;
+                /* ✅ إعادة ضبط طابع بداية الجولة عند بدء جولة جديدة من Live */
+                State.roundStartTime = Date.now();
                 State.roundTimer = ROUND_DURATION;
                 generateBets();
                 const newAnalysis = State.codex.analyze(State.bets);
@@ -1373,15 +1307,25 @@ function processLiveData(msg) {
 }
 
 /* ==========================================================================
- *  ✅ startGameLoop — تم الإصلاح:
- *    • العداد يبدأ بالضبط من ROUND_DURATION = 37 ثانية (بدون أي random)
- *    • الخصم يعتمد على الوقت الفعلي (Date.now) — دقيق 100%
- *    • لا مزيد من البطء ولا 40 ثانية
+ *  ✅ startGameLoop — الإصلاح الاحترافي للعداد:
+ *    • العداد يعتمد كلياً على الوقت الحقيقي (Date.now - roundStartTime)
+ *    • مستقل تماماً عن "سرعة التحليل" → لا تأثر ولا انحراف
+ *    • يبدأ بالضبط من 37 ثانية وينتهي بالضبط عند 0 بعد 37 ثانية حقيقية
+ *    • عرض الثواني طبيعي: 37 → 36 → 35 → ... → 0
  * ========================================================================== */
 function startGameLoop() {
     if (State.mainInterval) clearInterval(State.mainInterval);
-    State.roundTimer = ROUND_DURATION;   // ✅ يبدأ بالضبط بـ 37
+
+    /* ✅ ضبط طابع بداية الجولة */
+    State.roundStartTime = Date.now();
+    State.roundTimer = ROUND_DURATION;
     State.gameState = 1;
+
+    /* عرض ابتدائي فوري */
+    document.getElementById('timerFill').style.width = '100%';
+    document.getElementById('timerText').textContent = `⏱️ ${ROUND_DURATION}s`;
+    document.getElementById('roundTimerText').textContent = '🟢 وقت الرهان مفتوح';
+
     generateBets();
 
     const initAnalysis = State.codex.analyze(State.bets);
@@ -1391,27 +1335,28 @@ function startGameLoop() {
         updateWarningPanel(initAnalysis);
     }
 
-    const intervalMs = Math.max(300, Math.floor(1000 / State.speed));
-    let lastTick = Date.now();
+    /* سرعة التحليل تؤثر فقط على تحديث التحليل، وليس على العداد */
+    const analysisIntervalMs = Math.max(250, Math.floor(1000 / State.speed));
 
     State.mainInterval = setInterval(() => {
-        if (!State.running) { lastTick = Date.now(); return; }
-
-        /* حساب الزمن الحقيقي المنقضي بالثواني */
-        const now = Date.now();
-        const elapsed = (now - lastTick) / 1000;
-        lastTick = now;
+        if (!State.running) return;
 
         if (State.gameState === 1) {
-            State.roundTimer -= elapsed;   // ✅ خصم دقيق بالزمن الفعلي
 
+            /* ✅ حساب الوقت المتبقي مباشرة من الساعة الحقيقية — لا انحراف ولا تسارع */
+            const elapsedRealSeconds = (Date.now() - State.roundStartTime) / 1000;
+            State.roundTimer = Math.max(0, ROUND_DURATION - elapsedRealSeconds);
+
+            /* انتهاء الوقت */
             if (State.roundTimer <= 0) {
                 State.gameState = 2;
-                State.roundTimer = 0;
+                document.getElementById('timerFill').style.width = '0%';
+                document.getElementById('timerText').textContent = '⏱️ 0s';
                 document.getElementById('roundTimerText').textContent = '🔴 جاري سحب النتيجة...';
                 return;
             }
 
+            /* تحديث الرهانات + التحليل (بدون أي علاقة بالعداد) */
             if (Math.random() < 0.2 && !State.connector) {
                 generateBets();
             }
@@ -1422,6 +1367,7 @@ function startGameLoop() {
                 if (analysis) { updatePredictions(analysis); updateWarningPanel(analysis); }
             }
 
+            /* ✅ تحديث شريط العداد والنص (كل تيك نعرض القيمة الحقيقية) */
             const pct = (State.roundTimer / ROUND_DURATION) * 100;
             document.getElementById('timerFill').style.width = `${Math.max(0, Math.min(100, pct))}%`;
             document.getElementById('timerText').textContent = `⏱️ ${Math.ceil(State.roundTimer)}s`;
@@ -1442,6 +1388,7 @@ function startGameLoop() {
             document.getElementById('liveProgressionText').textContent = phrases[Math.floor(Math.random() * phrases.length)];
 
         } else if (State.gameState === 2) {
+
             if (!State.connector && Math.random() < 0.1) {
                 /* ---- WINNER SIMULATION — uses AI1 weights (SMALI-EXACT) ---- */
                 const lastGuesses = currentBoardFruits.slice();
@@ -1451,28 +1398,28 @@ function startGameLoop() {
                     weights[k] = calculateAI1Weight(k, lastGuesses);
                 });
 
-                /* Build weighted lottery over ALL fruits */
                 const bag = [];
                 FRUIT_KEYS.forEach(k => {
                     const w = Math.max(0, Math.floor(weights[k] || 0));
                     for (let i = 0; i < w; i++) bag.push(k);
                 });
 
-                /* Shuffle */
                 for (let i = bag.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [bag[i], bag[j]] = [bag[j], bag[i]];
                 }
 
-                /* First element = winner (respect cherry/watermelon exclusion) */
                 let winner = bag[0];
                 if (!winner) winner = FRUIT_KEYS[Math.floor(Math.random() * FRUIT_KEYS.length)];
 
                 handleWinner(winner);
 
                 State.gameState = 1;
-                /* ✅ الإصلاح: بدون أي إضافة عشوائية — الجولة الجديدة تبدأ بالضبط من 37 */
+
+                /* ✅ إعادة ضبط طابع بداية الجولة — الجولة الجديدة تبدأ الآن بالضبط */
+                State.roundStartTime = Date.now();
                 State.roundTimer = ROUND_DURATION;
+
                 generateBets();
 
                 const newAnalysis = State.codex.analyze(State.bets);
@@ -1487,7 +1434,7 @@ function startGameLoop() {
             }
         }
         document.getElementById('channelCountLabel').textContent = State.codexAnalysis?.all?.length || 0;
-    }, intervalMs);
+    }, analysisIntervalMs);
 }
 
 function generateBets() {
@@ -1558,11 +1505,10 @@ addLog('[نظام] 🧠 الأوزان الأساسية: كرز 1–15 | بطي�
 addLog('[نظام] 🎲 multiplier = randInt(3)+2 (2..4) · bonus = randInt(4)+2 (2..5) / -2', 'info');
 addLog('[نظام] ⚡ highConfidence @ w≥25 · cap=30 · count=3-or-4', 'info');
 addLog('[نظام] 🚫 استبعاد الكرز/البطيخ متبادل في القرعة (كما هو)', 'info');
-addLog('[نظام] ⏱️ العداد يبدأ بالضبط من 37 ثانية وبدقة زمن حقيقية 100%', 'info');
+addLog('[نظام] ⏱️ العداد حقيقي 100% — 37 ثانية بالضبط، كل ثانية تمر في ثانيتها', 'info');
 addLog('[نظام] اضغط "تشغيل المحرك الهجين KLM" للبدء', 'system');
 </script>
 
-<!-- ================= سكربت تسجيل الدخول ================= -->
 <script>
 (function () {
     var _A1 = "Z21haWwz";
@@ -1693,7 +1639,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
-<!-- ============================================================== -->
 
 </body>
 </html>
