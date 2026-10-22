@@ -14,15 +14,14 @@
 
     <style>
         :root {
-            /* الألوان متطابقة تماماً مع تصميم التطبيق (AvailableAppsActivity) */
-            --primary: #A865FF;       /* بنفسجي مضيء */
-            --secondary: #8A2BE2;     /* بنفسجي غامق */
-            --gold: #E0B0FF;          /* بنفسجي ساطع جداً بديل للذهبي ليتناسب مع الثيم */
-            --bg-dark: #0C0519;       /* لون خلفية التطبيق */
-            --bg-card: #140A23;       /* لون الحاويات الداخلي */
+            --primary: #A865FF;
+            --secondary: #8A2BE2;
+            --gold: #E0B0FF;
+            --bg-dark: #0C0519;
+            --bg-card: #140A23;
             --text-main: #ffffff;
             --text-muted: #807994;
-            --success: #00E676;       /* الأخضر الخاص بنقطة "متاح" */
+            --success: #00E676;
             --error: #ff4757;
         }
 
@@ -34,7 +33,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-dark); /* مطابقة لخلفية التطبيق */
+            background: var(--bg-dark);
             color: var(--text-main);
             text-align: center;
             min-height: 100vh;
@@ -47,7 +46,7 @@
             overflow-x: hidden;
         }
 
-        /* تأثير الخلفية المتوهجة بأسلوب التطبيق */
+        /* تأثير الخلفية المتوهجة */
         body::before {
             content: '';
             position: fixed;
@@ -66,6 +65,122 @@
             100% { transform: scale(1.1); opacity: 1; }
         }
 
+        /* ============================================
+           شاشة القفل - تظهر فقط خارج التطبيق (WebView)
+           ============================================ */
+        #lock-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 35px;
+            padding: 45px 30px;
+            max-width: 520px;
+            width: 100%;
+            animation: lockEnter 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes lockEnter {
+            0% { opacity: 0; transform: scale(0.88) translateY(20px); }
+            60% { opacity: 1; transform: scale(1.03) translateY(-4px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .lock-visual {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: floatY 3.5s ease-in-out infinite;
+        }
+
+        @keyframes floatY {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .lock-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: var(--primary);
+            border-right-color: rgba(168, 101, 255, 0.25);
+            animation: spinRing 3.2s linear infinite;
+            box-shadow: 0 0 30px rgba(168, 101, 255, 0.25);
+        }
+
+        .lock-ring::before {
+            content: '';
+            position: absolute;
+            inset: 14px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-bottom-color: var(--gold);
+            border-left-color: rgba(224, 176, 255, 0.25);
+            animation: spinRing 4.2s linear infinite reverse;
+        }
+
+        @keyframes spinRing {
+            to { transform: rotate(360deg); }
+        }
+
+        .lock-icon {
+            font-size: 58px;
+            z-index: 2;
+            animation: lockPulse 2.2s ease-in-out infinite;
+        }
+
+        @keyframes lockPulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 18px rgba(168, 101, 255, 0.7)); }
+            50% { transform: scale(1.12); filter: drop-shadow(0 0 35px rgba(224, 176, 255, 1)); }
+        }
+
+        .lock-text {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.8;
+            padding: 22px 32px;
+            border-radius: 18px;
+            background: rgba(20, 10, 35, 0.85);
+            border: 1px solid rgba(168, 101, 255, 0.4);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            animation: lockTextGlow 3s ease-in-out infinite alternate;
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes lockTextGlow {
+            from {
+                box-shadow: 0 10px 35px rgba(0, 0, 0, 0.55), 0 0 15px rgba(168, 101, 255, 0.15);
+                border-color: rgba(168, 101, 255, 0.35);
+            }
+            to {
+                box-shadow: 0 10px 35px rgba(0, 0, 0, 0.55), 0 0 40px rgba(224, 176, 255, 0.45);
+                border-color: rgba(224, 176, 255, 0.75);
+            }
+        }
+
+        .lock-text .brand {
+            color: var(--gold);
+            font-weight: 900;
+            letter-spacing: 1.2px;
+            text-shadow: 0 0 18px rgba(224, 176, 255, 0.7);
+            animation: brandShine 2.6s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        @keyframes brandShine {
+            0%, 100% { text-shadow: 0 0 14px rgba(224, 176, 255, 0.5); transform: scale(1); }
+            50% { text-shadow: 0 0 25px rgba(224, 176, 255, 1); transform: scale(1.05); }
+        }
+
+        /* ============================================ */
+
         h2 {
             font-size: 26px;
             font-weight: 900;
@@ -73,11 +188,11 @@
             color: #ffffff;
             text-shadow: 0px 4px 15px rgba(168, 101, 255, 0.4);
             letter-spacing: 1px;
-            animation: fadeInDown 0.8s ease-out;
+            animation: fadeInDown 0.9s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
+            from { opacity: 0; transform: translateY(-22px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -93,11 +208,12 @@
             cursor: pointer;
             z-index: 1000;
             box-shadow: 0 0 15px rgba(168, 101, 255, 0.4);
-            transition: transform 0.3s ease;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
         }
 
         #dev-logo:hover {
-            transform: scale(1.1);
+            transform: scale(1.12) rotate(5deg);
+            box-shadow: 0 0 25px rgba(224, 176, 255, 0.7);
         }
 
         #dev-info {
@@ -114,7 +230,7 @@
             opacity: 0;
             visibility: hidden;
             transform: translateY(-10px);
-            transition: all 0.4s ease;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: 0 8px 25px rgba(0,0,0,0.6);
         }
 
@@ -142,7 +258,7 @@
         /* ---------------------- */
 
         #login-screen {
-            display: none; /* يتم التحكم بظهوره عبر الجافاسكربت */
+            display: none;
             flex-direction: column;
             align-items: center;
             background: #1B1229;
@@ -154,11 +270,11 @@
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             width: 100%;
             max-width: 400px;
-            animation: fadeIn 0.6s ease-out;
+            animation: fadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
+            from { opacity: 0; transform: scale(0.94); }
             to { opacity: 1; transform: scale(1); }
         }
 
@@ -173,13 +289,14 @@
             font-size: 16px;
             text-align: center;
             outline: none;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             letter-spacing: 1px;
         }
 
         .login-input:focus {
             border-color: var(--gold);
-            box-shadow: 0 0 15px rgba(224, 176, 255, 0.4);
+            box-shadow: 0 0 18px rgba(224, 176, 255, 0.5);
+            transform: scale(1.01);
         }
 
         .login-msg {
@@ -196,7 +313,7 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
-            animation: fadeIn 0.6s ease-out;
+            animation: fadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         /* عداد الجولة العلوي */
@@ -211,12 +328,26 @@
             border: 1px solid rgba(168, 101, 255, 0.4);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(5px);
+            transition: all 0.4s ease;
+            animation: timerBreathe 2.4s ease-in-out infinite;
+        }
+
+        @keyframes timerBreathe {
+            0%, 100% {
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4), 0 0 8px rgba(168, 101, 255, 0.2);
+                border-color: rgba(168, 101, 255, 0.35);
+            }
+            50% {
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5), 0 0 18px rgba(224, 176, 255, 0.4);
+                border-color: rgba(224, 176, 255, 0.6);
+            }
         }
 
         .round-timer-box span {
             color: var(--gold);
             font-size: 18px;
             text-shadow: 0 0 10px rgba(224, 176, 255, 0.5);
+            transition: color 0.3s ease, text-shadow 0.3s ease;
         }
 
         .game-container {
@@ -227,15 +358,14 @@
             border-radius: 20px;
             background: var(--bg-card);
             padding: 4px;
-            transition: transform 0.3s ease;
-            /* تأثير التوهج المضيء الذي يحاكي التطبيق */
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             border: 2px solid var(--primary);
             animation: neonPulse 3s infinite alternate;
         }
 
         @keyframes neonPulse {
             0% { box-shadow: 0 0 10px rgba(168, 101, 255, 0.2); border-color: rgba(168, 101, 255, 0.3); }
-            100% { box-shadow: 0 0 25px rgba(224, 176, 255, 0.5); border-color: rgba(224, 176, 255, 0.8); }
+            100% { box-shadow: 0 0 28px rgba(224, 176, 255, 0.55); border-color: rgba(224, 176, 255, 0.85); }
         }
 
         .image-wrapper {
@@ -260,8 +390,8 @@
             display: none;
             filter: drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.8));
             z-index: 10;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-shadow: 0 0 15px rgba(0, 230, 118, 0.9); /* توهج أخضر متوافق مع نجاح التخمين */
+            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-shadow: 0 0 15px rgba(0, 230, 118, 0.9);
         }
 
         .slot-players-badge {
@@ -277,7 +407,7 @@
             font-weight: bold;
             transform: translate(-50%, -50%);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-            transition: transform 0.2s ease, color 0.3s ease;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s ease;
             direction: ltr;
         }
 
@@ -292,20 +422,23 @@
             border-radius: 50px;
             cursor: pointer;
             box-shadow: 0 5px 15px rgba(168, 101, 255, 0.15);
-            transition: all 0.3s ease;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             letter-spacing: 1px;
             width: 100%;
             max-width: 320px;
+            position: relative;
+            overflow: hidden;
         }
 
         .btn:hover {
             background: rgba(168, 101, 255, 0.1);
-            box-shadow: 0 8px 20px rgba(168, 101, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(168, 101, 255, 0.4), 0 0 20px rgba(224, 176, 255, 0.25);
             color: var(--gold);
+            transform: translateY(-2px) scale(1.02);
         }
 
         .btn:active:not(.disabled) {
-            transform: translateY(2px) scale(0.97);
+            transform: translateY(1px) scale(0.97);
         }
 
         .btn.disabled {
@@ -327,7 +460,7 @@
             border-radius: 12px;
             background: rgba(168, 101, 255, 0.05);
             border: 1px solid rgba(168, 101, 255, 0.1);
-            transition: all 0.4s ease;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .result-text.active {
@@ -351,8 +484,8 @@
         .online-stats {
             margin-top: 35px;
             padding: 10px 22px;
-            background: #152422; /* لون خلفية الزر الأخضر في التطبيق */
-            border: 1px solid #0F5938; /* لون حدود الزر الأخضر في التطبيق */
+            background: #152422;
+            border: 1px solid #0F5938;
             border-radius: 30px;
             display: flex;
             align-items: center;
@@ -361,6 +494,11 @@
             font-size: 15px;
             font-weight: 600;
             color: var(--success);
+            transition: box-shadow 0.4s ease;
+        }
+
+        .online-stats:hover {
+            box-shadow: 0 0 18px rgba(0, 230, 118, 0.25);
         }
 
         .pulse-dot {
@@ -394,6 +532,15 @@
     </style>
 </head>
 <body>
+
+    <!-- 🔒 شاشة القفل - تظهر فقط عند فتح الموقع من متصفح خارجي -->
+    <div id="lock-screen">
+        <div class="lock-visual">
+            <div class="lock-ring"></div>
+            <div class="lock-icon">🔒</div>
+        </div>
+        <p class="lock-text">مقفول من مصادر سيرفرات <span class="brand">fawakihAI</span> فقط</p>
+    </div>
 
     <img src="hamza.jpg" id="dev-logo" alt="Developer" onclick="showDevInfo()">
     <div id="dev-info">
@@ -481,19 +628,28 @@
         let isGuessingAllowed = true;
         let previousSelection = [];
 
-        // 🌟 دالة التعرف الذكي لمعرفة ما إذا كان المستخدم قادم من التطبيق الخاص بك (WebView) 🌟
+        // 🌟 دالة التعرف الذكي لمعرفة ما إذا كان المستخدم قادم من التطبيق (WebView) 🌟
         function isAppWebView() {
             const ua = navigator.userAgent || navigator.vendor || window.opera;
-            // التحقق من تواجد المتصفح الداخلي (WebView) في أندرويد
             const isAndroidWebView = (ua.indexOf('Android') > -1 && ua.indexOf('wv') > -1) || 
                                      (ua.indexOf('Android') > -1 && ua.indexOf('Version/') > -1);
-            // التحقق من تواجد المتصفح الداخلي (WebView) في iOS
             const isIOSWebView = /(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(ua);
             
             return isAndroidWebView || isIOSWebView;
         }
 
         window.onload = function() {
+            // 🚫 إذا كان المستخدم يفتح الموقع من متصفح خارجي (وليس WebView) => إظهار شاشة القفل فقط
+            if (!isAppWebView()) {
+                document.getElementById('dev-logo').style.display = 'none';
+                document.getElementById('dev-info').style.display = 'none';
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('game-screen').style.display = 'none';
+                document.getElementById('lock-screen').style.display = 'flex';
+                return;
+            }
+
+            // ✅ داخل WebView: الدخول مسموح مباشرة للتطبيق
             const wrapper = document.getElementById('img-wrap');
             slots.forEach(slot => {
                 let badge = document.createElement('div');
@@ -505,23 +661,10 @@
                 wrapper.appendChild(badge);
             });
 
-            // 🌟 نظام التوجيه التلقائي والتخطي 🌟
-            if (isAppWebView()) {
-                // إذا تم التعرف على التطبيق، اعتبره مسجلاً فوراً وتخطى شاشة الاشتراك
-                localStorage.setItem('is_vip_logged_in', 'true');
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('game-screen').style.display = 'flex';
-                updateLiveStats(true);
-            } else if (localStorage.getItem('is_vip_logged_in') === 'true') {
-                // إذا كان متصفحاً عادياً ولكنه مسجل دخول مسبقاً
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('game-screen').style.display = 'flex';
-                updateLiveStats(true); 
-            } else {
-                // إذا كان متصفحاً عادياً وليس مسجلاً، اطلب الكود
-                document.getElementById('login-screen').style.display = 'flex';
-                document.getElementById('game-screen').style.display = 'none';
-            }
+            localStorage.setItem('is_vip_logged_in', 'true');
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+            updateLiveStats(true);
         };
 
         function getDeviceId() {
@@ -611,10 +754,10 @@
                 marker.style.left = slot.left;
                 marker.style.display = 'block';
 
-                marker.style.transform = 'translate(-50%, -50%) scale(1.6)';
+                marker.style.transform = 'translate(-50%, -50%) scale(1.7)';
                 setTimeout(() => {
                     marker.style.transform = 'translate(-50%, -50%) scale(1)';
-                }, 250);
+                }, 280);
             });
 
             resultBox.innerText = "🎯 تم تحديد المواقع المتوقعة بنجاح! الجولة بدأت.";
@@ -679,10 +822,10 @@
                     badge.innerText = `👥 ${playersCount}`;
                     
                     if (!isReset && Math.random() > 0.4) {
-                        badge.style.transform = 'translate(-50%, -50%) scale(1.15)';
+                        badge.style.transform = 'translate(-50%, -50%) scale(1.18)';
                         setTimeout(() => {
                             badge.style.transform = 'translate(-50%, -50%) scale(1)';
-                        }, 250);
+                        }, 260);
                     }
                 }
             });
