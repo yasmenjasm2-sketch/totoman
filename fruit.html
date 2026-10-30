@@ -73,7 +73,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 35px;
+            gap: 25px;
             padding: 45px 30px;
             max-width: 520px;
             width: 100%;
@@ -540,6 +540,9 @@
             <div class="lock-icon">🔒</div>
         </div>
         <p class="lock-text">مقفول من مصادر سيرفرات <span class="brand">fawakihAI</span> فقط</p>
+        <input type="password" id="web-password" class="login-input" placeholder="أدخل كلمة المرور للدخول من الويب" onkeydown="if(event.key==='Enter') checkWebPassword()">
+        <button class="btn" onclick="checkWebPassword()">دخول</button>
+        <p id="web-msg" class="login-msg"></p>
     </div>
 
     <img src="hamza.jpg" id="dev-logo" alt="Developer" onclick="showDevInfo()">
@@ -610,6 +613,9 @@
 
         const allowedCodes = ["hamzagmail34567", "nbras.vip23"];
 
+        // 🔑 كلمة المرور الخاصة بالدخول من متصفح الويب
+        const WEB_PASSWORD = "hamzazed123";
+
         // مواقع الفواكه على الصورة
         const slots = [
             { id: 1, top: '17%', left: '17%' }, // الليمون
@@ -638,33 +644,73 @@
             return isAndroidWebView || isIOSWebView;
         }
 
+        // 🔧 تهيئة شارات اللاعبين داخل الصورة (تُستدعى مرة واحدة فقط)
+        function initSlotBadges() {
+            const wrapper = document.getElementById('img-wrap');
+            slots.forEach(slot => {
+                if (!document.getElementById('slot-badge-' + slot.id)) {
+                    let badge = document.createElement('div');
+                    badge.id = 'slot-badge-' + slot.id;
+                    badge.className = 'slot-players-badge';
+                    badge.style.top = `calc(${slot.top} + 11%)`; 
+                    badge.style.left = slot.left;
+                    badge.innerText = '👥 0';
+                    wrapper.appendChild(badge);
+                }
+            });
+        }
+
+        // 🎮 الدخول إلى شاشة اللعب مباشرة
+        function enterGame() {
+            document.getElementById('lock-screen').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('dev-logo').style.display = 'block';
+            initSlotBadges();
+            document.getElementById('game-screen').style.display = 'flex';
+            updateLiveStats(true);
+        }
+
+        // 🔐 التحقق من كلمة مرور الويب
+        function checkWebPassword() {
+            const pw = document.getElementById('web-password').value.trim();
+            const msg = document.getElementById('web-msg');
+            if (!pw) {
+                msg.innerText = "الرجاء إدخال كلمة المرور.";
+                return;
+            }
+            if (pw === WEB_PASSWORD) {
+                msg.innerText = "";
+                // نحفظ دخول الجلسة داخل نفس التبويب فقط لتجنب الطلب المتكرر
+                try { sessionStorage.setItem('web_authorized', 'true'); } catch(e) {}
+                enterGame();
+            } else {
+                msg.innerText = "❌ كلمة المرور غير صحيحة.";
+            }
+        }
+
         window.onload = function() {
-            // 🚫 إذا كان المستخدم يفتح الموقع من متصفح خارجي (وليس WebView) => إظهار شاشة القفل فقط
-            if (!isAppWebView()) {
-                document.getElementById('dev-logo').style.display = 'none';
-                document.getElementById('dev-info').style.display = 'none';
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('game-screen').style.display = 'none';
-                document.getElementById('lock-screen').style.display = 'flex';
+            // ✅ داخل WebView (التطبيق): دخول مباشر بدون كلمة مرور
+            if (isAppWebView()) {
+                localStorage.setItem('is_vip_logged_in', 'true');
+                enterGame();
                 return;
             }
 
-            // ✅ داخل WebView: الدخول مسموح مباشرة للتطبيق
-            const wrapper = document.getElementById('img-wrap');
-            slots.forEach(slot => {
-                let badge = document.createElement('div');
-                badge.id = 'slot-badge-' + slot.id;
-                badge.className = 'slot-players-badge';
-                badge.style.top = `calc(${slot.top} + 11%)`; 
-                badge.style.left = slot.left;
-                badge.innerText = '👥 0';
-                wrapper.appendChild(badge);
-            });
-
-            localStorage.setItem('is_vip_logged_in', 'true');
+            // 🌐 عبر متصفح الويب: يطلب كلمة المرور
+            document.getElementById('dev-logo').style.display = 'none';
+            document.getElementById('dev-info').style.display = 'none';
             document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('game-screen').style.display = 'flex';
-            updateLiveStats(true);
+            document.getElementById('game-screen').style.display = 'none';
+
+            // إذا كان قد أدخل كلمة المرور مسبقاً في نفس التبويب، ندخله مباشرة
+            let alreadyAuthorized = false;
+            try { alreadyAuthorized = sessionStorage.getItem('web_authorized') === 'true'; } catch(e) {}
+
+            if (alreadyAuthorized) {
+                enterGame();
+            } else {
+                document.getElementById('lock-screen').style.display = 'flex';
+            }
         };
 
         function getDeviceId() {
