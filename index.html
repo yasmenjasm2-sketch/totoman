@@ -1249,42 +1249,10 @@
   </div>
 </footer>
 
-<!-- ===== سكربت استدعاء الآراء المستقلة ===== -->
+
+<!-- ===== سكربت الآراء ===== -->
 <script src="reviews.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const list = document.getElementById('feedbacks-list');
-    
-    // التحقق من وجود المصفوفة داخل ملف reviews.js
-    if (typeof fawakihReviews !== 'undefined' && fawakihReviews.length > 0) {
-      list.innerHTML = ''; // مسح عبارة "جاري التحميل..."
-      
-      fawakihReviews.forEach(review => {
-        const item = document.createElement('div');
-        item.className = 'feedback-item';
-        
-        // تصميم الأفاتار الدائري بالحرف واللون
-        item.innerHTML = `
-          <div class="feedback-header">
-            <div class="feedback-user-info">
-              <div style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.2rem; background-color: ${review.bgColor}; color: ${review.textColor}; border: 1px solid var(--orange);">
-                ${review.initial}
-              </div>
-              <div>
-                <div class="feedback-user-name">${review.name}</div>
-                <div class="feedback-date">${review.date}</div>
-              </div>
-            </div>
-          </div>
-          <div class="feedback-text">${review.text}</div>
-        `;
-        list.appendChild(item);
-      });
-    } else {
-      list.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">لا توجد آراء حالياً.</div>';
-    }
-  });
-</script>
+
 
 </body>
 </html>
