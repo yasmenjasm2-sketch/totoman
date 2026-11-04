@@ -2,40 +2,72 @@
  * ============================================================================
  * fruitsystm.js
  * ملف العقل الرئيسي المستقل لخوارزمية التخمين — النسخة الاحترافية
+ * نسخة "القوة العشرية المعزّزة" — عشوائية فائقة الانتشار
  * ============================================================================
  *
- *  ▸ عشوائية نقية بنمط Fisher-Yates (مطابقة لخوارزمية AI1 المحفوظة)
- *  ▸ منطق "الأقلية" (الضغط الأقل = أولوية أعلى)
+ *  ▸ عشوائية تشفيرية (Crypto-based RNG) بنمط Fisher-Yates
+ *  ▸ خلط متعدد المراحل (Multi-Pass Shuffle) — 3 مراحل افتراضياً
+ *  ▸ منطق "الأقلية" (الضغط الأقل = أولوية أعلى) مع كسر نمط معزّز
  *  ▸ استبعاد قطعي للكرز (4) والبطيخ (6)
- *  ▸ نمط 3+1 (3 لم تُختَر سابقاً + 1 ظهرت سابقاً)
+ *  ▸ نمط 3+1 مرن: يبقى أساسياً لكن يتغيّر عشوائياً أحياناً (2+2 / 4+0 / 1+3)
+ *  ▸ تشويش موسّع ±30% بدل ±15% لكسر الجمود التام
  *  ▸ معالجة ذكية للنقص والبيانات المفقودة
  *
  * ============================================================================
  */
 
 // ============================================================================
-// [1] الخلط العشوائي الاحترافي — Fisher-Yates Shuffle
+// [0] مولّد عشوائية تشفيري — Crypto-Secure RNG
+// ============================================================================
+// يستخدم crypto.getRandomValues عند توفره (متصفح / Node حديث)
+// ثم يعود إلى Math.random كخطة بديلة لضمان العمل في كل بيئة
+// ============================================================================
+function secureRandom() {
+    try {
+        if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+            const arr = new Uint32Array(1);
+            crypto.getRandomValues(arr);
+            return arr[0] / 4294967296; // [0, 1)
+        }
+    } catch (_) { /* تجاهل والعودة للبديل */ }
+    return Math.random();
+}
+
+// ============================================================================
+// [1] الخلط العشوائي الاحترافي — Fisher-Yates Shuffle (Crypto-based)
 // ============================================================================
 // المميزات:
 //   • عشوائية موحّدة تامة (Uniform Distribution)
 //   • لا يوجد تحيز لأي موضع من المصفوفة
-//   • معتمدة أكاديمياً وتُستخدم في المحركات الرسمية
-//   • مطابقة حرفياً لخوارزمية AI1 المحفوظة
+//   • مصدر عشوائية تشفيري بدل Math.random
+//   • مطابقة لبصمة AI1 لكن بقوة عشوائية أعلى
 // ============================================================================
 function shuffleArray(array) {
     const result = [...array];
     for (let i = result.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = Math.floor(secureRandom() * (i + 1));
         [result[i], result[j]] = [result[j], result[i]];
     }
     return result;
 }
 
 // ============================================================================
-// [2] قراءة آمنة لعداد الضغطات (slotAmounts)
+// [1.b] خلط متعدد المراحل — Multi-Pass Shuffle
 // ============================================================================
-// يعزل قراءة المتغير العالمي بعيداً عن منطق الترتيب لتفادي التكرار الشرطي
-// ويعيد 0 عند عدم توفر البيانات بدلاً من NaN
+// كل مرحلة تعيد توزيع العناصر فوق نتيجة المرحلة السابقة
+// النتيجة: توزيع عشوائي فائق بدل توزيع عشوائي مفرد
+// ============================================================================
+function multiShuffle(array, passes = 3) {
+    let result = [...array];
+    const safePasses = Math.max(1, Math.min(5, passes | 0));
+    for (let p = 0; p < safePasses; p++) {
+        result = shuffleArray(result);
+    }
+    return result;
+}
+
+// ============================================================================
+// [2] قراءة آمنة لعداد الضغطات (slotAmounts)
 // ============================================================================
 function getSlotAmount(slotId) {
     if (typeof slotAmounts === 'undefined' || !slotAmounts) return 0;
@@ -44,34 +76,34 @@ function getSlotAmount(slotId) {
 }
 
 // ============================================================================
-// [3] منطق "الأقلية" — تفضيل الفواكه ذات الضغط الأقل
+// [3] منطق "الأقلية" — تفضيل الفواكه ذات الضغط الأقل (نسخة معزّزة)
 // ============================================================================
 // الخطوات:
-//   1) خلط ابتدائي (Fisher-Yates) — لضمان عدم تطابق الترتيب عند التساوي
-//   2) 20% من المرات نُرجع النتيجة عشوائية كاملة (كسر النمط)
-//   3) 80% من المرات نرتب تصاعدياً بحسب العدد مع عامل تشويش ±15%
+//   1) خلط متعدد المراحل (3 مراحل) — كسر أي ترتيب موروث
+//   2) 35% من المرات: عشوائي كامل (كان 20% — الآن أقوى)
+//   3) 65% من المرات: ترتيب تصاعدي مع تشويش ±30% (كان ±15%)
 // ============================================================================
 function applyMinorityLogic(slots) {
     if (!Array.isArray(slots) || slots.length === 0) return [];
 
-    // 1) خلط عشوائي نظيف (Fisher-Yates)
-    const shuffled = shuffleArray(slots);
+    // 1) خلط متعدد المراحل
+    const shuffled = multiShuffle(slots, 3);
 
-    // 2) نقطة كسر النمط (20% عشوائي كامل)
-    if (Math.random() <= 0.20) {
-        return shuffled;
+    // 2) كسر النمط المعزّز: 35% عشوائي كامل
+    if (secureRandom() <= 0.35) {
+        return multiShuffle(shuffled, 2);
     }
 
-    // 3) ترتيب تصاعدي بحسب العدد مع تشويش ±15% لتفادي الجمود
+    // 3) ترتيب تصاعدي مع تشويش ±30% لتفادي الجمود
     return shuffled.sort((a, b) => {
-        const jitteredA = getSlotAmount(a.id) * (0.85 + Math.random() * 0.30);
-        const jitteredB = getSlotAmount(b.id) * (0.85 + Math.random() * 0.30);
+        const jitteredA = getSlotAmount(a.id) * (0.70 + secureRandom() * 0.60);
+        const jitteredB = getSlotAmount(b.id) * (0.70 + secureRandom() * 0.60);
         return jitteredA - jitteredB;
     });
 }
 
 // ============================================================================
-// [4] الدالة الرئيسية — توليد 4 توقعات
+// [4] الدالة الرئيسية — توليد 4 توقعات (قوة تخمين عشرية معزّزة)
 // ============================================================================
 function generatePrediction(slots, previousSelection) {
     try {
@@ -97,7 +129,7 @@ function generatePrediction(slots, previousSelection) {
         }
 
         // ---------------------------------------------------------------
-        // حالة 2: الجولات اللاحقة (نمط 3+1)
+        // حالة 2: الجولات اللاحقة — نمط مرن يغلب عليه 3+1
         // ---------------------------------------------------------------
         else {
             // فصل الفواكه إلى مجموعتين: لم تظهر سابقاً / ظهرت سابقاً
@@ -108,22 +140,37 @@ function generatePrediction(slots, previousSelection) {
                 s => previousSelection.includes(s.id)
             );
 
-            // اختيار 3 من "لم تظهر" + 1 من "ظهرت" (بعد تطبيق منطق الأقلية)
-            selectedSlots = applyMinorityLogic(notPickedLastTime)
-                .slice(0, 3)
-                .concat(applyMinorityLogic(pickedLastTime).slice(0, 1));
+            // -----------------------------------------------------------------
+            // توزيع عشوائي مرجّح لنمط التقسيم:
+            //   3+1 هو الأساس (5 أوزان من 9) → يبقى المهيمن
+            //   لكن يسمح أحياناً بـ 2+2 و 4+0 و 1+3 لكسر التنبؤ
+            // -----------------------------------------------------------------
+            const splitPatterns = [
+                [3, 1], [3, 1], [3, 1], [3, 1], [3, 1], // 55% تقريباً
+                [2, 2], [2, 2],                          // 22% تقريباً
+                [4, 0],                                  // 11% تقريباً
+                [1, 3]                                   // 11% تقريباً
+            ];
+            const chosenSplit = splitPatterns[Math.floor(secureRandom() * splitPatterns.length)];
+            const [wantNotPicked, wantPicked] = chosenSplit;
+
+            // اختيار من كل مجموعة بعد تطبيق منطق الأقلية
+            const partA = applyMinorityLogic(notPickedLastTime).slice(0, wantNotPicked);
+            const partB = applyMinorityLogic(pickedLastTime).slice(0, wantPicked);
+
+            selectedSlots = partA.concat(partB);
 
             // استكمال النقص إن وُجد (بسبب الاستبعاد أو نقص البيانات)
             if (selectedSlots.length < 4) {
                 const needed = 4 - selectedSlots.length;
-                const remaining = pickedLastTime.filter(
-                    s => !selectedSlots.includes(s)
+                const remaining = shuffleArray(
+                    availableSlots.filter(s => !selectedSlots.includes(s))
                 );
                 selectedSlots = selectedSlots.concat(remaining.slice(0, needed));
             }
 
-            // خلط نهائي (Fisher-Yates) لضمان عدم ثبات المواضع
-            selectedSlots = shuffleArray(selectedSlots);
+            // خلط نهائي متعدد المراحل لضمان عدم ثبات المواضع
+            selectedSlots = multiShuffle(selectedSlots, 3);
         }
 
         // ---------------------------------------------------------------
