@@ -27,7 +27,8 @@
             --text-muted: #9A90B5;
             --success: #00E5A0;
             --success-glow: rgba(0, 229, 160, 0.5);
-            --error: #FF5470;
+            --error: #FF2E4D;
+            --error-glow: rgba(255, 46, 77, 0.75);
             --border-subtle: rgba(176, 125, 255, 0.18);
             --border-strong: rgba(176, 125, 255, 0.45);
         }
@@ -55,7 +56,6 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* تأثير الخلفية المتوهجة */
         body::before {
             content: '';
             position: fixed;
@@ -352,15 +352,99 @@
             filter: saturate(1.05) contrast(1.02);
         }
 
+        /* =========================================================
+           المؤشرات الجديدة — دوائر برمجية (Programmatic Circles)
+           المؤشرات 1-4: أخضر نيون (success)
+           المؤشر  5  : أحمر نيون (error) — خاص بالكرز/البطيخ فقط
+           ========================================================= */
         .marker {
             position: absolute;
-            font-size: 26px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid var(--success);
+            background: radial-gradient(circle,
+                rgba(0, 229, 160, 0.18) 0%,
+                rgba(0, 229, 160, 0.04) 55%,
+                transparent 75%);
             transform: translate(-50%, -50%);
             display: none;
-            filter: drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.85));
             z-index: 10;
-            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-            text-shadow: 0 0 15px var(--success-glow);
+            box-shadow:
+                0 0 20px var(--success-glow),
+                inset 0 0 12px rgba(0, 229, 160, 0.2);
+            transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: markerGlow 1.8s ease-in-out infinite;
+            will-change: transform, box-shadow;
+        }
+
+        /* الحلقة الداخلية للمؤشر الأخضر */
+        .marker::before {
+            content: '';
+            position: absolute;
+            inset: 7px;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 229, 160, 0.55);
+            box-shadow: inset 0 0 8px rgba(0, 229, 160, 0.35);
+        }
+
+        /* نقطة مركزية */
+        .marker::after {
+            content: '';
+            position: absolute;
+            inset: 18px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #00FFB0 0%, rgba(0, 229, 160, 0.35) 60%, transparent 100%);
+            box-shadow: 0 0 10px rgba(0, 229, 160, 0.85);
+        }
+
+        @keyframes markerGlow {
+            0%, 100% {
+                box-shadow:
+                    0 0 20px var(--success-glow),
+                    inset 0 0 12px rgba(0, 229, 160, 0.2);
+            }
+            50% {
+                box-shadow:
+                    0 0 34px rgba(0, 229, 160, 0.85),
+                    inset 0 0 16px rgba(0, 229, 160, 0.35);
+            }
+        }
+
+        /* ---------- المؤشر الخامس — أحمر (كرز / بطيخ) ---------- */
+        .marker.red {
+            border-color: var(--error);
+            background: radial-gradient(circle,
+                rgba(255, 46, 77, 0.22) 0%,
+                rgba(255, 46, 77, 0.05) 55%,
+                transparent 75%);
+            box-shadow:
+                0 0 24px var(--error-glow),
+                inset 0 0 14px rgba(255, 46, 77, 0.28);
+            animation: markerGlowRed 1.2s ease-in-out infinite;
+        }
+
+        .marker.red::before {
+            border-color: rgba(255, 46, 77, 0.65);
+            box-shadow: inset 0 0 8px rgba(255, 46, 77, 0.45);
+        }
+
+        .marker.red::after {
+            background: radial-gradient(circle, #FF5577 0%, rgba(255, 46, 77, 0.45) 60%, transparent 100%);
+            box-shadow: 0 0 12px rgba(255, 46, 77, 0.95);
+        }
+
+        @keyframes markerGlowRed {
+            0%, 100% {
+                box-shadow:
+                    0 0 24px var(--error-glow),
+                    inset 0 0 14px rgba(255, 46, 77, 0.28);
+            }
+            50% {
+                box-shadow:
+                    0 0 42px rgba(255, 46, 77, 1),
+                    inset 0 0 18px rgba(255, 46, 77, 0.45);
+            }
         }
 
         .slot-players-badge {
@@ -518,10 +602,14 @@
             <div class="image-wrapper" id="img-wrap">
                 <img src="vipvip.jpg" alt="Fruit Party" class="game-image">
                 
-                <div id="marker-1" class="marker">✅</div>
-                <div id="marker-2" class="marker">✅</div>
-                <div id="marker-3" class="marker">✅</div>
-                <div id="marker-4" class="marker">✅</div>
+                <!-- المؤشرات الأربعة الأساسية (أخضر) -->
+                <div id="marker-1" class="marker"></div>
+                <div id="marker-2" class="marker"></div>
+                <div id="marker-3" class="marker"></div>
+                <div id="marker-4" class="marker"></div>
+
+                <!-- المؤشر الخامس (أحمر) — للكرز أو البطيخ فقط -->
+                <div id="marker-5" class="marker red"></div>
             </div>
         </div>
 
@@ -685,7 +773,7 @@
             
             const resultBox = document.getElementById('result-text');
 
-            // جلب التخمين من الملف المستقل (fruitsystm.js)
+            // جلب التخمين من الملف المستقل (fruitsystm.js) — 4 مواقع
             let selectedSlots = generatePrediction(slots, previousSelection);
 
             if (!selectedSlots || selectedSlots.length === 0) {
@@ -702,6 +790,9 @@
             
             previousSelection = selectedSlots.map(s => s.id);
 
+            // -----------------------------------------------------------------
+            // توزيع المؤشرات الأربعة الخضراء (1-4)
+            // -----------------------------------------------------------------
             selectedSlots.forEach((slot, index) => {
                 let marker = document.getElementById('marker-' + (index + 1));
                 marker.style.top = slot.top;
@@ -714,7 +805,27 @@
                 }, 280);
             });
 
-            resultBox.innerText = "🎯 تم تحديد المواقع المتوقعة بنجاح! الجولة بدأت.";
+            // -----------------------------------------------------------------
+            // المؤشر الخامس الأحمر — حصرياً بين الكرز (4) والبطيخ (6)
+            // -----------------------------------------------------------------
+            const cherrySlot    = slots.find(s => s.id === 4); // 🍒
+            const watermelonSlot = slots.find(s => s.id === 6); // 🍉
+
+            const fifthSlot = Math.random() < 0.5 ? cherrySlot : watermelonSlot;
+
+            const marker5 = document.getElementById('marker-5');
+            marker5.style.top = fifthSlot.top;
+            marker5.style.left = fifthSlot.left;
+            marker5.style.display = 'block';
+
+            marker5.style.transform = 'translate(-50%, -50%) scale(1.8)';
+            setTimeout(() => {
+                marker5.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 320);
+
+            const fifthName = fifthSlot.id === 4 ? 'الكرز 🍒' : 'البطيخ 🍉';
+
+            resultBox.innerText = `🎯 تم تحديد 4 مواقع متوقعة! والمؤشر الأحمر (تخمين خامس) يشير إلى: ${fifthName}`;
             resultBox.classList.remove('active');
             setTimeout(() => { resultBox.classList.add('active'); }, 50);
 
