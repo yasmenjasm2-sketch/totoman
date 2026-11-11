@@ -444,6 +444,7 @@
 </head>
 <body>
 
+    <!-- 🔒 شاشة التحقق من الاشتراك فقط (بدون كلمة مرور) -->
     <div id="lock-screen" style="display: flex;">
         <div class="lock-visual">
             <div class="lock-ring"></div>
@@ -459,7 +460,7 @@
     </div>
 
     <div id="game-screen">
-        <h2>تخمين اللعبة الفائزة VIP</h2>
+        <h2>Fruit party</h2>
 
         <div class="round-timer-box">
             وقت الجولة المتبقي: <span id="round-timer">15</span> ثانية
@@ -468,13 +469,12 @@
         <div class="game-container">
             <div class="image-wrapper" id="img-wrap">
                 <img src="vipvip.jpg" alt="Fruit Party" class="game-image">
-                <!-- المؤشرات 1 إلى 3 للفواكه الصغيرة -->
+                <!-- المؤشرات العلوية (خضراء) للفواكه الصغيرة 1, 2, 3 -->
                 <div id="marker-1" class="marker"></div>
                 <div id="marker-2" class="marker"></div>
                 <div id="marker-3" class="marker"></div>
-                <!-- المؤشر 4 للفواكه الكبيرة السفلية (أخضر) -->
-                <div id="marker-4" class="marker"></div>
-                <!-- المؤشر 5 للفواكه الكبيرة العلوية (أحمر) -->
+                <!-- المؤشرات السفلية (حمراء) للفواكه الكبيرة 4, 5 -->
+                <div id="marker-4" class="marker red"></div>
                 <div id="marker-5" class="marker red"></div>
             </div>
         </div>
@@ -520,6 +520,9 @@
         let currentDeviceData = null;
         let subscriptionCheckInterval = null;
 
+        // ============================================================
+        // 🔑 مفتاح الدخول من WebView (Java)
+        // ============================================================
         const WEBVIEW_ACCESS_KEY = "NBRS_2024_VIP_ACCESS_7f3a9c";
 
         function isWebViewSession() {
@@ -530,20 +533,21 @@
         }
 
         const slots = [
-            { id: 1, top: '17%', left: '17%' },
-            { id: 2, top: '17%', left: '50%' },
-            { id: 3, top: '17%', left: '83%' },
-            { id: 4, top: '50%', left: '17%' },
-            { id: 5, top: '50%', left: '83%' },
-            { id: 6, top: '83%', left: '17%' },
-            { id: 7, top: '83%', left: '50%' },
-            { id: 8, top: '83%', left: '83%' }
+            { id: 1, top: '17%', left: '17%' }, // ليمون
+            { id: 2, top: '17%', left: '50%' }, // توت
+            { id: 3, top: '17%', left: '83%' }, // كيوي
+            { id: 4, top: '50%', left: '17%' }, // كرز
+            { id: 5, top: '50%', left: '83%' }, // برقوق
+            { id: 6, top: '83%', left: '17%' }, // بطيخ
+            { id: 7, top: '83%', left: '50%' }, // موز
+            { id: 8, top: '83%', left: '83%' }  // فراولة
         ];
 
         let slotAmounts = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0};
         let currentRoundTime = 15;
         let roundInterval;
         let isGuessingAllowed = true;
+        let previousSelection = [];
 
         function initSlotBadges() {
             const wrapper = document.getElementById('img-wrap');
@@ -568,6 +572,7 @@
             updateLiveStats(true);
         }
 
+        // 🛡️ نظام التحقق من الاشتراك عبر Firebase
         function checkSubscriptionStatus() {
             db.ref('requests/' + deviceId).on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -625,6 +630,7 @@
             }, 10000);
         }
 
+        // 🚀 تشغيل التطبيق
         window.onload = function() {
             if (isWebViewSession()) {
                 enterGame();
@@ -634,16 +640,16 @@
         };
 
         // ============================================================
-        // منطق اللعبة — التخمين بعد التعديل الجديد
+        // منطق اللعبة المعدل لاستقبال 5 مؤشرات
         // ============================================================
         function makeGuess() {
             if (!isGuessingAllowed) return;
             const resultBox = document.getElementById('result-text');
 
-            // استدعاء الخوارزمية
-            let prediction = generatePrediction(slots);
+            // استدعاء الخوارزمية من ملف fruitsystm.js
+            let prediction = generatePrediction(slots, previousSelection);
 
-            if (!prediction) {
+            if (!prediction || !prediction.topSlots || prediction.topSlots.length !== 3) {
                 resultBox.innerText = "❌ خطأ في النظام: لم يتمكن الخادم المستقل من التخمين. يرجى المحاولة مرة أخرى.";
                 resultBox.style.color = "var(--error)";
                 resultBox.style.background = "rgba(255, 84, 112, 0.1)";
@@ -651,12 +657,19 @@
                 return;
             }
 
+            // حفظ التوقعات السابقة للجولة القادمة
+            previousSelection = [
+                ...prediction.topSlots.map(s => s.id),
+                prediction.bottomSlot1.id,
+                prediction.bottomSlot2.id
+            ];
+
             resultBox.style.color = "var(--text-muted)";
             resultBox.style.background = "rgba(176, 125, 255, 0.05)";
             resultBox.style.borderColor = "rgba(176, 125, 255, 0.12)";
 
-            // 1. توزيع المؤشرات الثلاثة الصغيرة (marker-1, 2, 3)
-            prediction.smallSlots.forEach((slot, index) => {
+            // 1. رسم المؤشرات العلوية الثلاثة (الفواكه الصغيرة)
+            prediction.topSlots.forEach((slot, index) => {
                 let marker = document.getElementById('marker-' + (index + 1));
                 marker.style.top = slot.top;
                 marker.style.left = slot.left;
@@ -667,32 +680,37 @@
                 }, 280);
             });
 
-            // 2. المؤشر الأخضر السفلي (marker-4)
-            const bottomGreen = prediction.bottomGreenSlot;
-            let marker4 = document.getElementById('marker-4');
-            marker4.style.top = bottomGreen.top;
-            marker4.style.left = bottomGreen.left;
+            // 2. رسم المؤشر السفلي الأول (أحمر)
+            const marker4 = document.getElementById('marker-4');
+            marker4.style.top = prediction.bottomSlot1.top;
+            marker4.style.left = prediction.bottomSlot1.left;
             marker4.style.display = 'block';
-            marker4.style.transform = 'translate(-50%, -50%) scale(1.7)';
+            marker4.style.transform = 'translate(-50%, -50%) scale(1.8)';
             setTimeout(() => {
                 marker4.style.transform = 'translate(-50%, -50%) scale(1)';
-            }, 280);
+            }, 320);
 
-            // 3. المؤشر الأحمر العلوي (marker-5)
-            const redSlot = prediction.redSlot;
-            let marker5 = document.getElementById('marker-5');
-            marker5.style.top = redSlot.top;
-            marker5.style.left = redSlot.left;
+            // 3. رسم المؤشر السفلي الثاني (أحمر)
+            const marker5 = document.getElementById('marker-5');
+            marker5.style.top = prediction.bottomSlot2.top;
+            marker5.style.left = prediction.bottomSlot2.left;
             marker5.style.display = 'block';
             marker5.style.transform = 'translate(-50%, -50%) scale(1.8)';
             setTimeout(() => {
                 marker5.style.transform = 'translate(-50%, -50%) scale(1)';
             }, 320);
 
-            const redName = redSlot.id === 4 ? 'الكرز 🍒' : 'البطيخ 🍉';
-            const greenName = bottomGreen.id === 7 ? 'الموز 🍌' : 'الفراولة 🍓';
+            // تحديث النص التوضيحي
+            const fruitNames = {
+                1: 'الليمون 🍋', 2: 'التوت 🍓', 3: 'الكيوي 🥝', 5: 'البرقوق 🍇',
+                4: 'الكرز 🍒', 6: 'البطيخ 🍉', 7: 'الموز 🍌', 8: 'الفراولة 🍓'
+            };
+            
+            const topNames = prediction.topSlots.map(s => fruitNames[s.id]).join(' - ');
+            const b1Name = fruitNames[prediction.bottomSlot1.id];
+            const b2Name = fruitNames[prediction.bottomSlot2.id];
 
-            resultBox.innerText = `🎯 تم تحديد 3 مواقع للفواكه الصغيرة، والمؤشر الأخضر السفلي: ${greenName}، والمؤشر الأحمر: ${redName}`;
+            resultBox.innerText = `🎯 الصغيرة: ${topNames} | الكبيرة (أحمر): ${b1Name} و ${b2Name}`;
             resultBox.classList.remove('active');
             setTimeout(() => { resultBox.classList.add('active'); }, 50);
 
