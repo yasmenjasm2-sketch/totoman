@@ -8,12 +8,10 @@
  *  ▸ عشوائية تشفيرية (Crypto-based RNG) بنمط Fisher-Yates
  *  ▸ خلط متعدد المراحل (Multi-Pass Shuffle) — 3 مراحل افتراضياً
  *  ▸ منطق "الأقلية" (الضغط الأقل = أولوية أعلى) مع كسر نمط معزّز
- *  ▸ استبعاد قطعي للكرز (4) والبطيخ (6) من المواقع الأربعة
- *  ▸ نمط 3+1 مرن: يبقى أساسياً لكن يتغيّر عشوائياً أحياناً (2+2 / 4+0 / 1+3)
- *  ▸ تشويش موسّع ±30% بدل ±15% لكسر الجمود التام
- *  ▸ معالجة ذكية للنقص والبيانات المفقودة
- *  ▸ [جديد] اختيار المؤشر الخامس (الأحمر) يتم هنا داخل الخوارزمية
- *           (بين الكرز 🍒 والبطيخ 🍉) ويُرجَع للواجهة
+ *  ▸ [تعديل] تقسيم المؤشرات:
+ *       - 3 مؤشرات للفواكه الصغيرة (الليمون 1، التوت 2، الكيوي 3)
+ *       - 1 مؤشر أخضر للفواكه الكبيرة السفلية (الموز 7، الفراولة 8)
+ *       - 1 مؤشر أحمر للفواكه الكبيرة العلوية (الكرز 4، البطيخ 6)
  *
  * ============================================================================
  */
@@ -88,104 +86,64 @@ function applyMinorityLogic(slots) {
 }
 
 // ============================================================================
-// [4] الدالة الرئيسية — توليد 4 توقعات + اختيار المؤشر الخامس
+// [4] الدالة الرئيسية — توليد التوقعات مقسمة حسب الطلب
 // ============================================================================
-// ترجع: { mainSlots: [4 عناصر], fifthSlot: عنصر واحد }
+// ترجع: { smallSlots: [3], bottomGreenSlot: element, redSlot: element }
 // أو null عند فشل التحقق
 // ============================================================================
 function generatePrediction(slots, previousSelection) {
     try {
-        // ---------------------------------------------------------------
         // التحقق من صحة البيانات الأساسية
-        // ---------------------------------------------------------------
         if (!slots || slots.length === 0) {
             throw new Error("بيانات الفواكه مفقودة أو غير صالحة.");
         }
 
         // ---------------------------------------------------------------
-        // الاستبعاد القطعي: الكرز (4) والبطيخ (6) لن يظهرا في الأربعة
+        // 1) الفواكه الصغيرة (الليمون 1، التوت 2، الكيوي 3)
         // ---------------------------------------------------------------
-        const availableSlots = slots.filter(s => s && s.id !== 4 && s.id !== 6);
-
-        let selectedSlots = [];
-
-        // ---------------------------------------------------------------
-        // حالة 1: الجولة الأولى (لا يوجد اختيار سابق)
-        // ---------------------------------------------------------------
-        if (!previousSelection || previousSelection.length === 0) {
-            selectedSlots = applyMinorityLogic(availableSlots).slice(0, 4);
+        const smallCandidates = slots.filter(s => s && (s.id === 1 || s.id === 2 || s.id === 3));
+        
+        // نستخدم منطق الأقلية لترتيبهم
+        let selectedSmall = applyMinorityLogic(smallCandidates);
+        
+        // التأكد من وجود 3 عناصر (بما أنهم 3 أصلاً سيتم اختيارهم جميعاً، لكن نأخذ أول 3 لضمان الأمان)
+        if (selectedSmall.length > 3) {
+            selectedSmall = selectedSmall.slice(0, 3);
+        } else if (selectedSmall.length < 3) {
+            // fallback في حال كانت البيانات ناقصة
+            const remaining = smallCandidates.filter(s => !selectedSmall.includes(s));
+            selectedSmall = selectedSmall.concat(remaining);
         }
 
         // ---------------------------------------------------------------
-        // حالة 2: الجولات اللاحقة — نمط مرن يغلب عليه 3+1
+        // 2) المؤشر الأخضر السفلي (الموز 7، الفراولة 8)
         // ---------------------------------------------------------------
-        else {
-            const notPickedLastTime = availableSlots.filter(
-                s => !previousSelection.includes(s.id)
-            );
-            const pickedLastTime = availableSlots.filter(
-                s => previousSelection.includes(s.id)
-            );
-
-            // توزيع عشوائي مرجّح لنمط التقسيم
-            const splitPatterns = [
-                [3, 1], [3, 1], [3, 1], [3, 1], [3, 1], // 55% تقريباً
-                [2, 2], [2, 2],                          // 22% تقريباً
-                [4, 0],                                  // 11% تقريباً
-                [1, 3]                                   // 11% تقريباً
-            ];
-            const chosenSplit = splitPatterns[Math.floor(secureRandom() * splitPatterns.length)];
-            const [wantNotPicked, wantPicked] = chosenSplit;
-
-            const partA = applyMinorityLogic(notPickedLastTime).slice(0, wantNotPicked);
-            const partB = applyMinorityLogic(pickedLastTime).slice(0, wantPicked);
-
-            selectedSlots = partA.concat(partB);
-
-            // استكمال النقص إن وُجد
-            if (selectedSlots.length < 4) {
-                const needed = 4 - selectedSlots.length;
-                const remaining = shuffleArray(
-                    availableSlots.filter(s => !selectedSlots.includes(s))
-                );
-                selectedSlots = selectedSlots.concat(remaining.slice(0, needed));
-            }
-
-            // خلط نهائي متعدد المراحل
-            selectedSlots = multiShuffle(selectedSlots, 3);
-        }
-
-        // ---------------------------------------------------------------
-        // فحص أمان نهائي: يجب أن نُرجع 4 عناصر بالضبط
-        // ---------------------------------------------------------------
-        if (selectedSlots.length !== 4) {
-            throw new Error("فشل في تحديد المواقع (العدد غير مطابق).");
-        }
-
-        // ===============================================================
-        // [5] اختيار المؤشر الخامس (الأحمر) — يتم داخل الخوارزمية
-        // ===============================================================
-        // يُختار بين الكرز (id = 4) 🍒 والبطيخ (id = 6) 🍉
-        // لا يتم اختياره في ملف الواجهة إطلاقاً
-        // ===============================================================
-        const fifthCandidates = slots.filter(s => s && (s.id === 4 || s.id === 6));
-
-        let fifthSlot;
-        if (fifthCandidates.length > 0) {
-            fifthSlot = fifthCandidates[Math.floor(secureRandom() * fifthCandidates.length)];
+        const bottomGreenCandidates = slots.filter(s => s && (s.id === 7 || s.id === 8));
+        let bottomGreenSlot;
+        if (bottomGreenCandidates.length > 0) {
+            bottomGreenSlot = applyMinorityLogic(bottomGreenCandidates)[0];
         } else {
-            // fallback احتياطي إن لم يوجد الكرز أو البطيخ في البيانات
-            fifthSlot = secureRandom() < 0.5
-                ? { id: 4, top: '50%', left: '17%' }
-                : { id: 6, top: '83%', left: '17%' };
+            bottomGreenSlot = { id: 7, top: '83%', left: '50%' }; // fallback
         }
 
         // ---------------------------------------------------------------
-        // الإرجاع النهائي: كائن يحوي المواقع الأربعة + المؤشر الخامس
+        // 3) المؤشر الأحمر (الكرز 4، البطيخ 6)
+        // ---------------------------------------------------------------
+        const redCandidates = slots.filter(s => s && (s.id === 4 || s.id === 6));
+        let redSlot;
+        if (redCandidates.length > 0) {
+            redSlot = applyMinorityLogic(redCandidates)[0];
+        } else {
+            redSlot = { id: 4, top: '50%', left: '17%' }; // fallback
+        }
+
+        // ---------------------------------------------------------------
+        // الإرجاع النهائي
         // ---------------------------------------------------------------
         return {
-            mainSlots: selectedSlots,
-            fifthSlot: fifthSlot
+            smallSlots: selectedSmall,
+            bottomGreenSlot: bottomGreenSlot,
+            redSlot: redSlot
         };
 
     } catch (error) {
