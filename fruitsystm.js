@@ -1,17 +1,15 @@
- /**
+/**
  * ============================================================================
  * fruitsystm.js
  * ملف العقل الرئيسي المستقل لخوارزمية التخمين — النسخة الاحترافية
- * نسخة "القوة العشرية المعزّزة" — عشوائية فائقة الانتشار
  * ============================================================================
  *
+ *  ▸ التعديل الجديد: تقسيم المؤشرات إلى 5 (3 علوية للصغيرة، 2 سفلية للكبيرة)
+ *  ▸ المؤشرات العلوية (3): تختار 3 من 4 (ليمون 1، توت 2، كيوي 3، برقوق 5)
+ *  ▸ المؤشر السفلي الأول (أحمر): يختار 1 من 2 (كرز 4، بطيخ 6)
+ *  ▸ المؤشر السفلي الثاني (أحمر): يختار 1 من 2 (موز 7، فراولة 8)
  *  ▸ عشوائية تشفيرية (Crypto-based RNG) بنمط Fisher-Yates
- *  ▸ خلط متعدد المراحل (Multi-Pass Shuffle) — 3 مراحل افتراضياً
  *  ▸ منطق "الأقلية" (الضغط الأقل = أولوية أعلى) مع كسر نمط معزّز
- *  ▸ [تعديل] تقسيم المؤشرات:
- *       - 3 مؤشرات للفواكه الصغيرة (الليمون 1، التوت 2، الكيوي 3)
- *       - 1 مؤشر أخضر للفواكه الكبيرة السفلية (الموز 7، الفراولة 8)
- *       - 1 مؤشر أحمر للفواكه الكبيرة العلوية (الكرز 4، البطيخ 6)
  *
  * ============================================================================
  */
@@ -86,64 +84,74 @@ function applyMinorityLogic(slots) {
 }
 
 // ============================================================================
-// [4] الدالة الرئيسية — توليد التوقعات مقسمة حسب الطلب
+// [4] الدالة الرئيسية — توليد 5 توقعات مقسمة حسب طلبك
 // ============================================================================
-// ترجع: { smallSlots: [3], bottomGreenSlot: element, redSlot: element }
-// أو null عند فشل التحقق
+// ترجع: { topSlots: [3 عناصر], bottomSlot1: عنصر, bottomSlot2: عنصر }
 // ============================================================================
 function generatePrediction(slots, previousSelection) {
     try {
-        // التحقق من صحة البيانات الأساسية
         if (!slots || slots.length === 0) {
             throw new Error("بيانات الفواكه مفقودة أو غير صالحة.");
         }
 
         // ---------------------------------------------------------------
-        // 1) الفواكه الصغيرة (الليمون 1، التوت 2، الكيوي 3)
+        // تحديد مجموعات الفواكه حسب المناطق
         // ---------------------------------------------------------------
-        const smallCandidates = slots.filter(s => s && (s.id === 1 || s.id === 2 || s.id === 3));
-        
-        // نستخدم منطق الأقلية لترتيبهم
-        let selectedSmall = applyMinorityLogic(smallCandidates);
-        
-        // التأكد من وجود 3 عناصر (بما أنهم 3 أصلاً سيتم اختيارهم جميعاً، لكن نأخذ أول 3 لضمان الأمان)
-        if (selectedSmall.length > 3) {
-            selectedSmall = selectedSmall.slice(0, 3);
-        } else if (selectedSmall.length < 3) {
-            // fallback في حال كانت البيانات ناقصة
-            const remaining = smallCandidates.filter(s => !selectedSmall.includes(s));
-            selectedSmall = selectedSmall.concat(remaining);
+        const topGroupIds = [1, 2, 3, 5]; // ليمون، توت، كيوي، برقوق بنفسجي
+        const bottom1Ids = [4, 6];        // كرز، بطيخ
+        const bottom2Ids = [7, 8];        // موز، فراولة
+
+        const topSlotsAvailable = slots.filter(s => s && topGroupIds.includes(s.id));
+        const bottom1Available = slots.filter(s => s && bottom1Ids.includes(s.id));
+        const bottom2Available = slots.filter(s => s && bottom2Ids.includes(s.id));
+
+        // ---------------------------------------------------------------
+        // 1. اختيار 3 مؤشرات علوية (من أصل 4 فواكه صغيرة)
+        // ---------------------------------------------------------------
+        let selectedTopSlots = [];
+
+        if (!previousSelection || previousSelection.length === 0) {
+            selectedTopSlots = applyMinorityLogic(topSlotsAvailable).slice(0, 3);
+        } else {
+            const notPickedLastTime = topSlotsAvailable.filter(s => !previousSelection.includes(s.id));
+            const pickedLastTime = topSlotsAvailable.filter(s => previousSelection.includes(s.id));
+
+            let partA = applyMinorityLogic(notPickedLastTime);
+            let partB = applyMinorityLogic(pickedLastTime);
+
+            selectedTopSlots = partA.concat(partB).slice(0, 3);
+
+            // استكمال النقص إن وُجد
+            if (selectedTopSlots.length < 3) {
+                const needed = 3 - selectedTopSlots.length;
+                const remaining = shuffleArray(
+                    topSlotsAvailable.filter(s => !selectedTopSlots.includes(s))
+                );
+                selectedTopSlots = selectedTopSlots.concat(remaining.slice(0, needed));
+            }
+        }
+
+        if (selectedTopSlots.length !== 3) {
+            throw new Error("فشل في تحديد المواقع العلوية (العدد غير مطابق).");
         }
 
         // ---------------------------------------------------------------
-        // 2) المؤشر الأخضر السفلي (الموز 7، الفراولة 8)
+        // 2. اختيار المؤشر السفلي الأول (أحمر) - كرز أو بطيخ
         // ---------------------------------------------------------------
-        const bottomGreenCandidates = slots.filter(s => s && (s.id === 7 || s.id === 8));
-        let bottomGreenSlot;
-        if (bottomGreenCandidates.length > 0) {
-            bottomGreenSlot = applyMinorityLogic(bottomGreenCandidates)[0];
-        } else {
-            bottomGreenSlot = { id: 7, top: '83%', left: '50%' }; // fallback
-        }
+        const selectedBottom1 = bottom1Available[Math.floor(secureRandom() * bottom1Available.length)];
 
         // ---------------------------------------------------------------
-        // 3) المؤشر الأحمر (الكرز 4، البطيخ 6)
+        // 3. اختيار المؤشر السفلي الثاني (أحمر) - موز أو فراولة
         // ---------------------------------------------------------------
-        const redCandidates = slots.filter(s => s && (s.id === 4 || s.id === 6));
-        let redSlot;
-        if (redCandidates.length > 0) {
-            redSlot = applyMinorityLogic(redCandidates)[0];
-        } else {
-            redSlot = { id: 4, top: '50%', left: '17%' }; // fallback
-        }
+        const selectedBottom2 = bottom2Available[Math.floor(secureRandom() * bottom2Available.length)];
 
         // ---------------------------------------------------------------
         // الإرجاع النهائي
         // ---------------------------------------------------------------
         return {
-            smallSlots: selectedSmall,
-            bottomGreenSlot: bottomGreenSlot,
-            redSlot: redSlot
+            topSlots: selectedTopSlots,
+            bottomSlot1: selectedBottom1,
+            bottomSlot2: selectedBottom2
         };
 
     } catch (error) {
