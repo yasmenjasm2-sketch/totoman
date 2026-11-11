@@ -444,7 +444,6 @@
 </head>
 <body>
 
-    <!-- 🔒 شاشة التحقق من الاشتراك فقط (بدون كلمة مرور) -->
     <div id="lock-screen" style="display: flex;">
         <div class="lock-visual">
             <div class="lock-ring"></div>
@@ -469,10 +468,13 @@
         <div class="game-container">
             <div class="image-wrapper" id="img-wrap">
                 <img src="vipvip.jpg" alt="Fruit Party" class="game-image">
+                <!-- المؤشرات 1 إلى 3 للفواكه الصغيرة -->
                 <div id="marker-1" class="marker"></div>
                 <div id="marker-2" class="marker"></div>
                 <div id="marker-3" class="marker"></div>
+                <!-- المؤشر 4 للفواكه الكبيرة السفلية (أخضر) -->
                 <div id="marker-4" class="marker"></div>
+                <!-- المؤشر 5 للفواكه الكبيرة العلوية (أحمر) -->
                 <div id="marker-5" class="marker red"></div>
             </div>
         </div>
@@ -518,10 +520,6 @@
         let currentDeviceData = null;
         let subscriptionCheckInterval = null;
 
-        // ============================================================
-        // 🔑 مفتاح الدخول من WebView (Java) — يجب أن يطابق
-        //    WEBVIEW_ACCESS_KEY في ملف AvailableAppsActivity.java
-        // ============================================================
         const WEBVIEW_ACCESS_KEY = "NBRS_2024_VIP_ACCESS_7f3a9c";
 
         function isWebViewSession() {
@@ -546,7 +544,6 @@
         let currentRoundTime = 15;
         let roundInterval;
         let isGuessingAllowed = true;
-        let previousSelection = [];
 
         function initSlotBadges() {
             const wrapper = document.getElementById('img-wrap');
@@ -571,7 +568,6 @@
             updateLiveStats(true);
         }
 
-        // 🛡️ نظام التحقق من الاشتراك عبر Firebase — كما كان قبل
         function checkSubscriptionStatus() {
             db.ref('requests/' + deviceId).on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -629,28 +625,25 @@
             }, 10000);
         }
 
-        // 🚀 تشغيل التطبيق
         window.onload = function() {
-            // إذا كان الطلب قادماً من تطبيق WebView (Java) بعد التحقق من كلمة المرور
-            // → دخول مباشر بدون تحقق من Firebase
             if (isWebViewSession()) {
                 enterGame();
                 return;
             }
-            // وإلا: تحقق من الاشتراك عبر Firebase (كما كان قبل)
             checkSubscriptionStatus();
         };
 
         // ============================================================
-        // منطق اللعبة
+        // منطق اللعبة — التخمين بعد التعديل الجديد
         // ============================================================
         function makeGuess() {
             if (!isGuessingAllowed) return;
             const resultBox = document.getElementById('result-text');
 
-            let prediction = generatePrediction(slots, previousSelection);
+            // استدعاء الخوارزمية
+            let prediction = generatePrediction(slots);
 
-            if (!prediction || !prediction.mainSlots || prediction.mainSlots.length === 0) {
+            if (!prediction) {
                 resultBox.innerText = "❌ خطأ في النظام: لم يتمكن الخادم المستقل من التخمين. يرجى المحاولة مرة أخرى.";
                 resultBox.style.color = "var(--error)";
                 resultBox.style.background = "rgba(255, 84, 112, 0.1)";
@@ -658,15 +651,12 @@
                 return;
             }
 
-            let selectedSlots = prediction.mainSlots;
-
             resultBox.style.color = "var(--text-muted)";
             resultBox.style.background = "rgba(176, 125, 255, 0.05)";
             resultBox.style.borderColor = "rgba(176, 125, 255, 0.12)";
 
-            previousSelection = selectedSlots.map(s => s.id);
-
-            selectedSlots.forEach((slot, index) => {
+            // 1. توزيع المؤشرات الثلاثة الصغيرة (marker-1, 2, 3)
+            prediction.smallSlots.forEach((slot, index) => {
                 let marker = document.getElementById('marker-' + (index + 1));
                 marker.style.top = slot.top;
                 marker.style.left = slot.left;
@@ -677,18 +667,32 @@
                 }, 280);
             });
 
-            const fifthSlot = prediction.fifthSlot;
-            const marker5 = document.getElementById('marker-5');
-            marker5.style.top = fifthSlot.top;
-            marker5.style.left = fifthSlot.left;
+            // 2. المؤشر الأخضر السفلي (marker-4)
+            const bottomGreen = prediction.bottomGreenSlot;
+            let marker4 = document.getElementById('marker-4');
+            marker4.style.top = bottomGreen.top;
+            marker4.style.left = bottomGreen.left;
+            marker4.style.display = 'block';
+            marker4.style.transform = 'translate(-50%, -50%) scale(1.7)';
+            setTimeout(() => {
+                marker4.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 280);
+
+            // 3. المؤشر الأحمر العلوي (marker-5)
+            const redSlot = prediction.redSlot;
+            let marker5 = document.getElementById('marker-5');
+            marker5.style.top = redSlot.top;
+            marker5.style.left = redSlot.left;
             marker5.style.display = 'block';
             marker5.style.transform = 'translate(-50%, -50%) scale(1.8)';
             setTimeout(() => {
                 marker5.style.transform = 'translate(-50%, -50%) scale(1)';
             }, 320);
 
-            const fifthName = fifthSlot.id === 4 ? 'الكرز 🍒' : 'البطيخ 🍉';
-            resultBox.innerText = `🎯 تم تحديد 4 مواقع متوقعة! والمؤشر الأحمر (تخمين خامس) يشير إلى: ${fifthName}`;
+            const redName = redSlot.id === 4 ? 'الكرز 🍒' : 'البطيخ 🍉';
+            const greenName = bottomGreen.id === 7 ? 'الموز 🍌' : 'الفراولة 🍓';
+
+            resultBox.innerText = `🎯 تم تحديد 3 مواقع للفواكه الصغيرة، والمؤشر الأخضر السفلي: ${greenName}، والمؤشر الأحمر: ${redName}`;
             resultBox.classList.remove('active');
             setTimeout(() => { resultBox.classList.add('active'); }, 50);
 
@@ -759,4 +763,4 @@
         }
     </script>
 </body>
-</html>p
+</html>
